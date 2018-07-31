@@ -1,0 +1,95 @@
+import { createExamAttempt } from '../db-handlers/exam-attempt-cud';
+import * as ExamFetch from '../db-handlers/exam-fetch';
+import * as CourseFetch from '../db-handlers/course/course-fetch';
+import * as ExamAttemptFetch from '../db-handlers/exam-attempt-fetch';
+import { createActivity } from '../db-handlers/activities-cud';
+import { getStringByLocale } from '../parsers/intl-string-parser';
+import { toClientUrlId } from '../utils/client-url';
+
+export const takeExam = async (courseId, unitId, viewer, info) => {
+  try {
+    let arrayReturn = await ExamFetch.returnObjectExamAttempt(
+      unitId,
+      courseId,
+      viewer,
+      info
+    );
+    let attempt = await createExamAttempt({
+      exam_id: arrayReturn.exam_id,
+      user_id: viewer.user_id,
+      unit_id: unitId,
+      started_at: arrayReturn.started_at,
+      is_cancelled: false,
+      is_active: true,
+      question_ids: arrayReturn.arrayQuestion
+    });
+
+    if (!attempt) {
+      return { completionObj: { code: '1', msg: 'Invalid attempt' } };
+    }
+    const course = await CourseFetch.findById(courseId);
+    const courseTitle = getStringByLocale(course.title, viewer.locale).text;
+    const courseUrlId = toClientUrlId(courseTitle, course._id);
+
+    createActivity(viewer.user_id, {
+      listDef_value: 'attempted_exam',
+      activity_link: `/courses/${courseUrlId}/grades`,
+      doc_ref: {
+        EmbeddedDocRef: {
+          embedded_doc_refs: [
+            {
+              level: 'course',
+              doc_id: courseId
+            },
+            {
+              level: 'unit',
+              doc_id: unitId
+            },
+            {
+              level: 'exam',
+              doc_id: arrayReturn.exam_id
+            }
+          ]
+        }
+      }
+    });
+    const exam = await ExamFetch.findById(attempt.exam_id);
+    const time_limit = exam.time_limit;
+
+    return {
+      exam_attempt_id: attempt._id,
+      exam_time_limit: time_limit,
+      exam_id: attempt.exam_id,
+      completionObj: {
+        code: '0',
+        msg: ''
+      }
+    };
+  } catch (error) {
+    return { completionObj: { code: '1', msg: error.message } };
+  }
+};
+
+export const leaveExam = async (exam_attempt_id, cancel, viewer, info) => {
+  try {
+    let examattempt = await ExamAttemptFetch.findById(exam_attempt_id);
+    examattempt.submitted_at = new Date();
+    examattempt.is_cancelled = cancel !== false;
+
+    let exam = await ExamFetch.findById(examattempt.exam_id);
+    const timeDiff =
+      (examattempt.submitted_at - examattempt.started_at) / 1000 / 60;
+    examattempt.time_limit_exceeded = timeDiff > exam.time_limit;
+    examattempt.is_active = false;
+    await examattempt.save();
+
+    return {
+      completionObj: {
+        code: '0',
+        msg: ''
+      }
+    };
+  } catch (error) {
+    return { completionObj: { code: '1', msg: error.message } };
+  }
+};
