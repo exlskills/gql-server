@@ -2,7 +2,7 @@
   "name": "gql-server-core",
   "private": true,
   "description": "GraphQL NodeJS Server",
-  "repository": "EXLinc/gql-server-core",
+  "repository": "https://github.com/exlskills/gql-server",
   "version": "0.1.0",
   "scripts": {
     "start": "npm run start:dev",
