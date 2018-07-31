@@ -1,5 +1,5 @@
 {
-  "name": "gql-server-core",
+  "name": "gql-server",
   "description": "EXLskills GraphQL NodeJS API Server",
   "repository": "https://github.com/exlskills/gql-server",
   "version": "0.1.0",
