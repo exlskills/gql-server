@@ -1,7 +1,6 @@
 {
   "name": "gql-server-core",
-  "private": true,
-  "description": "GraphQL NodeJS Server",
+  "description": "EXLskills GraphQL NodeJS API Server",
   "repository": "https://github.com/exlskills/gql-server",
   "version": "0.1.0",
   "scripts": {
@@ -13,8 +12,8 @@
     "build": "babel src -d build --copy-files && npm run build:copy",
     "build:copy": "copyfiles package.json ./build",
     "lint-fix": "eslint --fix .",
-    "docker:build": "docker build -t exlskills/gql-api:latest .",
-    "docker:push": "docker push exlskills/gql-api:latest"
+    "docker:build": "docker build -t exlskills/gql-server:latest .",
+    "docker:push": "docker push exlskills/gql-server:latest"
   },
   "betterScripts": {
     "start-prod": {

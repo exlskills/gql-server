@@ -1,15 +1,17 @@
-# EXLskills GraphQL API
+# EXLskills GraphQL API Server
 
 ## Requirements
 
 You may be able to get away with more/less than what's described below, but we can't recommend anything outside of these options:
 
 Operating Systems:
+
 - Ubuntu 16.04
 - OS X 10.13+
 - Windows has not been thoroughly tested, although it has worked and should work... Windows-related contributions are welcome
 
 Other Dependencies:
+
 - MongoDB v3.4+ (Recommend v3.6+)
 - NodeJS v8.10+
 - NPM v6.1+
@@ -17,9 +19,9 @@ Other Dependencies:
 ## Installation
 
 ```
-git clone https://github.com/exlskills/gql-api
+git clone https://github.com/exlskills/gql-server
 
-cd gql-api
+cd gql-server
 
 npm install
 ```
