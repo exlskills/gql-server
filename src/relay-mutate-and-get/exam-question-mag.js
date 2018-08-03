@@ -58,7 +58,9 @@ export const answerQuestion = async (
         question.question_type == 'MCSA' ||
         question.question_type == 'MCMA'
       ) {
-        const answers = response_data.selected_ids;
+        const answers = response_data.selected_ids.sort(
+          (a, b) => a.seq - b.seq
+        );
         const corrects = [];
         const options = question.data.sort((a, b) => a.seq - b.seq);
         for (let item of options) {
@@ -84,18 +86,23 @@ export const answerQuestion = async (
       updateObject.points = question.points;
       updateObject.pct_score = 100;
     } else if (question.question_type == 'MCMA' && response_data) {
-      const answers = response_data.selected_ids;
+      const answers = response_data.selected_ids.sort((a, b) => a.seq - b.seq);
       let rightOptions = 0;
       let wrongOptions = 0;
+      let totalCorrectAnswers = 0;
+      for (let opt of question.data) {
+        if (opt.is_answer) totalCorrectAnswers++;
+      }
       for (let answer of answers) {
-        const optData = question.data.find(
-          item => item._id.toString() == answer
-        );
-
-        if (optData && optData.is_answer) {
-          rightOptions += 1;
-        } else {
-          wrongOptions += 1;
+        for (let opt of question.data) {
+          if (opt._id.toString() === answer) {
+            if (opt.is_answer) {
+              rightOptions += 1;
+            } else {
+              wrongOptions += 1;
+            }
+            break;
+          }
         }
       }
 
@@ -103,8 +110,7 @@ export const answerQuestion = async (
       if (tmpScore >= 0) {
         updateObject.points = tmpScore;
       }
-
-      updateObject.pct_score = updateObject.points / question.points * 100;
+      updateObject.pct_score = updateObject.points / totalCorrectAnswers * 100;
     } else {
       // TBD
     }

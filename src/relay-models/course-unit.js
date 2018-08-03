@@ -62,7 +62,7 @@ export const CourseUnitType = new GraphQLObjectType({
       type: new GraphQLList(GraphQLString)
     },
     final_exam_weight_pct: {
-      type: new GraphQLNonNull(GraphQLInt)
+      type: new GraphQLNonNull(GraphQLFloat)
     },
     attempts_left: {
       type: GraphQLInt

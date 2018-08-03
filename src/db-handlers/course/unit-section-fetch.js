@@ -27,8 +27,7 @@ export const computeCardEMA = async (userId, questionIds) => {
       arrayScores.push(pct_score);
       sumQuesInters += pct_score;
     }
-    const ema0 = sumQuesInters / quesInters.length;
-    let currEma = ema0;
+    let currEma = sumQuesInters / quesInters.length;
     for (let score of arrayScores) {
       currEma = (score - currEma) * K + currEma;
     }
