@@ -66,9 +66,13 @@ const CourseSchema = new mongoose.Schema(
       required: true
     },
     info_md: {
+      type: IntlStringSchema,
+      required: false
+    },
+    repo_url: {
       type: String,
-      required: true,
-      default: '# Course \n\n Welcome!'
+      required: false,
+      default: null
     },
     verified_cert_cost: {
       type: Number,

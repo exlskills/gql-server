@@ -87,6 +87,9 @@ export const CourseType = new GraphQLObjectType({
     info_md: {
       type: new GraphQLNonNull(GraphQLString)
     },
+    repo_url: {
+      type: GraphQLString
+    },
     verified_cert_cost: {
       type: GraphQLFloat
     },

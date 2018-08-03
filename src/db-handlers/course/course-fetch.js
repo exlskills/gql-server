@@ -339,6 +339,10 @@ export const fetchCourseEntry = async (course_id, viewer, info) => {
     courseRecord.description,
     viewer.locale
   ).text;
+  courseRecord.info_md = getStringByLocale(
+    courseRecord.info_md,
+    viewer.locale
+  ).text;
   try {
     const lastAccessRefsResp = await CardInteraction.findOne({
       user_id: viewer.user_id,
