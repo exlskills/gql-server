@@ -2,11 +2,26 @@ export const resolveLang = async () => [
   {
     label: 'English',
     value: 'en',
-    _id: '123'
+    _id: '_lang_en'
   },
   {
-    label: '中文',
+    label: '中文 (简体)',
     value: 'zh',
-    _id: '456'
+    _id: '_lang_zh'
+  },
+  {
+    label: '中文 (繁體)',
+    value: 'zh-TW',
+    _id: '_lang_zh-TW'
+  },
+  {
+    label: 'Español',
+    value: 'es',
+    _id: '_lang_es'
+  },
+  {
+    label: 'Русский',
+    value: 'ru',
+    _id: '_lang_ru'
   }
 ];
