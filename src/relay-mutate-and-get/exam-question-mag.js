@@ -54,63 +54,67 @@ export const answerQuestion = async (
     if (response_data) {
       updateObject.points = 0;
       updateObject.pct_score = 0;
+
       if (
-        question.question_type == 'MCSA' ||
-        question.question_type == 'MCMA'
+        question.question_type === 'MCSA' ||
+        question.question_type === 'MCMA'
       ) {
-        const answers = response_data.selected_ids.sort(
-          (a, b) => a.seq - b.seq
-        );
-        const corrects = [];
+        is_correct = true;
+        let isAnswer_count = 0;
         const options = question.data.sort((a, b) => a.seq - b.seq);
         for (let item of options) {
           if (item.is_answer) {
-            corrects.push(item._id.toString());
+            isAnswer_count++;
+            if (response_data.selected_ids.indexOf(item._id.toString()) < 0) {
+              is_correct = false;
+            }
           }
           const intlText = getStringByLocale(item.explanation, viewer.locale)
             .text;
           explain_text = `${explain_text}${intlText}\n\n`;
         }
 
-        is_correct =
-          corrects.length == answers.length &&
-          corrects.every(function(u, i) {
-            return u === answers[i];
-          });
+        if (isAnswer_count < response_data.selected_ids.length) {
+          is_correct = false;
+        }
       } else {
         //TBD
       }
     }
 
-    if (question.question_type == 'MCSA' && is_correct) {
+    updateObject.points = 0;
+    updateObject.pct_score = 0;
+    if (question.question_type === 'MCSA' && is_correct) {
       updateObject.points = question.points;
       updateObject.pct_score = 100;
-    } else if (question.question_type == 'MCMA' && response_data) {
-      const answers = response_data.selected_ids.sort((a, b) => a.seq - b.seq);
-      let rightOptions = 0;
-      let wrongOptions = 0;
-      let totalCorrectAnswers = 0;
-      for (let opt of question.data) {
-        if (opt.is_answer) totalCorrectAnswers++;
-      }
-      for (let answer of answers) {
-        for (let opt of question.data) {
-          if (opt._id.toString() === answer) {
-            if (opt.is_answer) {
-              rightOptions += 1;
-            } else {
-              wrongOptions += 1;
-            }
-            break;
+    } else if (question.question_type === 'MCMA' && response_data) {
+      let correctAnswersArray = [];
+      let correctAnswersCount = 0;
+      let incorrectAnswersCount = 0;
+      let totalIsAnswerCount = 0;
+      for (let item of question.data) {
+        if (item.is_answer) {
+          totalIsAnswerCount++;
+          if (response_data.selected_ids.indexOf(item._id.toString()) < 0) {
+            incorrectAnswersCount++;
+          } else {
+            correctAnswersCount++;
+            correctAnswersArray.push(item._id.toString());
           }
         }
       }
-
-      const tmpScore = rightOptions - wrongOptions;
-      if (tmpScore >= 0) {
-        updateObject.points = tmpScore;
+      for (let answerId of response_data.selected_ids) {
+        if (correctAnswersArray.indexOf(answerId) < 0) {
+          incorrectAnswersCount++;
+        }
       }
-      updateObject.pct_score = updateObject.points / totalCorrectAnswers * 100;
+
+      const answerBalance = correctAnswersCount - incorrectAnswersCount;
+      if (answerBalance > 0) {
+        updateObject.points =
+          (question.points / totalIsAnswerCount) * answerBalance;
+        updateObject.pct_score = (updateObject.points / question.points) * 100;
+      }
     } else {
       // TBD
     }
@@ -122,9 +126,9 @@ export const answerQuestion = async (
         updateObject.exam_attempt_id
       );
       const quesInterIdx = examattempt.question_interaction_ids.findIndex(
-        item => item.toString() == record._id.toString()
+        item => item.toString() === record._id.toString()
       );
-      if (quesInterIdx == -1) {
+      if (quesInterIdx === -1) {
         examattempt.question_interaction_ids.push(record._id);
       }
       examattempt.final_grade_pct = await ExamAttemptFetch.computeFinalGrade(
@@ -161,17 +165,17 @@ export const answerQuestion = async (
       const courseData = await CourseFetch.findById(courseId.doc_id);
 
       let unitIndex = courseData.units.Units.findIndex(
-        item => item._id == unitId.doc_id
+        item => item._id === unitId.doc_id
       );
-      if (unitIndex == -1) {
+      if (unitIndex === -1) {
         unitIndex = 0;
       }
       const currUnit = courseData.units.Units[unitIndex];
 
       let sectionIdx = currUnit.sections.Sections.findIndex(
-        item => item._id == sectionId.doc_id
+        item => item._id === sectionId.doc_id
       );
-      if (sectionIdx == -1) {
+      if (sectionIdx === -1) {
         sectionIdx = 0;
       }
 
