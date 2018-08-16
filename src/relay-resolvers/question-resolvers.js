@@ -12,6 +12,7 @@ import {
 import { fromGlobalId } from 'graphql-relay';
 
 export const resolveQuestionEntry = async (obj, args, viewer, info) => {
+  console.log(`in resolveQuestionEntry`);
   const businessKey = '_id';
   const fetchParameters = {};
   if (obj) {
@@ -24,7 +25,12 @@ export const resolveQuestionEntry = async (obj, args, viewer, info) => {
         e => e.param === 'question_id'
       );
       if (questionParam) {
+        console.log(`question param ` + questionParam.value);
         fetchParameters.questionId = fromGlobalId(questionParam.value).id;
+        console.log(
+          `question param - from global id ` +
+            fromGlobalId(questionParam.value).id
+        );
       }
     } else {
       return Promise.reject('invalid args');
@@ -34,6 +40,7 @@ export const resolveQuestionEntry = async (obj, args, viewer, info) => {
   return result[0];
 };
 export const resolveGetQuestion = (obj, args, viewer, info) => {
+  console.log(`in resolveGetQuestion`);
   if (!args || !args.resolverArgs) {
     return attachEmptyFrame();
   }
@@ -58,6 +65,7 @@ export const resolveGetQuestion = (obj, args, viewer, info) => {
   return connectionFromDataSource(execDetails, obj, args, viewer, info);
 };
 export const resolveGetQuestionByExam = (obj, args, viewer, info) => {
+  console.log(`in resolveQuestionByExam`);
   if (!args || !args.resolverArgs) {
     return attachEmptyFrame();
   }

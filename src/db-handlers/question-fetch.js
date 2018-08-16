@@ -7,6 +7,7 @@ import { getUserAnswer } from '../db-handlers/question-interaction-fetch';
 import { toGlobalId } from 'graphql-relay';
 
 export const findById = async (obj_id, viewer, info) => {
+  console.log(`in Question findById`);
   let record;
   try {
     //model, runParams, queryVal, sortVal, selectVal
@@ -17,11 +18,13 @@ export const findById = async (obj_id, viewer, info) => {
   return record;
 };
 
-export const fetchQuestionEntry = (fetchParameters, viewer) => {
+export const fetchQuestionEntry = async (fetchParameters, viewer) => {
+  console.log(`in fetchQuestionEntry`);
   let array = [];
   let elem;
   let viewerLocale = viewer.locale;
   elem = { $match: { _id: fetchParameters.questionId } };
+  //elem = { $match: { _id: '1408bd3fe87b4e4c942cea8688da1e4c_q_0' } };
   array.push(elem);
   elem = {
     $project: {
@@ -38,7 +41,10 @@ export const fetchQuestionEntry = (fetchParameters, viewer) => {
     }
   };
   array.push(elem);
-  return Question.aggregate(array).exec();
+  let result = await Question.aggregate(array).exec();
+  //  console.log(result);
+  // return Question.aggregate(array).exec();
+  return result;
 };
 
 export const getQuestions = async (
@@ -47,6 +53,7 @@ export const getQuestions = async (
   viewerLocale,
   fetchParameters
 ) => {
+  console.log(`in getQuestions`);
   let array = [];
   let elem;
   let sort = { $sort: { index: 1 } };
@@ -125,7 +132,10 @@ export const getQuestions = async (
       question.question_text,
       viewerLocale
     ).text;
-    if (question.question_type == 'MCSA' || question.question_type == 'MCMA') {
+    if (
+      question.question_type === 'MCSA' ||
+      question.question_type === 'MCMA'
+    ) {
       question.data = {
         options: question.data.map(item => ({
           _id: item._id,
@@ -133,7 +143,7 @@ export const getQuestions = async (
           text: getStringByLocale(item.text, viewerLocale).text
         }))
       };
-    } else if (question.question_type == 'WSCQ') {
+    } else if (question.question_type === 'WSCQ') {
       question.data.code = getStringByLocale(
         question.data.code,
         viewerLocale
@@ -146,7 +156,7 @@ export const getQuestions = async (
       question.doc_ref.EmbeddedDocRef.embedded_doc_refs
     ) {
       const cardRef = question.doc_ref.EmbeddedDocRef.embedded_doc_refs.find(
-        item => item.level == 'card'
+        item => item.level === 'card'
       );
       if (cardRef) {
         question.card_id = cardRef.doc_id;
@@ -161,6 +171,7 @@ export const getQuestionsByExam = async (
   viewerLocale,
   fetchParameters
 ) => {
+  console.log(`in getQuestionsByExam`);
   let array = [];
   let elem;
   let sort = { $sort: { sequence: 1 } };
@@ -245,7 +256,10 @@ export const getQuestionsByExam = async (
       question.question_text,
       viewerLocale
     ).text;
-    if (question.question_type == 'MCSA' || question.question_type == 'MCMA') {
+    if (
+      question.question_type === 'MCSA' ||
+      question.question_type === 'MCMA'
+    ) {
       question.data = {
         _id: question._id,
         options: question.data.map(item => ({
@@ -263,7 +277,7 @@ export const getQuestionsByExam = async (
         };
         question.question_answer = JSON.stringify(response);
       }
-    } else if (question.question_type == 'WSCQ') {
+    } else if (question.question_type === 'WSCQ') {
       question.data.code = getStringByLocale(
         question.data.code,
         viewerLocale

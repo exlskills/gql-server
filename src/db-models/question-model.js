@@ -56,14 +56,14 @@ const QuestionSchema = new mongoose.Schema(
   }
 );
 
-QuestionSchema.statics.nomalizeQuestionData = (question, viewerLocale) => {
+QuestionSchema.statics.nomalizeQuestionData = function(question, viewerLocale) {
+  console.log(`in QuestionSchema.statics.nomalizeQuestionData`);
   question.question_text = getStringByLocale(
     question.question_text,
     viewerLocale
   ).text;
   question.hint = getStringByLocale(question.hint, viewerLocale).text;
-
-  if (question.question_type == 'MCSA' || question.question_type == 'MCMA') {
+  if (question.question_type === 'MCSA' || question.question_type === 'MCMA') {
     question.data = {
       _id: question._id,
       options: question.data.map(item => ({
@@ -74,7 +74,7 @@ QuestionSchema.statics.nomalizeQuestionData = (question, viewerLocale) => {
         explanation: getStringByLocale(item.explanation, viewerLocale).text
       }))
     };
-  } else if (question.question_type == 'WSCQ') {
+  } else if (question.question_type === 'WSCQ') {
     question.data.code = getStringByLocale(
       question.data.code,
       viewerLocale
@@ -88,6 +88,7 @@ QuestionSchema.statics.nomalizeQuestionData = (question, viewerLocale) => {
 };
 
 QuestionSchema.methods.updateInfo = async function(data, viewerLocale) {
+  console.log(`in QuestionSchema.methods.updateInfo`);
   if ('tags' in data) {
     this.tags = data.tags;
   }
@@ -113,10 +114,10 @@ QuestionSchema.methods.updateInfo = async function(data, viewerLocale) {
 
   if ('data' in data) {
     const answerData = data.data;
-    if (this.question_type == 'MCSA' || this.question_type == 'MCMA') {
+    if (this.question_type === 'MCSA' || this.question_type === 'MCMA') {
       if (answerData.options && answerData.options.length > 0) {
         for (let opt of answerData.options) {
-          let quesOpt = this.data.find(item => item._id.toString() == opt.id);
+          let quesOpt = this.data.find(item => item._id.toString() === opt.id);
           if (!quesOpt) {
             continue;
           }
@@ -143,13 +144,20 @@ QuestionSchema.methods.updateInfo = async function(data, viewerLocale) {
         }
         this.markModified('data');
       }
-    } else if (this.question_type == 'WSCQ') {
+    } else if (this.question_type === 'WSCQ') {
       if (answerData) {
-        if ('code' in answerData) {
-          this.data.code = updateIntlStringObject(
-            this.data.code,
+        if ('src_files' in answerData) {
+          this.data.src_files = updateIntlStringObject(
+            this.data.src_files,
             viewerLocale,
-            answerData.code
+            answerData.src_files
+          );
+        }
+        if ('tmpl_files' in answerData) {
+          this.data.tmpl_files = updateIntlStringObject(
+            this.data.tmpl_files,
+            viewerLocale,
+            answerData.tmpl_files
           );
         }
         if ('explanation' in answerData) {
@@ -159,17 +167,20 @@ QuestionSchema.methods.updateInfo = async function(data, viewerLocale) {
             answerData.explanation
           );
         }
-        if ('code_tags' in answerData) {
-          this.data.code_tags = answerData.code_tags;
+        if ('test_files' in answerData) {
+          this.data.test_files = answerData.test_files;
+        }
+        if ('grading_tests' in answerData) {
+          this.data.grading_tests = answerData.grading_tests;
+        }
+        if ('grading_strategy' in answerData) {
+          this.data.grading_strategy = answerData.grading_strategy;
         }
         if ('environment_key' in answerData) {
           this.data.environment_key = answerData.environment_key;
         }
         if ('use_advanced_features' in answerData) {
           this.data.use_advanced_features = answerData.use_advanced_features;
-        }
-        if ('validation_code' in answerData) {
-          this.data.validation_code = answerData.validation_code;
         }
       }
     }

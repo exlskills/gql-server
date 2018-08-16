@@ -8,12 +8,28 @@ export default new mongoose.Schema(
       default: new mongoose.Types.ObjectId(),
       auto: true
     },
-    code: {
+    api_version: {
+      type: String,
+      required: true
+    },
+    src_files: {
       type: IntlStringSchema,
       required: true
     },
-    code_tags: {
-      type: [String],
+    test_files: {
+      type: String,
+      required: true
+    },
+    tmpl_files: {
+      type: IntlStringSchema,
+      required: true
+    },
+    grading_strategy: {
+      type: String,
+      required: true
+    },
+    grading_tests: {
+      type: String,
       required: true
     },
     environment_key: {
@@ -26,10 +42,6 @@ export default new mongoose.Schema(
     },
     explanation: {
       type: IntlStringSchema,
-      required: true
-    },
-    validation_code: {
-      type: String,
       required: true
     }
   },

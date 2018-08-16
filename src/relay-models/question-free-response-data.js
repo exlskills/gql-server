@@ -18,8 +18,8 @@ export const QuestionFreeResponseDataType = new GraphQLObjectType({
     code: {
       type: new GraphQLNonNull(GraphQLString)
     },
-    code_tags: {
-      type: new GraphQLNonNull(new GraphQLList(GraphQLString)) // TODO: needs testing
+    grading_tests: {
+      type: new GraphQLNonNull(GraphQLString)
     },
     environment_key: {
       type: new GraphQLNonNull(GraphQLString)

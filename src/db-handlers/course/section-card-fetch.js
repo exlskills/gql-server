@@ -11,6 +11,7 @@ export const findById = async (
   cardId,
   viewerLocale
 ) => {
+  console.log(`Card findById`);
   let array = [];
   let selectFields = {};
 
@@ -158,16 +159,17 @@ export const findById = async (
 };
 
 export const fetchCardByQuestionId = async (questionId, viewerLocale) => {
+  console.log(`in fetchCardByQuestionId`);
   const question = await QuestionFetch.findById(questionId);
   if (!question) {
     return {};
   }
 
   const docRefs = question.doc_ref.EmbeddedDocRef.embedded_doc_refs;
-  const course = docRefs.find(item => item.level == 'course');
-  const unit = docRefs.find(item => item.level == 'unit');
-  const section = docRefs.find(item => item.level == 'section');
-  const card = docRefs.find(item => item.level == 'card');
+  const course = docRefs.find(item => item.level === 'course');
+  const unit = docRefs.find(item => item.level === 'unit');
+  const section = docRefs.find(item => item.level === 'section');
+  const card = docRefs.find(item => item.level === 'card');
 
   if (!course || !unit || !section || !card) {
     return {};
@@ -189,6 +191,7 @@ export const fetchSectionCards = async (
   viewerLocale,
   fetchParameters
 ) => {
+  console.log(`in fetchSectionCards`);
   let sort = { $sort: { index: 1 } };
   let skip = aggregateArray.find(item => !!item.$skip);
   let limit = aggregateArray.find(item => !!item.$limit);
