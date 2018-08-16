@@ -21,7 +21,10 @@ const cfg = {
   public_key_b64: process.env.JWT_PUB_KEY_B64,
   card_ema: {
     n: 10
-  }
+  },
+  wsenv_signaling_url:
+    process.env.WSENV_SIGNALLING_URL ||
+    'https://wsenv-signaling-api.exlcode.com/v0/connect'
 };
 
 export default cfg;

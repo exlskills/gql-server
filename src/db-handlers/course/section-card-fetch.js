@@ -11,7 +11,7 @@ export const findById = async (
   cardId,
   viewerLocale
 ) => {
-  console.log(`Card findById`);
+  console.log(`in Section Card findById`);
   let array = [];
   let selectFields = {};
 
@@ -353,7 +353,8 @@ export const fetchSectionCards = async (
   });
   selectFields.content = 1;
 
-  // lookup for questions
+  // Pull all card's questions data using lookup
+  // TODO: consider pulling questions separately to filter Q's content by Locale and required fields
   array.push({
     $lookup: {
       from: 'question',
@@ -377,14 +378,17 @@ export const fetchSectionCards = async (
   if (limit) array.push(limit);
 
   let result = await Course.aggregate(array).exec();
+  console.log(`fetched card ` + JSON.stringify(result));
 
-  // process intlString object
+  // Normalize questions for Locale and remove extra Qs fields
+  // TODO: see suggestion above to pull Locale-only Qs data from the DB
   let question;
   for (let card of result) {
     let allQuestions = [];
     for (let question of card.questionsList) {
       allQuestions.push(Question.nomalizeQuestionData(question, viewerLocale));
     }
+    // pick a random question to show
     card.question =
       allQuestions[Math.floor(Math.random() * allQuestions.length)];
 

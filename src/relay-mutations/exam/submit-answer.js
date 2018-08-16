@@ -10,7 +10,7 @@ import { fromGlobalId, mutationWithClientMutationId } from 'graphql-relay';
 
 import { CompletionObjType } from '../../relay-models/completion-obj';
 
-import { answerQuestion } from '../../relay-mutate-and-get/exam-question-mag';
+import { gradeQuestionAnswer } from '../../relay-mutate-and-get/exam-question-mag';
 import { CourseUnitType } from '../../relay-models/course-unit';
 import { fetchCourseUnits } from '../../db-handlers/course/course-unit-fetch';
 
@@ -32,8 +32,8 @@ export default mutationWithClientMutationId({
       type: CourseUnitType,
       resolve: async (obj, whatisthis, viewer) => {
         const docRefs = obj.question.doc_ref.EmbeddedDocRef.embedded_doc_refs;
-        const course = docRefs.find(item => item.level == 'course');
-        const unit = docRefs.find(item => item.level == 'unit');
+        const course = docRefs.find(item => item.level === 'course');
+        const unit = docRefs.find(item => item.level === 'unit');
 
         if (!course || !unit) {
           return Promise.reject('invalid docrefs');
@@ -87,25 +87,14 @@ export default mutationWithClientMutationId({
     viewer,
     info
   ) => {
+    console.log(`in SubmitAnswer mutateAndGetPayload`);
+    console.log(`response_data raw ` + response_data);
     const localQuestionId = fromGlobalId(question_id).id;
     const localExamAttemptId = fromGlobalId(exam_attempt_id).id;
-    let resData;
-    try {
-      if (response_data) {
-        resData = JSON.parse(singleToDoubleQuotes(response_data));
-        if (resData.selected_ids) {
-          resData.selected_ids = resData.selected_ids.map(
-            optionId => fromGlobalId(optionId).id
-          );
-        }
-      }
-    } catch (error) {
-      return Promise.reject(error.message);
-    }
-    return answerQuestion(
+    return gradeQuestionAnswer(
       localQuestionId,
       localExamAttemptId,
-      resData,
+      response_data,
       checkAnswer,
       quiz,
       is_quiz_start,

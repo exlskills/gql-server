@@ -4,6 +4,7 @@ import * as projectionWriter from '../../utils/projection-writer';
 import * as util from 'util';
 import Question from '../../db-models/question-model';
 export const fetchCardEntry = async (fetchParameters, viewer) => {
+  console.log(`in fetchCardEntry`);
   let arrayQuestion = [];
   let elemQuestion = { $match: { _id: fetchParameters.questionId } };
   arrayQuestion.push(elemQuestion);
@@ -238,5 +239,7 @@ export const fetchCardEntry = async (fetchParameters, viewer) => {
       )
     }
   });
-  return Course.aggregate(array).exec();
+  let result = await Course.aggregate(array).exec();
+  return result;
+  // return Course.aggregate(array).exec();
 };

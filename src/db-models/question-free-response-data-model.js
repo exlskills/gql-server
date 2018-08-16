@@ -1,7 +1,8 @@
 import mongoose from 'mongoose';
 import IntlStringSchema from './intl-string-model.js';
+import { getStringByLocale } from '../parsers/intl-string-parser';
 
-export default new mongoose.Schema(
+const QuestionFreeResponseSchema = new mongoose.Schema(
   {
     _id: {
       type: mongoose.Schema.Types.ObjectId,
@@ -48,4 +49,22 @@ export default new mongoose.Schema(
   {
     timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' }
   }
+);
+
+QuestionFreeResponseSchema.statics.nomalizeQuestionData = function(
+  question,
+  viewerLocale
+) {
+  console.log(`in QuestionFreeResponseSchema.statics.nomalizeQuestionData`);
+  question.data = {
+    tmpl_files: getStringByLocale(question.data.tmpl_files, viewerLocale).text,
+    explanation: getStringByLocale(question.data.explanation, viewerLocale).text
+  };
+  return question;
+};
+
+export default mongoose.model(
+  'QuestionFreeResponse',
+  QuestionFreeResponseSchema,
+  'questionfreeresonse'
 );

@@ -2,6 +2,7 @@ import { basicFind } from '../db-handlers/basic-query-handler';
 import QuestionInteraction from '../db-models/question-interaction-model.js';
 
 export const findById = async (obj_id, viewer, info) => {
+  console.log(`in Quest Interact findById`);
   let record;
   try {
     //model, runParams, queryVal, sortVal, selectVal
@@ -42,6 +43,7 @@ export const findByQuestionIds = async (
 };
 
 export const getUserAnswer = async (exam_attempt_id, question_id, user_id) => {
+  console.log(`in Quest Interact getUserAnswer`);
   const record = await basicFind(
     QuestionInteraction,
     { isOne: true },
