@@ -9,6 +9,13 @@ import mongoose from 'mongoose';
 import { singleToDoubleQuotes } from '../utils/string-utils';
 import { fromGlobalId } from 'graphql-relay';
 
+import {
+  getWsenvGradingClient,
+  callWsenvGrading
+} from '../utils/wsenv-connect';
+
+import { test_user_files } from '../tests/grading-test-data';
+
 const ObjectId = mongoose.Types.ObjectId;
 
 export const gradeQuestionAnswer = async (
@@ -63,9 +70,33 @@ export const gradeQuestionAnswer = async (
       question.question_type === 'MCSA' ||
       question.question_type === 'MCMA'
     ) {
+      let question1 = await QuestionFetch.findById(
+        'f84e175d65884adaa21af014a9d25e91_q_0',
+        viewer
+      );
+
+      gradingObj = await gradeWSCQQuestionAnswer(
+        question1,
+        response_data,
+        viewer
+      );
+
       gradingObj = await gradeMCQuestionAnswer(question, response_data, viewer);
+    } else if (question.question_type === 'WSCQ') {
+      gradingObj = await gradeWSCQQuestionAnswer(
+        question,
+        response_data,
+        viewer
+      );
     } else {
-      // TODO
+      return {
+        completionObj: {
+          code: '1',
+          msg:
+            'Grading logic not implemented for question type ' +
+            question.question_type
+        }
+      };
     }
 
     questionInteractionInfo.points = gradingObj.points;
@@ -168,13 +199,14 @@ export const gradeQuestionAnswer = async (
 
     return returnData;
   } catch (error) {
+    console.log(`Error 01 ` + error);
     return { completionObj: { code: '1', msg: error.message } };
   }
 };
 
 const gradeMCQuestionAnswer = async (question, response_data, viewer) => {
   console.log(`in gradeMCQuestionAnswer`);
-  // This will be inside try of the calling routine
+  // This is run inside 'try' of the calling routine
   let response_data_adj;
   if (response_data) {
     response_data_adj = JSON.parse(singleToDoubleQuotes(response_data));
@@ -246,12 +278,37 @@ const gradeMCQuestionAnswer = async (question, response_data, viewer) => {
   return { is_correct, explain_text, points, pct_score };
 };
 
-const gradeMCQuestionAnswer = async (question, response_data, viewer) => {
-  console.log(`in gradeMCQuestionAnswer`);
+const gradeWSCQQuestionAnswer = async (question, response_data, viewer) => {
+  console.log(`in gradeWSCQQuestionAnswer`);
+  // This is run inside 'try' of the calling routine
   let is_correct = false;
   let explain_text = '';
   let points = 0;
   let pct_score = 0;
+
+  const wsenvGradingUrl = await getWsenvGradingClient();
+  console.log(`grading url ` + wsenvGradingUrl);
+
+  console.log(`p1_raw ` + question.data.grading_tests);
+  console.log(`p2_raw ` + question.data.test_files);
+  console.log(`p3_raw ` + test_user_files);
+  console.log(`p1 ` + JSON.parse(question.data.grading_tests));
+  console.log(`p2 ` + JSON.parse(question.data.test_files));
+  console.log(`p3 ` + JSON.parse(test_user_files));
+
+  let gradingCallObject = {
+    apiVersion: question.data.api_version,
+    gradingStrategy: question.data.grading_strategy,
+    gradingTests: JSON.parse(question.data.grading_tests),
+    environmentKey: question.data.environment_key,
+    testFiles: JSON.parse(question.data.test_files),
+    userFiles: JSON.parse(test_user_files)
+  };
+
+  const grading_response = await callWsenvGrading(
+    wsenvGradingUrl,
+    gradingCallObject
+  );
 
   return { is_correct, explain_text, points, pct_score };
 };

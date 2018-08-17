@@ -22,9 +22,9 @@ const cfg = {
   card_ema: {
     n: 10
   },
-  wsenv_signaling_url:
+  wsenv_signalling_url:
     process.env.WSENV_SIGNALLING_URL ||
-    'https://wsenv-signaling-api.exlcode.com/v0/connect'
+    'https://wsenv-signalling-api.exlcode.com/v0/connect-grading'
 };
 
 export default cfg;

@@ -58,7 +58,6 @@
     "graphql-server-express": "^1.0.0",
     "jsonwebtoken": "^7.4.1",
     "mongoose": "^5.2.5",
-    "prettier": "^1.14.2",
     "webpack": "2.5.1",
     "webpack-dev-server": "2.4.5"
   },
@@ -71,6 +70,7 @@
     "eslint-config-prettier": "^2.3.0",
     "eslint-plugin-import": "^2.13.0",
     "eslint-plugin-prettier": "^2.1.2",
-    "nodemon": "^1.18.3"
+    "nodemon": "^1.18.3",
+    "prettier": "^1.14.2"
   }
 }
