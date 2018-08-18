@@ -1,6 +1,6 @@
 import { GraphQLList, GraphQLString } from 'graphql';
 import { UserActivityType } from '../../../relay-models/user-activity';
-import { resolveUserActivitiesById } from '../../../relay-resolvers/user-resolvers';
+import { resolveUserActivities } from '../../../relay-resolvers/user-resolvers';
 export default {
   type: new GraphQLList(UserActivityType),
   args: {
@@ -14,5 +14,5 @@ export default {
       type: GraphQLString
     }
   },
-  resolve: resolveUserActivitiesById
+  resolve: resolveUserActivities
 };

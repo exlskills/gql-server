@@ -7,7 +7,7 @@ import moment from 'moment';
 import { getStringByLocale } from '../../parsers/intl-string-parser';
 import { computeCardEMA } from './unit-section-fetch';
 import ExamAttempt from '../../db-models/exam-attempt-model';
-import { fetchLastCancelledAttempt } from '../exam-attempt-fetch';
+import { fetchLastCancelledExamAttempt } from '../exam-attempt-fetch';
 
 export const fetchCourseUnits = async (
   filterValues,
@@ -224,7 +224,7 @@ export const fetchCourseUnits = async (
     } else {
       unitElem.attempts_left = unitElem.attempts_allowed_per_day;
     }
-    let lastCancelled = await fetchLastCancelledAttempt(userId, unitElem._id);
+    let lastCancelled = await fetchLastCancelledExamAttempt(userId, unitElem._id);
     if (lastCancelled && lastCancelled.isContinue == true) {
       unitElem.is_continue_exam = true;
       unitElem.exam_ = lastCancelled._id;
@@ -275,7 +275,7 @@ export const fetchUnitStatus = async (
   for (let unit of result) {
     let examAttempts = [];
     try {
-      examAttempts = await ExamAttemptFetch.findByUserAndUnit(
+      examAttempts = await ExamAttemptFetch.fetchExamAttemptByUserAndUnit(
         fetchParameters.userId,
         unit._id,
         {

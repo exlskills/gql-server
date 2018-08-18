@@ -11,22 +11,23 @@ export const editCard = async (
   data,
   viewer
 ) => {
+  console.log(`in editCard`);
   const course = await CourseFetch.findById(localCourseId);
   if (!course) {
     return Promise.reject(Error('Course is not found'));
   }
 
-  const unit = course.units.Units.find(it => it._id == localUnitId);
+  const unit = course.units.Units.find(it => it._id === localUnitId);
   if (!unit) {
     return Promise.reject(Error('CourseUnit is not found'));
   }
 
-  const section = unit.sections.Sections.find(it => it._id == localSectionId);
+  const section = unit.sections.Sections.find(it => it._id === localSectionId);
   if (!section) {
     return Promise.reject(Error('UnitSection is not found'));
   }
 
-  const card = section.cards.Cards.find(it => it._id == localCardId);
+  const card = section.cards.Cards.find(it => it._id === localCardId);
   if (!card) {
     return Promise.reject(Error('SectionCard is not found'));
   }

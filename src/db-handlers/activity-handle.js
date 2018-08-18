@@ -4,6 +4,7 @@ import Activity from '../db-models/activity-model';
 import moment from 'moment';
 
 export const findById = async (obj_id, viewer, info) => {
+  console.log(`in Activity findById`);
   let record;
   try {
     record = await basicFind(Activity, { isById: true }, obj_id);
@@ -19,6 +20,7 @@ export const fetchActivities = async (
   viewerLocale,
   fetchParameters
 ) => {
+  console.log(`in fetchActivities`);
   let user_id = fetchParameters.user_id;
   let input_date = fetchParameters.input_date;
   let startDate = moment(input_date)

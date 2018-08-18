@@ -4,6 +4,7 @@ import * as projectionWriter from '../../utils/projection-writer';
 import Config from '../.././config';
 
 export const computeCardEMA = async (userId, questionIds) => {
+  console.log(`in computeCardEMA`);
   const N = Config.card_ema.n;
   const K = 2 / (N + 1);
   let quesInters = [];
@@ -43,6 +44,7 @@ export const fetchUnitSections = async (
   viewerLocale,
   fetchParameters
 ) => {
+  console.log(`in fetchUnitSections`);
   let sort = { $sort: { index: 1 } };
   let skip = aggregateArray.find(item => !!item.$skip);
   let limit = aggregateArray.find(item => !!item.$limit);

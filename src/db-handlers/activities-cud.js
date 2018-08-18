@@ -2,6 +2,7 @@ import Activity from '../db-models/activity-model';
 import ListDef from '../db-models/list-def-model';
 
 export const createActivity = async (user_id, object) => {
+  console.log(`in createActivity`);
   try {
     let def = await ListDef.findOne({ value: object.listDef_value }).exec();
     if (!def) {

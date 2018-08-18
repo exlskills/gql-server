@@ -5,6 +5,7 @@ import { getStringByLocale } from '../../parsers/intl-string-parser';
 import ExamAttempt from '../../db-models/exam-attempt-model';
 
 export const fetchUnit = async (unit_id, course_id, user_id, viewer) => {
+  console.log(`in fetchUnit`);
   let array = [];
   let elem;
 

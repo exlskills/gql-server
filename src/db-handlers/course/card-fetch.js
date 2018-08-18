@@ -3,6 +3,7 @@ import Course from '../../db-models/course-model';
 import * as projectionWriter from '../../utils/projection-writer';
 import * as util from 'util';
 import Question from '../../db-models/question-model';
+
 export const fetchCardEntry = async (fetchParameters, viewer) => {
   console.log(`in fetchCardEntry`);
   let arrayQuestion = [];

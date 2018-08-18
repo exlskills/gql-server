@@ -1,4 +1,4 @@
-import { fetchOneVersionedContent } from '../db-handlers/versioned-content/versioned-content-fetch';
+import { fetchVersionedContentById } from '../db-handlers/versioned-content/versioned-content-fetch';
 
 export const getOneVersionedContentRecord = (args, viewer, info) =>
   getOneVersionedContentRecordWorker(args, viewer, info).then(res => {
@@ -19,7 +19,7 @@ const getOneVersionedContentRecordWorker = async (args, viewer, info) => {
   }
 
   try {
-    return await fetchOneVersionedContent(
+    return await fetchVersionedContentById(
       args.content_id,
       version,
       viewer.locale

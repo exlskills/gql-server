@@ -3,6 +3,7 @@ import VersionedContent from '../../db-models/versioned-content-model.js';
 import * as projectionWriter from '../../utils/projection-writer';
 
 export const findById = async (obj_id, viewer, info) => {
+  console.log(` in Versioned Content findById`);
   let record;
   try {
     //model, runParams, queryVal, sortVal, selectVal
@@ -13,7 +14,12 @@ export const findById = async (obj_id, viewer, info) => {
   return record;
 };
 
-export const fetchOneVersionedContent = (content_id, version, viewerLocale) => {
+export const fetchVersionedContentById = (
+  content_id,
+  version,
+  viewerLocale
+) => {
+  console.log(` in fetchVersionedContentById`);
   let array = [];
   let elem;
 

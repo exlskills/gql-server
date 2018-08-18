@@ -8,6 +8,7 @@ export const updateUserCourseRole_Role = async (
   course_id,
   roleArrayObj
 ) => {
+  console.log(`in updateUserCourseRole_Role`);
   let userObj;
   try {
     userObj = await basicFind(User, { isById: true }, user_id);
@@ -48,6 +49,7 @@ export const updateUserCourseRole_Object = async (
   course_id,
   objContent
 ) => {
+  console.log(`in updateUserCourseRole_Object`);
   // This is used to update last_accessed_at
   // course_id is a key field and should never be updated
   // roles are updated via a different method
@@ -81,6 +83,7 @@ export const createUserCourseRole_Object = async (
   course_id,
   objContent
 ) => {
+  console.log(`in createUserCourseRole_Object`);
   // Check the same obj doesn't already exist
   try {
     const userObj = await basicFind(

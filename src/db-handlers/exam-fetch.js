@@ -2,7 +2,9 @@ import { basicFind } from '../db-handlers/basic-query-handler';
 import Exam from '../db-models/exam-model.js';
 import ExamAttempt from '../db-models/exam-attempt-model';
 import Course from '../db-models/course-model';
+
 export const findById = async (obj_id, viewer, info) => {
+  console.log(`in Exam findById`);
   let record;
   try {
     //model, runParams, queryVal, sortVal, selectVal
@@ -12,14 +14,15 @@ export const findById = async (obj_id, viewer, info) => {
   }
   return record;
 };
+
 async function getNextExam(exam_id, user_id, unit_id) {
+  console.log(`in getNextExam`);
   let array = [];
   let elem;
   elem = { $match: { exam_id: exam_id, unit_id: unit_id, user_id: user_id } };
   array.push(elem);
   const response = await ExamAttempt.aggregate(array).exec();
-  if (response.length > 0) return true;
-  return false;
+  return response.length > 0;
 }
 
 function RNG(seed) {
@@ -74,6 +77,7 @@ function make_random_string() {
 }
 
 async function getLocatedExamId(unit_id, course_id, viewer, info) {
+  console.log(`in getLocatedExamId`);
   let array = [];
   let elem;
   elem = { $match: { _id: course_id } };
@@ -115,10 +119,9 @@ async function getLocatedExamId(unit_id, course_id, viewer, info) {
     let id_not_attemp = '';
     let i = randomN;
     for (; i < lengthExam; i++) {
-      let exam = arrayExam[i];
-      const exam_id = exam;
+      const exam_id = arrayExam[i];
       const user_id = viewer.user_id;
-      if (!await getNextExam(exam_id, user_id, unit_id)) {
+      if (!(await getNextExam(exam_id, user_id, unit_id))) {
         id_not_attemp = exam_id;
         return id_not_attemp;
       }
@@ -127,6 +130,7 @@ async function getLocatedExamId(unit_id, course_id, viewer, info) {
     return id_not_attemp;
   }
 }
+
 async function getRandomQuestionIds(exam_id) {
   const exam = await findById(exam_id);
   let secret_seed = make_random_string();
@@ -136,12 +140,14 @@ async function getRandomQuestionIds(exam_id) {
   }
   return { quesIds: arrayQuestion, seed: secret_seed };
 }
+
 export const returnObjectExamAttempt = async (
   unit_id,
   course_id,
   viewer,
   info
 ) => {
+  console.log(`in returnObjectExamAttempt`);
   let exam_id = await getLocatedExamId(unit_id, course_id, viewer, info);
   let { quesIds, seed } = await getRandomQuestionIds(exam_id);
   let started_at = new Date();
@@ -153,7 +159,9 @@ export const returnObjectExamAttempt = async (
     question_count: quesIds.length
   };
 };
+
 export const getOneExam = async (unit_id, course_id, viewer, info) => {
+  console.log(`in getOneExam`);
   let exam_id = await getLocatedExamId(unit_id, course_id, viewer, info);
   return exam_id;
 };

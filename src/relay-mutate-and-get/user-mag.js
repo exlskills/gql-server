@@ -11,7 +11,7 @@ export const updateUserProfile = async (locale, profile, viewer) => {
 
 export const updateUserUnitStatus = async (unit_id, course_id, viewer) => {
   try {
-    const result = await UserCud.updateUserQuizlvl(
+    const result = await UserCud.updateUserQuizLvl(
       viewer.user_id,
       unit_id,
       course_id
