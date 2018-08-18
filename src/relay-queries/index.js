@@ -15,9 +15,11 @@ export default {
   courseUnitSummary: courseQueries.courseUnitSummary,
   cardEntry: courseQueries.sectionCardEntry,
   cardByQuestion: courseQueries.cardByQuestion,
-  userProfile: queryUsers.profile,
   userActivity: queryUsers.userActivity,
-  profileSpecific: queryUsers.profileSpecific,
+  // TODO: in wc, change profileSpecific to userProfile
+  profileSpecific: queryUsers.userProfile,
+  userProfile: queryUsers.userProfile,
+  // TODO: in wc, change userActivityById to userActivity
   userActivityById: queryUsers.userActivityById,
   oneExam: queryExam.oneExam,
   specificExamAttempt: examAttempt.specificExamAttempt,

@@ -3,6 +3,7 @@ import ExamAttempt from '../db-models/exam-attempt-model.js';
 import QuestionInteraction from '../db-models/question-interaction-model';
 
 export const findById = async (obj_id, viewer, info) => {
+  console.log(`in Exam Attempt findById`);
   let record;
   try {
     //model, runParams, queryVal, sortVal, selectVal
@@ -13,7 +14,12 @@ export const findById = async (obj_id, viewer, info) => {
   return record;
 };
 
-export const findByUserAndUnit = async (user_id, unit_id, opts = {}) => {
+export const fetchExamAttemptByUserAndUnit = async (
+  user_id,
+  unit_id,
+  opts = {}
+) => {
+  console.log(`in fetchExamAttemptByUserAndUnit`);
   try {
     const sortVal = opts.sort;
     if (!opts.includeExam) {
@@ -40,12 +46,13 @@ export const findByUserAndUnit = async (user_id, unit_id, opts = {}) => {
 };
 
 export const computeFinalGrade = async quesInteIds => {
+  console.log(`in computeFinalGrade`);
   const result = await QuestionInteraction.aggregate([
     { $match: { _id: { $in: quesInteIds } } }
   ]).exec();
   let sumOfSoc = 0;
   for (let res of result) {
-    if (res.pct_score == null || res.pct_score == '' || isNaN(res.pct_score)) {
+    if (res.pct_score == null || res.pct_score === '' || isNaN(res.pct_score)) {
       res.pct_score = 0;
     }
     sumOfSoc += res.pct_score;
@@ -53,7 +60,8 @@ export const computeFinalGrade = async quesInteIds => {
   return sumOfSoc;
 };
 
-export const fetchLastCancelledAttempt = async (user_id, unit_id) => {
+export const fetchLastCancelledExamAttempt = async (user_id, unit_id) => {
+  console.log(`in fetchLastCancelledExamAttempt`);
   let array = [];
   array.push({
     $match: {

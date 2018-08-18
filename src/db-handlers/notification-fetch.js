@@ -3,6 +3,7 @@ import Notification from '../db-models/notification-model';
 import * as projectionWriter from '../utils/projection-writer';
 
 export const findById = async (obj_id, viewer, info) => {
+  console.log(`in Notification findById`);
   let record;
   try {
     //model, runParams, queryVal, sortVal, selectVal
@@ -29,6 +30,7 @@ export const fetchNotifications = (
   viewerLocale,
   fetchParameters
 ) => {
+  console.log(`in fetchNotifications`);
   let selectFields = {
     notification_link: 1,
     is_read: 1,

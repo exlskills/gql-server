@@ -8,6 +8,7 @@ import mongoose from 'mongoose';
 const ObjectId = mongoose.Types.ObjectId;
 
 export const findById = async (obj_id, viewer, info) => {
+  console.log(`in User findById`);
   let record;
   try {
     //model, runParams, queryVal, sortVal, selectVal
@@ -24,7 +25,8 @@ export const findById = async (obj_id, viewer, info) => {
   return record;
 };
 
-export const findByIdOrgs = async (obj_id, viewer, info) => {
+export const fetchUserOrgsList = async (obj_id, viewer, info) => {
+  console.log(`in fetchUserOrgsList`);
   let record;
   let arrayRet = [];
   let arrayIds = [];
@@ -34,7 +36,11 @@ export const findByIdOrgs = async (obj_id, viewer, info) => {
       {
         isById: true
       },
-      obj_id
+      obj_id,
+      null,
+      {
+        organization_roles: 1
+      }
     );
     let arrayOrgs = record.organization_roles;
     for (let org of arrayOrgs) {
@@ -84,7 +90,9 @@ export const findByIdOrgs = async (obj_id, viewer, info) => {
   };
 };
 
-export const profileById = async (obj_id, viewer, info) => {
+export const fetchUserProfileById = async (obj_id, viewer, info) => {
+  console.log(`in fetchUserProfileById`);
+  // NOTE: do not include sensitive info into the fields selection below
   let record;
   try {
     //model, runParams, queryVal, sortVal, selectVal
@@ -127,6 +135,7 @@ export const fetchUserActivities = async (
   viewer,
   info
 ) => {
+  console.log(`in fetchUserActivities`);
   let record;
 
   const array = [
@@ -167,13 +176,14 @@ export const fetchUserActivities = async (
   }
 };
 
-export const suggetedUser = async (text, stringOrganization, viewer, info) => {
+export const suggestedUser = async (text, stringOrganization, viewer, info) => {
+  console.log(`in suggestedUser`);
   let records;
   let array = [];
   let elem = {};
   let arrayOrganization = stringOrganization.split('|');
 
-  if (arrayOrganization.length > 0 && stringOrganization != '') {
+  if (arrayOrganization.length > 0 && stringOrganization !== '') {
     arrayOrganization = arrayOrganization.splice(
       arrayOrganization.length - 2,
       1

@@ -5,7 +5,7 @@ import { UserType } from '../../../relay-models/user';
 export default {
   type: UserType,
   args: {
-    locale: {
+    user_id: {
       type: GraphQLString
     }
   },

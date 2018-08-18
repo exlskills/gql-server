@@ -1,6 +1,6 @@
 import { basicFind } from '../db-handlers/basic-query-handler';
 import {
-  profileById,
+  fetchUserProfileById,
   fetchUserActivities
 } from '../db-handlers/user/user-fetch';
 import User from '../db-models/user-model';
@@ -9,6 +9,7 @@ import { toGlobalId, fromGlobalId } from 'graphql-relay';
 import moment from 'moment';
 
 export const findUserById = async (user_id, viewer, info) => {
+  console.log(`in findUserById`);
   let userRecord;
   try {
     //model, runParams, queryVal, sortVal, selectVal
@@ -26,11 +27,12 @@ export const findUserById = async (user_id, viewer, info) => {
   return userRecord;
 };
 
-export const resolveUserProfileSpecific = async (obj, args, viewer, info) => {
+export const resolveUserProfile = async (obj, args, viewer, info) => {
+  console.log(`in resolveUserProfile`);
   try {
-    let userId = args && args.user_id ? args.user_id : viewer.user_id;
-    userId = fromGlobalId(userId).id;
-    let userRecord = await profileById(userId, viewer);
+    let userId =
+      args && args.user_id ? fromGlobalId(userId).id : viewer.user_id;
+    let userRecord = await fetchUserProfileById(userId, viewer);
     let locale = viewer.locale;
     return mdbUserToGqlUser(userRecord, { userId, locale });
   } catch (error) {
@@ -38,17 +40,8 @@ export const resolveUserProfileSpecific = async (obj, args, viewer, info) => {
   }
 };
 
-export const resolveUserProfile = async (obj, args, viewer, info) => {
-  try {
-    let userRecord = await profileById(viewer.user_id, viewer);
-    const locale = args && args.locale ? args.locale : viewer.locale;
-    return mdbUserToGqlUser(userRecord, { user_id: viewer.user_id, locale });
-  } catch (error) {
-    return Promise.reject(error);
-  }
-};
-
 export const resolveUserActivities = async (obj, args, viewer, info) => {
+  console.log(`in resolveUserActivities`);
   if (!args || !args.start_date || !args.end_date) {
     return Promise.reject('start_date and end_date are required');
   }
@@ -61,30 +54,9 @@ export const resolveUserActivities = async (obj, args, viewer, info) => {
   startDate = startDate.startOf('day');
   endDate = endDate.endOf('day');
 
-  try {
-    return await fetchUserActivities(
-      viewer.user_id,
-      startDate.toDate(),
-      endDate.toDate()
-    );
-  } catch (error) {
-    return Promise.reject(error);
-  }
-};
+  let userId =
+    args && args.user_id ? fromGlobalId(args.user_id).id : viewer.user_id;
 
-export const resolveUserActivitiesById = async (obj, args, viewer, info) => {
-  if (!args || !args.start_date || !args.end_date) {
-    return Promise.reject('start_date and end_date are required');
-  }
-
-  let startDate = moment(args.start_date, 'YYYY-MM-DD');
-  let endDate = moment(args.end_date, 'YYYY-MM-DD');
-  if (!startDate.isValid() || !endDate.isValid()) {
-    return Promise.reject('start_date and/or end_date are not valid');
-  }
-  startDate = startDate.startOf('day');
-  endDate = endDate.endOf('day');
-  let userId = fromGlobalId(args.user_id).id;
   try {
     return await fetchUserActivities(
       userId,

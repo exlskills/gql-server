@@ -1,11 +1,9 @@
 import userActivity from './user-activity';
-import profile from './profile';
-import profileSpecific from './user-profile-specific';
+import userProfile from './user-profile';
 import userActivityById from './user-activity-by-id';
 
 export default {
-  profile,
-  profileSpecific,
+  userProfile,
   userActivity,
   userActivityById
 };

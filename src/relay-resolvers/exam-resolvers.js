@@ -1,5 +1,5 @@
 import { findById, getOneExam } from '../db-handlers/exam-fetch';
-import { findByUserAndUnit } from '../db-handlers/exam-attempt-fetch';
+import { fetchExamAttemptByUserAndUnit } from '../db-handlers/exam-attempt-fetch';
 import { toGlobalId, fromGlobalId } from 'graphql-relay';
 export const resolveExam = async (obj, args, viewer, info) => {
   try {
@@ -14,7 +14,7 @@ export const resolveExam = async (obj, args, viewer, info) => {
 export const resolveExamAttempt = async (obj, args, viewer, info) => {
   try {
     let unit_id = fromGlobalId(args.unit_id).id;
-    return await findByUserAndUnit(viewer.user_id, unit_id);
+    return await fetchExamAttemptByUserAndUnit(viewer.user_id, unit_id);
   } catch (error) {
     return Promise.reject(error);
   }
