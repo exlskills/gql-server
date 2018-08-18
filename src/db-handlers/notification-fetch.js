@@ -1,6 +1,7 @@
 import { basicFind } from '../db-handlers/basic-query-handler';
 import Notification from '../db-models/notification-model';
 import * as projectionWriter from '../utils/projection-writer';
+import { logger } from '../utils/logger';
 
 export const findById = async (obj_id, viewer, info) => {
   console.log(`in Notification findById`);
@@ -30,7 +31,7 @@ export const fetchNotifications = (
   viewerLocale,
   fetchParameters
 ) => {
-  console.log(`in fetchNotifications`);
+  logger.debug(`in fetchNotifications`);
   let selectFields = {
     notification_link: 1,
     is_read: 1,

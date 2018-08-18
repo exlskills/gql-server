@@ -4,6 +4,7 @@ import * as projectionWriter from '../../utils/projection-writer';
 import { basicFind } from '../../db-handlers/basic-query-handler';
 import { getStringByLocale } from '../../parsers/intl-string-parser';
 import CardInteraction from '../../db-models/card-interaction-model';
+import { logger } from '../../utils/logger';
 
 export const findById = async (obj_id, viewer, info) => {
   console.log(`in Course findById`);
@@ -329,7 +330,7 @@ export const fetchTopic = async (obj_id, viewer, info) => {
   return await ListDef.aggregate(array).exec();
 };
 export const fetchCourseEntry = async (course_id, viewer, info) => {
-  console.log(`in fetchCourseEntry`);
+  logger.debug(`in fetchCourseEntry`);
   let courseRecord = await findById(course_id, viewer, info);
   courseRecord = courseRecord.toObject();
   courseRecord.title = getStringByLocale(

@@ -19,10 +19,13 @@ let graphQLServer;
 mongoose.Promise = global.Promise;
 
 function startGraphQLServer(callback) {
-  let promiseDb = mongoose.connect(config.mongo.uri, {
-    dbName: config.mongo.db,
-    autoReconnect: true
-  });
+  let promiseDb = mongoose.connect(
+    config.mongo.uri,
+    {
+      dbName: config.mongo.db,
+      autoReconnect: true
+    }
+  );
 
   promiseDb
     .then(db => {
