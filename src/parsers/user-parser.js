@@ -1,7 +1,8 @@
 import { getStringByLocale } from './intl-string-parser';
+import { logger } from '../utils/logger';
 
 export const mdbUserToGqlUser = (user, viewer) => {
-  console.log(`in mdbUserToGqlUser`);
+  logger.debug(`in mdbUserToGqlUser`);
   try {
     let gqlUser = user.toObject();
     gqlUser.full_name = getStringByLocale(

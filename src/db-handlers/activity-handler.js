@@ -2,9 +2,10 @@ import { basicFind } from '../db-handlers/basic-query-handler';
 import * as projectionWriter from '../utils/projection-writer';
 import Activity from '../db-models/activity-model';
 import moment from 'moment';
+import { logger } from '../utils/logger';
 
 export const findById = async (obj_id, viewer, info) => {
-  console.log(`in Activity findById`);
+  logger.debug(`in Activity findById`);
   let record;
   try {
     record = await basicFind(Activity, { isById: true }, obj_id);
@@ -20,7 +21,7 @@ export const fetchActivities = async (
   viewerLocale,
   fetchParameters
 ) => {
-  console.log(`in fetchActivities`);
+  logger.debug(`in fetchActivities`);
   let user_id = fetchParameters.user_id;
   let input_date = fetchParameters.input_date;
   let startDate = moment(input_date)

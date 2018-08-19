@@ -22,7 +22,7 @@ export default function aggregateBuilder(sortVal, skipVal, limitVal) {
       returnArray.push({ $skip: skipVal });
     }
   } else {
-    console.error('invalid limitVal in aggregateBuilder:', limitVal);
+    logger.error('invalid limitVal in aggregateBuilder:', limitVal);
   }
 
   return returnArray;

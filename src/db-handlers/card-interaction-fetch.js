@@ -1,8 +1,9 @@
 import { basicFind } from '../db-handlers/basic-query-handler';
 import CardInteraction from '../db-models/card-interaction-model.js';
+import { logger } from '../utils/logger';
 
 export const findById = async (obj_id, viewer, info) => {
-  console.log(`in Card interaction findById`);
+  logger.debug(`in Card interaction findById`);
   let record;
   try {
     //model, runParams, queryVal, sortVal, selectVal

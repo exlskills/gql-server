@@ -1,5 +1,5 @@
 import { GraphQLString } from 'graphql';
-import { resolveCourseUnitSummary } from '../../../relay-resolvers/course-resolvers';
+import { resolveUserCourseExamAttempts } from '../../../relay-resolvers/course-unit-resolvers';
 import { CourseType } from '../../../relay-models/course';
 
 export default {
@@ -9,5 +9,5 @@ export default {
       type: GraphQLString
     }
   },
-  resolve: resolveCourseUnitSummary
+  resolve: resolveUserCourseExamAttempts
 };

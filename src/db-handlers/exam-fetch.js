@@ -2,9 +2,10 @@ import { basicFind } from '../db-handlers/basic-query-handler';
 import Exam from '../db-models/exam-model.js';
 import ExamAttempt from '../db-models/exam-attempt-model';
 import Course from '../db-models/course-model';
+import { logger } from '../utils/logger';
 
 export const findById = async (obj_id, viewer, info) => {
-  console.log(`in Exam findById`);
+  logger.debug(`in Exam findById`);
   let record;
   try {
     //model, runParams, queryVal, sortVal, selectVal
@@ -16,7 +17,7 @@ export const findById = async (obj_id, viewer, info) => {
 };
 
 async function getNextExam(exam_id, user_id, unit_id) {
-  console.log(`in getNextExam`);
+  logger.debug(`in getNextExam`);
   let array = [];
   let elem;
   elem = { $match: { exam_id: exam_id, unit_id: unit_id, user_id: user_id } };
@@ -77,7 +78,7 @@ function make_random_string() {
 }
 
 async function getLocatedExamId(unit_id, course_id, viewer, info) {
-  console.log(`in getLocatedExamId`);
+  logger.debug(`in getLocatedExamId`);
   let array = [];
   let elem;
   elem = { $match: { _id: course_id } };
@@ -147,7 +148,7 @@ export const returnObjectExamAttempt = async (
   viewer,
   info
 ) => {
-  console.log(`in returnObjectExamAttempt`);
+  logger.debug(`in returnObjectExamAttempt`);
   let exam_id = await getLocatedExamId(unit_id, course_id, viewer, info);
   let { quesIds, seed } = await getRandomQuestionIds(exam_id);
   let started_at = new Date();
@@ -161,7 +162,7 @@ export const returnObjectExamAttempt = async (
 };
 
 export const getOneExam = async (unit_id, course_id, viewer, info) => {
-  console.log(`in getOneExam`);
+  logger.debug(`in getOneExam`);
   let exam_id = await getLocatedExamId(unit_id, course_id, viewer, info);
   return exam_id;
 };

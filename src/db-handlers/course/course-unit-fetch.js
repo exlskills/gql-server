@@ -8,13 +8,15 @@ import { getStringByLocale } from '../../parsers/intl-string-parser';
 import { computeCardEMA } from './unit-section-fetch';
 import ExamAttempt from '../../db-models/exam-attempt-model';
 import { fetchLastCancelledExamAttempt } from '../exam-attempt-fetch';
+import { logger } from '../../utils/logger';
 
-export const fetchCourseUnits = async (
+export const fetchCourseUnitsBase = async (
   filterValues,
   aggregateArray,
   viewerLocale,
   fetchParameters
 ) => {
+  logger.debug(`in fetchCourseUnitsBase`);
   let array = [];
   let elem;
 
@@ -121,17 +123,40 @@ export const fetchCourseUnits = async (
     }
   };
   array.push(elem);
-  // array.push(...aggregateArray);
-  // let sort = aggregateArray.find(item => !!item.$sort);
-  let sort = { $sort: { index: 1 } };
-  let skip = aggregateArray.find(item => !!item.$skip);
-  let limit = aggregateArray.find(item => !!item.$limit);
 
-  if (sort) array.push(sort);
-  if (skip) array.push(skip);
-  if (limit) array.push(limit);
+  if (aggregateArray) {
+    // array.push(...aggregateArray);
+    // let sort = aggregateArray.find(item => !!item.$sort);
+    let sort = { $sort: { index: 1 } };
+    let skip = aggregateArray.find(item => !!item.$skip);
+    let limit = aggregateArray.find(item => !!item.$limit);
 
-  let arrayRet = await Course.aggregate(array).exec();
+    if (sort) array.push(sort);
+    if (skip) array.push(skip);
+    if (limit) array.push(limit);
+  }
+
+  let result = await Course.aggregate(array).exec();
+  return result;
+};
+
+export const fetchCourseUnits = async (
+  filterValues,
+  aggregateArray,
+  viewerLocale,
+  fetchParameters
+) => {
+  logger.debug(`in fetchCourseUnits`);
+
+  let arrayRet = await fetchCourseUnitsBase(
+    filterValues,
+    aggregateArray,
+    viewerLocale,
+    fetchParameters
+  );
+
+  const userId = fetchParameters.userId;
+
   let userData = await UserFetch.findById(userId);
   for (let unitElem of arrayRet) {
     unitElem.ema = 0.0;
@@ -205,7 +230,7 @@ export const fetchCourseUnits = async (
       ) {
         let arrayCourseUnitStatus = courserole.course_unit_status;
         for (let unitStatus of arrayCourseUnitStatus) {
-          if (unitStatus.unit_id == unitElem._id) {
+          if (unitStatus.unit_id === unitElem._id) {
             unitElem.quiz_lvl = unitStatus.quiz_lvl;
           }
         }
@@ -224,8 +249,11 @@ export const fetchCourseUnits = async (
     } else {
       unitElem.attempts_left = unitElem.attempts_allowed_per_day;
     }
-    let lastCancelled = await fetchLastCancelledExamAttempt(userId, unitElem._id);
-    if (lastCancelled && lastCancelled.isContinue == true) {
+    let lastCancelled = await fetchLastCancelledExamAttempt(
+      userId,
+      unitElem._id
+    );
+    if (lastCancelled && lastCancelled.isContinue === true) {
       unitElem.is_continue_exam = true;
       unitElem.exam_ = lastCancelled._id;
     }
@@ -233,12 +261,13 @@ export const fetchCourseUnits = async (
   return arrayRet;
 };
 
-export const fetchUnitStatus = async (
+export const fetchUserCourseUnitExamStatus = async (
   filterValues,
   aggregateArray,
   viewerLocale,
   fetchParameters
 ) => {
+  logger.debug(`in fetchUserCourseUnitExamStatus`);
   let array = [];
   let selectFields = {};
 
@@ -295,8 +324,8 @@ export const fetchUnitStatus = async (
       const today = new Date().toDateString();
       unit.attempts = examAttempts.filter(
         item =>
-          item.started_at.toDateString() == today ||
-          (item.submitted_at && item.submitted_at.toDateString() == today)
+          item.started_at.toDateString() === today ||
+          (item.submitted_at && item.submitted_at.toDateString() === today)
       ).length;
 
       unit.attempts_left = unit.attempts_allowed_per_day - unit.attempts;
@@ -318,4 +347,125 @@ export const fetchUnitStatus = async (
   }
 
   return result;
+};
+
+export const fetchUserCourseExamAttemptsByUnit = async (
+  obj_id,
+  viewer,
+  info
+) => {
+  logger.debug(`in fetchUserCourseUnitExamAttempts`);
+  const array = [
+    {
+      $match: {
+        _id: obj_id
+      }
+    },
+    {
+      $project: {
+        units: '$units.Units'
+      }
+    },
+    {
+      $unwind: '$units'
+    },
+    {
+      $project: {
+        'units._id': 1,
+        'units.attempts_allowed_per_day': 1
+      }
+    },
+    {
+      $lookup: {
+        from: 'exam_attempt',
+        localField: 'units._id',
+        foreignField: 'course_unit_id',
+        as: 'exam_attempt'
+      }
+    },
+    {
+      $project: {
+        exam_attempt: {
+          $filter: {
+            input: '$exam_attempt',
+            cond: {
+              $eq: ['$$this.user_id', viewer.user_id]
+            }
+          }
+        },
+        count_exam: {
+          $size: '$exam_attempt'
+        },
+        'units.attempts_allowed_per_day': 1
+      }
+    },
+    {
+      $project: {
+        total: {
+          $subtract: ['$units.attempts_allowed_per_day', '$count_exam']
+        }
+      }
+    }
+  ];
+  return await Course.aggregate(array).exec();
+};
+
+export const fetchCourseUnitById = async (
+  unit_id,
+  course_id,
+  user_id,
+  viewer
+) => {
+  logger.debug(`in fetchCourseUnitById`);
+  let array = [];
+  let elem;
+
+  let viewerLocale = viewer.locale;
+
+  let fetchParameters = {
+    userId: user_id,
+    courseId: course_id,
+    unitId: unit_id
+  };
+
+  let arrayRet = await fetchCourseUnitsBase(
+    null,
+    null,
+    viewerLocale,
+    fetchParameters
+  );
+
+  for (let unitElem of arrayRet) {
+    for (let sectionElem of unitElem.sections_list) {
+      sectionElem.title = getStringByLocale(
+        sectionElem.title,
+        viewerLocale
+      ).text;
+      sectionElem.headline = getStringByLocale(
+        sectionElem.headline,
+        viewerLocale
+      ).text;
+    }
+    unitElem.ema = 0.0;
+    unitElem.quiz_lvl = 0;
+    unitElem.attempts_left = 0;
+    let has_quiz = false;
+    const userattempted = unitElem.user_attempted || [];
+    unitElem.unit_processing = has_quiz ? 0 : -1;
+    unitElem.grade = 0;
+    let arrayAttemp = await ExamAttempt.find({
+      started_at: {
+        $gte: moment().format('YYYY-MM-DD 00:00:00'),
+        $lte: moment().format('YYYY-MM-DD HH:mm:ss')
+      },
+      unit_id: { $eq: unitElem._id }
+    }).exec();
+    if (arrayAttemp.length > 0) {
+      unitElem.attempts_left =
+        unitElem.attempts_allowed_per_day - arrayAttemp.length;
+    } else {
+      unitElem.attempts_left = unitElem.attempts_allowed_per_day;
+    }
+  }
+  return arrayRet[0];
 };

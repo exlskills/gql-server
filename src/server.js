@@ -9,8 +9,9 @@ import mongoose from 'mongoose';
 import config from './config';
 import { Schema } from './schema';
 import * as middleware from './http-middleware';
+import { logger } from './utils/logger';
 
-console.log('Server starting ...');
+logger.info('Server starting ...');
 
 const GRAPHQL_PORT = parseInt(config.http_port);
 
@@ -19,17 +20,20 @@ let graphQLServer;
 mongoose.Promise = global.Promise;
 
 function startGraphQLServer(callback) {
-  let promiseDb = mongoose.connect(config.mongo.uri, {
-    dbName: config.mongo.db,
-    autoReconnect: true
-  });
+  let promiseDb = mongoose.connect(
+    config.mongo.uri,
+    {
+      dbName: config.mongo.db,
+      autoReconnect: true
+    }
+  );
 
   promiseDb
     .then(db => {
-      console.log('Mongoose connected ok ');
+      logger.info('Mongoose connected ok ');
     })
     .catch(err => {
-      console.error('Mongoose connection error:', err.stack);
+      logger.error('Mongoose connection error:', err.stack);
       process.exit(1);
     });
 
@@ -65,7 +69,7 @@ function startGraphQLServer(callback) {
   );
 
   graphQLServer = graphQLApp.listen(GRAPHQL_PORT, () => {
-    console.log(
+    logger.info(
       `GraphQL server is now running on http://localhost:${GRAPHQL_PORT}`
     );
     if (callback) {
@@ -93,9 +97,9 @@ function startServers(callback) {
 
 const watcher = chokidar.watch('/{database,schema}.js');
 watcher.on('change', path => {
-  console.log(`\`${path}\` changed. Restarting.`);
+  logger.debug(`\`${path}\` changed. Restarting.`);
   startServers(() =>
-    console.log('Restart your browser to use the updated schema.')
+    logger.debug('Restart your browser to use the updated schema.')
   );
 });
 

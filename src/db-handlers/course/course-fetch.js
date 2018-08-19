@@ -4,9 +4,10 @@ import * as projectionWriter from '../../utils/projection-writer';
 import { basicFind } from '../../db-handlers/basic-query-handler';
 import { getStringByLocale } from '../../parsers/intl-string-parser';
 import CardInteraction from '../../db-models/card-interaction-model';
+import { logger } from '../../utils/logger';
 
 export const findById = async (obj_id, viewer, info) => {
-  console.log(`in Course findById`);
+  logger.debug(`in Course findById`);
   let record;
   try {
     //model, runParams, queryVal, sortVal, selectVal
@@ -45,7 +46,7 @@ export const fetchCourses = async (
   viewerLocale,
   fetchParameters
 ) => {
-  console.log(`in fetchCourses`);
+  logger.debug(`in fetchCourses`);
   let courseFields = {
     subscription_level: 1,
     enrolled_count: 1,
@@ -256,80 +257,9 @@ export const fetchCourses = async (
   }
   return result;
 };
-export const fetchCourseUnitWithSummary = async (obj_id, viewer, info) => {
-  console.log(`in fetchCourseUnitWithSummary`);
-  const array = [
-    {
-      $match: {
-        _id: obj_id
-      }
-    },
-    {
-      $project: {
-        units: '$units.Units'
-      }
-    },
-    {
-      $unwind: '$units'
-    },
-    {
-      $project: {
-        'units._id': 1,
-        'units.attempts_allowed_per_day': 1
-      }
-    },
-    {
-      $lookup: {
-        from: 'exam_attempt',
-        localField: 'units._id',
-        foreignField: 'course_unit_id',
-        as: 'exam_attempt'
-      }
-    },
-    {
-      $project: {
-        exam_attempt: {
-          $filter: {
-            input: '$exam_attempt',
-            cond: {
-              $eq: ['$$this.user_id', viewer.user_id]
-            }
-          }
-        },
-        count_exam: {
-          $size: '$exam_attempt'
-        },
-        'units.attempts_allowed_per_day': 1
-      }
-    },
-    {
-      $project: {
-        total: {
-          $subtract: ['$units.attempts_allowed_per_day', '$count_exam']
-        }
-      }
-    }
-  ];
-  return await Course.aggregate(array).exec();
-};
-export const fetchTopic = async (obj_id, viewer, info) => {
-  console.log(`in fetchTopic`);
-  let array = [
-    {
-      $match: {
-        type: 'topic'
-      }
-    },
-    {
-      $project: {
-        value: 1
-      }
-    }
-  ];
-  return await ListDef.aggregate(array).exec();
-};
-export const fetchCourseEntry = async (course_id, viewer, info) => {
-  console.log(`in fetchCourseEntry`);
+
+export const fetchCourseById = async (course_id, viewer, info) => {
+  logger.debug(`in fetchCourseById`);
   let courseRecord = await findById(course_id, viewer, info);
   courseRecord = courseRecord.toObject();
   courseRecord.title = getStringByLocale(

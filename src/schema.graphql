@@ -339,7 +339,7 @@ type Query {
   oneExam(unit_id: String, course_id: String): Exam
   specificExamAttempt(unit_id: String): [ExamAttempt]
 
-  # Unit Entry
+  # Course Unit
   unitSpec(course_id: String, unit_id: String): CourseUnit
 
   # Content Latest Version

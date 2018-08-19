@@ -1,9 +1,10 @@
 import mongoose from 'mongoose';
 const ObjectId = mongoose.Types.ObjectId;
 import Notification from '../db-models/notification-model';
+import { logger } from '../utils/logger';
 
 export const createUserNotification = async (user_id, object) => {
-  console.log(`in createUserNotification`);
+  logger.debug(`in createUserNotification`);
   try {
     let userNotif = await Notification.findOne({ user_id }).exec();
     if (!userNotif) {
@@ -27,7 +28,7 @@ export const createUserNotification = async (user_id, object) => {
 };
 
 export const markNotificationAsRead = async (user_id, notif_id) => {
-  console.log(`in markNotificationAsRead`);
+  logger.debug(`in markNotificationAsRead`);
   try {
     let result;
     if (notif_id === 'all') {

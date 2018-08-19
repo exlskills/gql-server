@@ -1,10 +1,10 @@
 import { GraphQLString } from 'graphql';
 import { CourseUnitType } from '../../../relay-models/course-unit';
-import { resolveUnitEntry } from '../../../relay-resolvers/course-resolvers';
+import { resolveCourseUnit } from '../../../relay-resolvers/course-unit-resolvers';
 
 export default {
   type: CourseUnitType,
-  description: 'Unit Entry',
+  description: 'Course Unit',
   args: {
     course_id: {
       type: GraphQLString
@@ -14,5 +14,5 @@ export default {
     }
   },
   resolve: (obj, args, viewer, info) =>
-    resolveUnitEntry(obj, args, viewer, info)
+    resolveCourseUnit(obj, args, viewer, info)
 };

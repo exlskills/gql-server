@@ -20,7 +20,7 @@ export async function basicFind(
   } else if (queryVal) {
     queryFunc = model.find(queryVal);
   } else {
-    console.error('Invalid call parameters provided');
+    logger.error('Invalid call parameters provided');
     return Promise.reject('Invalid call parameters provided');
   }
 
@@ -35,7 +35,7 @@ export async function basicFind(
     result = await queryFunc.exec();
     return result;
   } catch (err) {
-    console.error('Find failed', err);
+    logger.error('Find failed', err);
     return Promise.reject('Find failed', err);
   }
 }
