@@ -1,8 +1,9 @@
 import { basicFind } from '../db-handlers/basic-query-handler';
 import OrganizationInvite from '../db-models/organization-invite-model.js';
+import { logger } from '../utils/logger';
 
 export const findById = async (obj_id, viewer, info) => {
-  console.log(`in Org Invite findById`);
+  logger.debug(`in Org Invite findById`);
   let record;
   try {
     //model, runParams, queryVal, sortVal, selectVal

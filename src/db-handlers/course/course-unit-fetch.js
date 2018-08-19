@@ -8,6 +8,7 @@ import { getStringByLocale } from '../../parsers/intl-string-parser';
 import { computeCardEMA } from './unit-section-fetch';
 import ExamAttempt from '../../db-models/exam-attempt-model';
 import { fetchLastCancelledExamAttempt } from '../exam-attempt-fetch';
+import { logger } from '../../utils/logger';
 
 export const fetchCourseUnits = async (
   filterValues,
@@ -15,6 +16,7 @@ export const fetchCourseUnits = async (
   viewerLocale,
   fetchParameters
 ) => {
+  logger.debug(`in fetchCourseUnits`);
   let array = [];
   let elem;
 
@@ -205,7 +207,7 @@ export const fetchCourseUnits = async (
       ) {
         let arrayCourseUnitStatus = courserole.course_unit_status;
         for (let unitStatus of arrayCourseUnitStatus) {
-          if (unitStatus.unit_id == unitElem._id) {
+          if (unitStatus.unit_id === unitElem._id) {
             unitElem.quiz_lvl = unitStatus.quiz_lvl;
           }
         }
@@ -224,8 +226,11 @@ export const fetchCourseUnits = async (
     } else {
       unitElem.attempts_left = unitElem.attempts_allowed_per_day;
     }
-    let lastCancelled = await fetchLastCancelledExamAttempt(userId, unitElem._id);
-    if (lastCancelled && lastCancelled.isContinue == true) {
+    let lastCancelled = await fetchLastCancelledExamAttempt(
+      userId,
+      unitElem._id
+    );
+    if (lastCancelled && lastCancelled.isContinue === true) {
       unitElem.is_continue_exam = true;
       unitElem.exam_ = lastCancelled._id;
     }
@@ -239,6 +244,7 @@ export const fetchUnitStatus = async (
   viewerLocale,
   fetchParameters
 ) => {
+  logger.debug(`in fetchUnitStatus`);
   let array = [];
   let selectFields = {};
 
@@ -295,8 +301,8 @@ export const fetchUnitStatus = async (
       const today = new Date().toDateString();
       unit.attempts = examAttempts.filter(
         item =>
-          item.started_at.toDateString() == today ||
-          (item.submitted_at && item.submitted_at.toDateString() == today)
+          item.started_at.toDateString() === today ||
+          (item.submitted_at && item.submitted_at.toDateString() === today)
       ).length;
 
       unit.attempts_left = unit.attempts_allowed_per_day - unit.attempts;

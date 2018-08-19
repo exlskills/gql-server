@@ -1,7 +1,8 @@
 import ExamptAttempt from '../db-models/exam-attempt-model';
+import { logger } from '../utils/logger';
 
 export const createExamAttempt = async examObject => {
-  console.log(`in createExamAttempt`);
+  logger.debug(`in createExamAttempt`);
   try {
     return await ExamptAttempt.create(examObject);
   } catch (err) {
@@ -10,7 +11,7 @@ export const createExamAttempt = async examObject => {
 };
 
 export const updateExamAttempt = async (condition, object, opts = {}) => {
-  console.log(`in updateExamAttempt`);
+  logger.debug(`in updateExamAttempt`);
   try {
     const result = await ExamptAttempt.update(condition, object).exec();
     let records;

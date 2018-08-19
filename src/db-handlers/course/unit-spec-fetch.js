@@ -3,9 +3,10 @@ import * as projectionWriter from '../../utils/projection-writer';
 import moment from 'moment';
 import { getStringByLocale } from '../../parsers/intl-string-parser';
 import ExamAttempt from '../../db-models/exam-attempt-model';
+import { logger } from '../../utils/logger';
 
 export const fetchUnit = async (unit_id, course_id, user_id, viewer) => {
-  console.log(`in fetchUnit`);
+  logger.debug(`in fetchUnit`);
   let array = [];
   let elem;
 

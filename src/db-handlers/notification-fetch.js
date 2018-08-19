@@ -4,7 +4,7 @@ import * as projectionWriter from '../utils/projection-writer';
 import { logger } from '../utils/logger';
 
 export const findById = async (obj_id, viewer, info) => {
-  console.log(`in Notification findById`);
+  logger.debug(`in Notification findById`);
   let record;
   try {
     //model, runParams, queryVal, sortVal, selectVal

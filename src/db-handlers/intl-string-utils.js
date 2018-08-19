@@ -1,6 +1,7 @@
+import { logger } from '../utils/logger';
 
 export const setDefaultIntlStringLocale = (field, defLocale) => {
-  console.log(`in setDefaultIntlStringLocale`);
+  logger.debug(`in setDefaultIntlStringLocale`);
   const index = field.intlString.findIndex(item => item.locale === defLocale);
   if (index === -1) {
     return field;
@@ -14,7 +15,7 @@ export const setDefaultIntlStringLocale = (field, defLocale) => {
 };
 
 export const updateIntlStringObject = (field, locale, newVal) => {
-  console.log(` in updateIntlStringObject`);
+  logger.debug(` in updateIntlStringObject`);
   const index = field.intlString.findIndex(item => item.locale === locale);
 
   if (index !== -1) {

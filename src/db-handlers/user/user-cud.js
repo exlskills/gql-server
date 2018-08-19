@@ -5,9 +5,10 @@ import {
   updateIntlStringObject
 } from '../intl-string-utils';
 import { fromGlobalId } from 'graphql-relay';
+import { logger } from '../../utils/logger';
 
 export const createUser = async userObject => {
-  console.log(`in createUser`);
+  logger.debug(`in createUser`);
   const user_id = id_gen();
   userObject._id = user_id;
   try {
@@ -19,7 +20,7 @@ export const createUser = async userObject => {
 };
 
 export const updateUserQuizLvl = async (user_id, unit_id, course_id) => {
-  console.log(` in updateUserQuizLvl`);
+  logger.debug(` in updateUserQuizLvl`);
   let user = await User.findOne({ _id: user_id }).exec();
   unit_id = fromGlobalId(unit_id).id;
   course_id = fromGlobalId(course_id).id;
@@ -79,7 +80,7 @@ export const updateUserQuizLvl = async (user_id, unit_id, course_id) => {
 };
 
 export const updateUserProfile = async (locale, profile) => {
-  console.log(` in updateUserProfile`);
+  logger.debug(` in updateUserProfile`);
   let user = await User.findOne({ _id: profile.id }).exec();
 
   if (user) {

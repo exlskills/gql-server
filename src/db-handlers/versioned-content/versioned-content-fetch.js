@@ -1,9 +1,10 @@
 import { basicFind } from '../../db-handlers/basic-query-handler';
 import VersionedContent from '../../db-models/versioned-content-model.js';
 import * as projectionWriter from '../../utils/projection-writer';
+import { logger } from '../../utils/logger';
 
 export const findById = async (obj_id, viewer, info) => {
-  console.log(` in Versioned Content findById`);
+  logger.debug(` in Versioned Content findById`);
   let record;
   try {
     //model, runParams, queryVal, sortVal, selectVal
@@ -19,7 +20,7 @@ export const fetchVersionedContentById = (
   version,
   viewerLocale
 ) => {
-  console.log(` in fetchVersionedContentById`);
+  logger.debug(` in fetchVersionedContentById`);
   let array = [];
   let elem;
 

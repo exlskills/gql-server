@@ -7,7 +7,7 @@ import CardInteraction from '../../db-models/card-interaction-model';
 import { logger } from '../../utils/logger';
 
 export const findById = async (obj_id, viewer, info) => {
-  console.log(`in Course findById`);
+  logger.debug(`in Course findById`);
   let record;
   try {
     //model, runParams, queryVal, sortVal, selectVal
@@ -46,7 +46,7 @@ export const fetchCourses = async (
   viewerLocale,
   fetchParameters
 ) => {
-  console.log(`in fetchCourses`);
+  logger.debug(`in fetchCourses`);
   let courseFields = {
     subscription_level: 1,
     enrolled_count: 1,
@@ -258,7 +258,7 @@ export const fetchCourses = async (
   return result;
 };
 export const fetchCourseUnitWithSummary = async (obj_id, viewer, info) => {
-  console.log(`in fetchCourseUnitWithSummary`);
+  logger.debug(`in fetchCourseUnitWithSummary`);
   const array = [
     {
       $match: {
@@ -314,7 +314,7 @@ export const fetchCourseUnitWithSummary = async (obj_id, viewer, info) => {
   return await Course.aggregate(array).exec();
 };
 export const fetchTopic = async (obj_id, viewer, info) => {
-  console.log(`in fetchTopic`);
+  logger.debug(`in fetchTopic`);
   let array = [
     {
       $match: {
