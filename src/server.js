@@ -69,7 +69,7 @@ function startGraphQLServer(callback) {
   );
 
   graphQLServer = graphQLApp.listen(GRAPHQL_PORT, () => {
-    logger.debug(
+    logger.info(
       `GraphQL server is now running on http://localhost:${GRAPHQL_PORT}`
     );
     if (callback) {

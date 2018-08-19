@@ -17,6 +17,7 @@ import { NodeInterface } from './node-definitions';
 import { SectionCardConnection, SectionCardType } from './section-card';
 import * as inputTypes from '../relay-queries/input-types';
 import * as courseResolvers from '../relay-resolvers/course-resolvers';
+import { resolveSectionCards } from '../relay-resolvers/section-card-resolvers';
 
 export const UnitSectionType = new GraphQLObjectType({
   name: 'UnitSection',
@@ -53,7 +54,7 @@ export const UnitSectionType = new GraphQLObjectType({
         ...connectionArgs
       },
       resolve: (obj, args, viewer, info) =>
-        courseResolvers.resolveSectionCards(obj, args, viewer, info),
+        resolveSectionCards(obj, args, viewer, info),
       description: 'Section cards'
     }
   }),

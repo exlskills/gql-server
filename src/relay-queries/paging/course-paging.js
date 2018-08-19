@@ -9,13 +9,13 @@ import {
   UnitSectionConnection
 } from '../../relay-models';
 
+import { resolveCourses } from '../../relay-resolvers/course-resolvers';
 import {
-  resolveCourses,
   resolveCourseUnits,
-  resolveSectionCards,
-  resolveUnitSections,
-  resolveUnitStatus
-} from '../../relay-resolvers/course-resolvers';
+  resolveUserCourseUnitExamStatus
+} from '../../relay-resolvers/course-unit-resolvers';
+import { resolveUnitSections } from '../../relay-resolvers/unit-section-resolvers';
+import { resolveSectionCards } from '../../relay-resolvers/section-card-resolvers';
 
 export const coursePaging = {
   type: CourseConnection,
@@ -54,7 +54,7 @@ export const unitPaging = {
     resolveCourseUnits(obj, args, viewer, info)
 };
 
-export const unitStatusPaging = {
+export const userCourseUnitExamStatusPaging = {
   type: CourseUnitConnection,
   description: 'User exam status for Course',
   args: {
@@ -69,7 +69,7 @@ export const unitStatusPaging = {
     },
     ...connectionArgs
   },
-  resolve: resolveUnitStatus
+  resolve: resolveUserCourseUnitExamStatus
 };
 
 export const sectionPaging = {
