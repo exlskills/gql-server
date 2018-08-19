@@ -4,7 +4,7 @@ import { getStringByLocale } from '../parsers/intl-string-parser';
 import * as ExamAttemptFetch from '../db-handlers/exam-attempt-fetch';
 import * as CourseFetch from '../db-handlers/course/course-fetch';
 import { toClientUrlId } from '../utils/client-url';
-
+import { logger } from '../utils/logger';
 import mongoose from 'mongoose';
 import { singleToDoubleQuotes } from '../utils/string-utils';
 import { fromGlobalId } from 'graphql-relay';
@@ -28,7 +28,7 @@ export const gradeQuestionAnswer = async (
   is_last_question,
   viewer
 ) => {
-  console.log(`in gradeQuestionAnswer`);
+  logger.debug(`in gradeQuestionAnswer`);
 
   try {
     let questionInteractionInfo = {
@@ -70,17 +70,6 @@ export const gradeQuestionAnswer = async (
       question.question_type === 'MCSA' ||
       question.question_type === 'MCMA'
     ) {
-      let question1 = await QuestionFetch.findById(
-        'f84e175d65884adaa21af014a9d25e91_q_0',
-        viewer
-      );
-
-      gradingObj = await gradeWSCQQuestionAnswer(
-        question1,
-        response_data,
-        viewer
-      );
-
       gradingObj = await gradeMCQuestionAnswer(question, response_data, viewer);
     } else if (question.question_type === 'WSCQ') {
       gradingObj = await gradeWSCQQuestionAnswer(
@@ -199,13 +188,13 @@ export const gradeQuestionAnswer = async (
 
     return returnData;
   } catch (error) {
-    console.log(`Error 01 ` + error);
+    logger.debug(`Error 01 ` + error);
     return { completionObj: { code: '1', msg: error.message } };
   }
 };
 
 const gradeMCQuestionAnswer = async (question, response_data, viewer) => {
-  console.log(`in gradeMCQuestionAnswer`);
+  logger.debug(`in gradeMCQuestionAnswer`);
   // This is run inside 'try' of the calling routine
   let response_data_adj;
   if (response_data) {
@@ -279,7 +268,12 @@ const gradeMCQuestionAnswer = async (question, response_data, viewer) => {
 };
 
 const gradeWSCQQuestionAnswer = async (question, response_data, viewer) => {
-  console.log(`in gradeWSCQQuestionAnswer`);
+  logger.debug(`in gradeWSCQQuestionAnswer`);
+
+  if (!response_data.user_files) {
+    return { is_correct: false, explain_text: '', points: 0, pct_score: 0 };
+  }
+
   // This is run inside 'try' of the calling routine
   let is_correct = false;
   let explain_text = '';
@@ -287,14 +281,16 @@ const gradeWSCQQuestionAnswer = async (question, response_data, viewer) => {
   let pct_score = 0;
 
   const wsenvGradingUrl = await getWsenvGradingClient();
-  console.log(`grading url ` + wsenvGradingUrl);
+  logger.debug(`grading url ` + wsenvGradingUrl);
 
-  console.log(`p1_raw ` + question.data.grading_tests);
-  console.log(`p2_raw ` + question.data.test_files);
-  console.log(`p3_raw ` + test_user_files);
-  console.log(`p1 ` + JSON.parse(question.data.grading_tests));
-  console.log(`p2 ` + JSON.parse(question.data.test_files));
-  console.log(`p3 ` + JSON.parse(test_user_files));
+  logger.debug(`p1_raw ` + question.data.grading_tests);
+  logger.debug(`p2_raw ` + question.data.test_files);
+  // logger.debug(`p3_raw ` + test_user_files);
+  logger.debug(`p3_raw ` + response_data.user_files);
+  logger.debug(`p1 ` + JSON.parse(question.data.grading_tests));
+  logger.debug(`p2 ` + JSON.parse(question.data.test_files));
+  // logger.debug(`p3 ` + JSON.parse(test_user_files));
+  logger.debug(`p3 ` + JSON.parse(response_data.user_files));
 
   let gradingCallObject = {
     apiVersion: question.data.api_version,
@@ -302,7 +298,8 @@ const gradeWSCQQuestionAnswer = async (question, response_data, viewer) => {
     gradingTests: JSON.parse(question.data.grading_tests),
     environmentKey: question.data.environment_key,
     testFiles: JSON.parse(question.data.test_files),
-    userFiles: JSON.parse(test_user_files)
+    // userFiles: JSON.parse(test_user_files)
+    userFiles: JSON.parse(response_data.user_files)
   };
 
   const grading_response = await callWsenvGrading(

@@ -18,11 +18,8 @@ export const QuestionDataType = new GraphQLObjectType({
   fields: () => ({
     id: globalIdField('QuestionData', obj => obj._id),
     // free_response
-    code: {
+    tmpl_files: {
       type: GraphQLString
-    },
-    code_tags: {
-      type: new GraphQLList(GraphQLString)
     },
     environment_key: {
       type: GraphQLString
@@ -33,7 +30,7 @@ export const QuestionDataType = new GraphQLObjectType({
     explanation: {
       type: GraphQLString
     },
-    validation_code: {
+    src_files: {
       type: GraphQLString
     },
     // multiple

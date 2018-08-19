@@ -414,12 +414,11 @@ type QuestionConnection {
 type QuestionData implements Node {
   # The ID of an object
   id: ID!
-  code: String
-  code_tags: [String]
+  tmpl_files: String
   environment_key: String
   use_advanced_features: Boolean
   explanation: String
-  validation_code: String
+  src_files: String
   options: [QuestionMultipleData]
 }
 

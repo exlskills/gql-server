@@ -1,6 +1,7 @@
 import mongoose from 'mongoose';
 import IntlStringSchema from './intl-string-model.js';
 import { getStringByLocale } from '../parsers/intl-string-parser';
+import { logger } from '../utils/logger';
 
 const QuestionFreeResponseSchema = new mongoose.Schema(
   {
@@ -51,11 +52,11 @@ const QuestionFreeResponseSchema = new mongoose.Schema(
   }
 );
 
-QuestionFreeResponseSchema.statics.nomalizeQuestionData = function(
+QuestionFreeResponseSchema.statics.normalizeQuestionData = function(
   question,
   viewerLocale
 ) {
-  console.log(`in QuestionFreeResponseSchema.statics.nomalizeQuestionData`);
+  logger.debug(`in QuestionFreeResponseSchema.statics.nomalizeQuestionData`);
   question.data = {
     tmpl_files: getStringByLocale(question.data.tmpl_files, viewerLocale).text,
     explanation: getStringByLocale(question.data.explanation, viewerLocale).text

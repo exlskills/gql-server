@@ -13,8 +13,7 @@ import { CompletionObjType } from '../../relay-models/completion-obj';
 import { gradeQuestionAnswer } from '../../relay-mutate-and-get/exam-question-mag';
 import { CourseUnitType } from '../../relay-models/course-unit';
 import { fetchCourseUnits } from '../../db-handlers/course/course-unit-fetch';
-
-import { singleToDoubleQuotes } from '../../utils/string-utils';
+import { logger } from '../../utils/logger';
 
 export default mutationWithClientMutationId({
   name: 'SubmitAnswer',
@@ -87,8 +86,8 @@ export default mutationWithClientMutationId({
     viewer,
     info
   ) => {
-    console.log(`in SubmitAnswer mutateAndGetPayload`);
-    console.log(`response_data raw ` + response_data);
+    logger.debug(`in SubmitAnswer mutateAndGetPayload`);
+    logger.debug(`response_data raw ` + response_data);
     const localQuestionId = fromGlobalId(question_id).id;
     const localExamAttemptId = fromGlobalId(exam_attempt_id).id;
     return gradeQuestionAnswer(

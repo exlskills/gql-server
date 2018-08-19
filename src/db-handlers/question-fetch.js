@@ -5,9 +5,10 @@ import { getStringByLocale } from '../parsers/intl-string-parser';
 import { returnObjectExamAttempt } from '../db-handlers/exam-fetch';
 import { getUserAnswer } from '../db-handlers/question-interaction-fetch';
 import { toGlobalId } from 'graphql-relay';
+import { logger } from '../utils/logger';
 
 export const findById = async (obj_id, viewer, info) => {
-  console.log(`in Question findById`);
+  logger.debug(`in Question findById`);
   let record;
   try {
     //model, runParams, queryVal, sortVal, selectVal
@@ -19,7 +20,7 @@ export const findById = async (obj_id, viewer, info) => {
 };
 
 export const fetchQuestionEntry = async (fetchParameters, viewer) => {
-  console.log(`in fetchQuestionEntry`);
+  logger.debug(`in fetchQuestionEntry`);
   let array = [];
   let elem;
   let viewerLocale = viewer.locale;
@@ -42,7 +43,7 @@ export const fetchQuestionEntry = async (fetchParameters, viewer) => {
   };
   array.push(elem);
   let result = await Question.aggregate(array).exec();
-  //  console.log(result);
+  //  logger.debug(result);
   // return Question.aggregate(array).exec();
   return result;
 };
@@ -53,7 +54,7 @@ export const getQuestions = async (
   viewerLocale,
   fetchParameters
 ) => {
-  console.log(`in getQuestions`);
+  logger.debug(`in getQuestions`);
   let array = [];
   let elem;
   let sort = { $sort: { index: 1 } };
@@ -87,7 +88,7 @@ export const getQuestions = async (
         _id: 1,
         text: 1,
         seq: 1,
-        code: 1
+        tmpl_files: 1
       },
       'hint.intlString': projectionWriter.writeIntlStringFilter(
         'hint',
@@ -105,7 +106,7 @@ export const getQuestions = async (
         _id: 1,
         text: 1,
         seq: 1,
-        code: 1
+        tmpl_files: 1
       },
       hint: projectionWriter.writeIntlStringEval('hint', viewerLocale),
       hint_exists: {
@@ -144,8 +145,8 @@ export const getQuestions = async (
         }))
       };
     } else if (question.question_type === 'WSCQ') {
-      question.data.code = getStringByLocale(
-        question.data.code,
+      question.data.tmpl_files = getStringByLocale(
+        question.data.tmpl_files,
         viewerLocale
       ).text;
     }
@@ -171,7 +172,7 @@ export const getQuestionsByExam = async (
   viewerLocale,
   fetchParameters
 ) => {
-  console.log(`in getQuestionsByExam`);
+  logger.debug(`in getQuestionsByExam`);
   let array = [];
   let elem;
   let sort = { $sort: { sequence: 1 } };
@@ -202,7 +203,7 @@ export const getQuestionsByExam = async (
         _id: 1,
         text: 1,
         seq: 1,
-        code: 1
+        tmpl_files: 1
       },
       'hint.intlString': projectionWriter.writeIntlStringFilter(
         'hint',
@@ -221,7 +222,7 @@ export const getQuestionsByExam = async (
         _id: 1,
         text: 1,
         seq: 1,
-        code: 1
+        tmpl_files: 1
       },
       hint: projectionWriter.writeIntlStringEval('hint', viewerLocale),
       hint_exists: {
@@ -278,8 +279,8 @@ export const getQuestionsByExam = async (
         question.question_answer = JSON.stringify(response);
       }
     } else if (question.question_type === 'WSCQ') {
-      question.data.code = getStringByLocale(
-        question.data.code,
+      question.data.tmpl_files = getStringByLocale(
+        question.data.tmpl_files,
         viewerLocale
       ).text;
     }

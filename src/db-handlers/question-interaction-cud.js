@@ -1,7 +1,8 @@
 import QuestionInteraction from '../db-models/question-interaction-model';
+import { logger } from '../utils/logger';
 
 export const upsertQuestionInteraction = async object => {
-  console.log(`in upsertQuestionInteraction`);
+  logger.debug(`in upsertQuestionInteraction`);
   try {
     const result = await QuestionInteraction.update(
       {

@@ -1,9 +1,8 @@
 import {
   connectionFromDataSource,
-  connectionFromArrayWithFrame,
   attachEmptyFrame
 } from '../paging-processor/connection-from-datasource';
-import * as util from 'util';
+import { logger } from '../utils/logger';
 import {
   fetchQuestionEntry,
   getQuestions,
@@ -12,7 +11,7 @@ import {
 import { fromGlobalId } from 'graphql-relay';
 
 export const resolveQuestionEntry = async (obj, args, viewer, info) => {
-  console.log(`in resolveQuestionEntry`);
+  logger.debug(`in resolveQuestionEntry`);
   const businessKey = '_id';
   const fetchParameters = {};
   if (obj) {
@@ -25,9 +24,9 @@ export const resolveQuestionEntry = async (obj, args, viewer, info) => {
         e => e.param === 'question_id'
       );
       if (questionParam) {
-        console.log(`question param ` + questionParam.value);
+        logger.debug(`question param ` + questionParam.value);
         fetchParameters.questionId = fromGlobalId(questionParam.value).id;
-        console.log(
+        logger.debug(
           `question param - from global id ` +
             fromGlobalId(questionParam.value).id
         );
@@ -40,7 +39,7 @@ export const resolveQuestionEntry = async (obj, args, viewer, info) => {
   return result[0];
 };
 export const resolveGetQuestion = (obj, args, viewer, info) => {
-  console.log(`in resolveGetQuestion`);
+  logger.debug(`in resolveGetQuestion`);
   if (!args || !args.resolverArgs) {
     return attachEmptyFrame();
   }
@@ -65,7 +64,7 @@ export const resolveGetQuestion = (obj, args, viewer, info) => {
   return connectionFromDataSource(execDetails, obj, args, viewer, info);
 };
 export const resolveGetQuestionByExam = (obj, args, viewer, info) => {
-  console.log(`in resolveQuestionByExam`);
+  logger.debug(`in resolveQuestionByExam`);
   if (!args || !args.resolverArgs) {
     return attachEmptyFrame();
   }

@@ -1,6 +1,7 @@
 import mongoose from 'mongoose';
 import IntlStringSchema from './intl-string-model.js';
-import {getStringByLocale} from "../parsers/intl-string-parser";
+import { getStringByLocale } from '../parsers/intl-string-parser';
+import { logger } from '../utils/logger';
 
 const QuestionMultipleSchema = new mongoose.Schema(
   {
@@ -31,11 +32,11 @@ const QuestionMultipleSchema = new mongoose.Schema(
   }
 );
 
-QuestionMultipleSchema.statics.nomalizeQuestionData = function(
+QuestionMultipleSchema.statics.normalizeQuestionData = function(
   question,
   viewerLocale
 ) {
-  console.log(`in QuestionMultipleSchema.statics.nomalizeQuestionData`);
+  logger.debug(`in QuestionMultipleSchema.statics.nomalizeQuestionData`);
   question.data = {
     _id: question._id,
     options: question.data.map(item => ({

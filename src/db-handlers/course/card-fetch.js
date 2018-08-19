@@ -1,11 +1,10 @@
-import { basicFind } from '../../db-handlers/basic-query-handler';
 import Course from '../../db-models/course-model';
 import * as projectionWriter from '../../utils/projection-writer';
-import * as util from 'util';
+import { logger } from '../utils/logger';
 import Question from '../../db-models/question-model';
 
 export const fetchCardEntry = async (fetchParameters, viewer) => {
-  console.log(`in fetchCardEntry`);
+  logger.debug(`in fetchCardEntry`);
   let arrayQuestion = [];
   let elemQuestion = { $match: { _id: fetchParameters.questionId } };
   arrayQuestion.push(elemQuestion);

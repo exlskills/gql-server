@@ -1,18 +1,19 @@
 import config from '../config';
 import Axios from 'axios';
+import { logger } from '../utils/logger';
 
-export const wsenvApiClient = (() => {
-  console.log(`In getApiClient`);
+const wsenvApiClient = () => {
+  logger.debug(`In getApiClient`);
   return Axios.create();
-})();
+};
 
 export const getWsenvGradingClient = async () => {
-  console.log(`In getWsenvGradingClient`);
+  logger.debug(`In getWsenvGradingClient`);
   try {
     const wsenvConnection = await wsenvApiClient.get(
       config.wsenv_signalling_url
     );
-    console.log(`wsenv con ` + wsenvConnection.data.grading_endpoint);
+    logger.debug(`wsenv con ` + wsenvConnection.data.grading_endpoint);
     const wsenvGradingClient = Axios.create({
       baseURL: wsenvConnection.data.grading_endpoint
     });
@@ -23,14 +24,14 @@ export const getWsenvGradingClient = async () => {
 };
 
 export const callWsenvGrading = async (endpointUrl, jsonBody) => {
-  console.log(`In callWsenvGrading`);
+  logger.debug(`In callWsenvGrading`);
   try {
-    console.log(`load ` + JSON.stringify(jsonBody));
+    logger.debug(`load ` + JSON.stringify(jsonBody));
     const gradingResponse = await Axios.post(endpointUrl, jsonBody);
-    console.log(`resp ` + JSON.stringify(gradingResponse.data));
+    logger.debug(`resp ` + JSON.stringify(gradingResponse.data));
     return gradingResponse;
   } catch (err) {
-    console.log(err.response);
+    logger.debug(err.response);
     return Promise.reject(new Error(err));
   }
 };

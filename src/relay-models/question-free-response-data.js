@@ -15,7 +15,7 @@ export const QuestionFreeResponseDataType = new GraphQLObjectType({
   description: 'Question data for the `free_response` question type',
   fields: () => ({
     id: globalIdField('QuestionFreeResponseData', obj => obj._id),
-    code: {
+    tmpl_files: {
       type: new GraphQLNonNull(GraphQLString)
     },
     grading_tests: {
@@ -30,7 +30,7 @@ export const QuestionFreeResponseDataType = new GraphQLObjectType({
     explanation: {
       type: new GraphQLNonNull(GraphQLString)
     },
-    validation_code: {
+    src_files: {
       type: new GraphQLNonNull(GraphQLString)
     }
   }),

@@ -8,6 +8,7 @@ import IntlStringSchema from './intl-string-model';
 import EmbeddedDocRefSchema from './embedded-doc-ref-model';
 import QuestionFreeResponse from './question-free-response-data-model';
 import QuestionMultiple from './question-multiple-data-model';
+import { logger } from '../utils/logger';
 
 const QuestionSchema = new mongoose.Schema(
   {
@@ -58,28 +59,31 @@ const QuestionSchema = new mongoose.Schema(
   }
 );
 
-QuestionSchema.statics.nomalizeQuestionData = function(question, viewerLocale) {
-  console.log(`in QuestionSchema.statics.nomalizeQuestionData`);
-  // console.log(`q_raw ` + JSON.stringify(question));
+QuestionSchema.statics.normalizeQuestionData = function(
+  question,
+  viewerLocale
+) {
+  logger.debug(`in QuestionSchema.statics.nomalizeQuestionData`);
+  // logger.debug(`q_raw ` + JSON.stringify(question));
   question.question_text = getStringByLocale(
     question.question_text,
     viewerLocale
   ).text;
   question.hint = getStringByLocale(question.hint, viewerLocale).text;
   if (question.question_type === 'MCSA' || question.question_type === 'MCMA') {
-    question = QuestionMultiple.nomalizeQuestionData(question, viewerLocale);
+    question = QuestionMultiple.normalizeQuestionData(question, viewerLocale);
   } else if (question.question_type === 'WSCQ') {
-    question = QuestionFreeResponse.nomalizeQuestionData(
+    question = QuestionFreeResponse.normalizeQuestionData(
       question,
       viewerLocale
     );
   }
-  // console.log(`q_normalized ` + JSON.stringify(question));
+  // logger.debug(`q_normalized ` + JSON.stringify(question));
   return question;
 };
 
 QuestionSchema.methods.updateInfo = async function(data, viewerLocale) {
-  console.log(`in QuestionSchema.methods.updateInfo`);
+  logger.debug(`in QuestionSchema.methods.updateInfo`);
   if ('tags' in data) {
     this.tags = data.tags;
   }
