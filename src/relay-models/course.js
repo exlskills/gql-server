@@ -19,7 +19,7 @@ import { CourseUnitConnection } from './course-unit';
 
 import { NodeInterface } from './node-definitions';
 
-import * as courseResolvers from '../relay-resolvers/course-resolvers';
+import { resolveCourseUnits } from '../relay-resolvers/course-unit-resolvers';
 import * as inputTypes from '../relay-queries/input-types';
 
 export const CourseType = new GraphQLObjectType({
@@ -72,7 +72,7 @@ export const CourseType = new GraphQLObjectType({
         ...connectionArgs
       },
       resolve: (obj, args, viewer, info) =>
-        courseResolvers.resolveCourseUnits(obj, args, viewer, info),
+        resolveCourseUnits(obj, args, viewer, info),
       description: 'Course units'
     },
     topics: {

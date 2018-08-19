@@ -1,9 +1,10 @@
 import { basicFind } from '../db-handlers/basic-query-handler';
 import Notification from '../db-models/notification-model';
 import * as projectionWriter from '../utils/projection-writer';
+import { logger } from '../utils/logger';
 
 export const findById = async (obj_id, viewer, info) => {
-  console.log(`in Notification findById`);
+  logger.debug(`in Notification findById`);
   let record;
   try {
     //model, runParams, queryVal, sortVal, selectVal
@@ -24,13 +25,14 @@ export const findById = async (obj_id, viewer, info) => {
  *   {boolean} unread: Whether to fetch only unread notifications
  * @return {Promise} The list of notifications on success, Promise.reject on error.
  */
-export const fetchNotifications = (
+export const fetchNotifications = async (
   filterValues,
   aggregateArray,
   viewerLocale,
   fetchParameters
 ) => {
-  console.log(`in fetchNotifications`);
+  logger.debug(`in fetchNotifications`);
+  logger.debug(`user id ` + fetchParameters.userId);
   let selectFields = {
     notification_link: 1,
     is_read: 1,
@@ -103,5 +105,6 @@ export const fetchNotifications = (
   if (skip) array.push(skip);
   if (limit) array.push(limit);
 
-  return Notification.aggregate(array).exec();
+  const result = await Notification.aggregate(array).exec();
+  return result;
 };

@@ -17,7 +17,7 @@ import {
 import { UnitSectionConnection, UnitSectionType } from './unit-section';
 import { NodeInterface } from './node-definitions';
 
-import { resolveUnitSections } from '../relay-resolvers/course-resolvers';
+import { resolveUnitSections } from '../relay-resolvers/unit-section-resolvers';
 import * as inputTypes from '../relay-queries/input-types';
 
 export const CourseUnitType = new GraphQLObjectType({

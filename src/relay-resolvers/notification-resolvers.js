@@ -15,7 +15,7 @@ export const resolveNotifications = async (obj, args, viewer, info) => {
   const fetchParameters = { userId: viewer.user_id };
 
   if (args.resolverArgs) {
-    const unreadParam = args.resolverArgs.find(e => e.param == 'unread');
+    const unreadParam = args.resolverArgs.find(e => e.param === 'unread');
     if (unreadParam) {
       fetchParameters.unread = true;
     }

@@ -1,14 +1,14 @@
 import User from '../../db-models/user-model';
 import { basicFind } from '../../db-handlers/basic-query-handler';
-
 import * as cudUtils from '../../utils/cud-utils';
+import { logger } from '../../utils/logger';
 
 export const updateUserCourseRole_Role = async (
   user_id,
   course_id,
   roleArrayObj
 ) => {
-  console.log(`in updateUserCourseRole_Role`);
+  logger.debug(`in updateUserCourseRole_Role`);
   let userObj;
   try {
     userObj = await basicFind(User, { isById: true }, user_id);
@@ -49,7 +49,7 @@ export const updateUserCourseRole_Object = async (
   course_id,
   objContent
 ) => {
-  console.log(`in updateUserCourseRole_Object`);
+  logger.debug(`in updateUserCourseRole_Object`);
   // This is used to update last_accessed_at
   // course_id is a key field and should never be updated
   // roles are updated via a different method
@@ -83,7 +83,7 @@ export const createUserCourseRole_Object = async (
   course_id,
   objContent
 ) => {
-  console.log(`in createUserCourseRole_Object`);
+  logger.debug(`in createUserCourseRole_Object`);
   // Check the same obj doesn't already exist
   try {
     const userObj = await basicFind(

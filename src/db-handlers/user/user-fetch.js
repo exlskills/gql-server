@@ -4,11 +4,12 @@ import * as projectionWriter from '../../utils/projection-writer';
 import Activity from '../../db-models/activity-model';
 import Organization from '../../db-models/organization-model';
 import mongoose from 'mongoose';
+import { logger } from '../../utils/logger';
 
 const ObjectId = mongoose.Types.ObjectId;
 
 export const findById = async (obj_id, viewer, info) => {
-  console.log(`in User findById`);
+  logger.debug(`in User findById`);
   let record;
   try {
     //model, runParams, queryVal, sortVal, selectVal
@@ -26,7 +27,7 @@ export const findById = async (obj_id, viewer, info) => {
 };
 
 export const fetchUserOrgsList = async (obj_id, viewer, info) => {
-  console.log(`in fetchUserOrgsList`);
+  logger.debug(`in fetchUserOrgsList`);
   let record;
   let arrayRet = [];
   let arrayIds = [];
@@ -91,7 +92,7 @@ export const fetchUserOrgsList = async (obj_id, viewer, info) => {
 };
 
 export const fetchUserProfileById = async (obj_id, viewer, info) => {
-  console.log(`in fetchUserProfileById`);
+  logger.debug(`in fetchUserProfileById`);
   // NOTE: do not include sensitive info into the fields selection below
   let record;
   try {
@@ -135,7 +136,7 @@ export const fetchUserActivities = async (
   viewer,
   info
 ) => {
-  console.log(`in fetchUserActivities`);
+  logger.debug(`in fetchUserActivities`);
   let record;
 
   const array = [
@@ -177,7 +178,7 @@ export const fetchUserActivities = async (
 };
 
 export const suggestedUser = async (text, stringOrganization, viewer, info) => {
-  console.log(`in suggestedUser`);
+  logger.debug(`in suggestedUser`);
   let records;
   let array = [];
   let elem = {};

@@ -1,7 +1,7 @@
 import { GraphQLNonNull, GraphQLString } from 'graphql';
 
 import { SectionCardType } from '../../../relay-models';
-import { resolveCardByQuestion } from '../../../relay-resolvers/course-resolvers';
+import { resolveCardByQuestion } from '../../../relay-resolvers/section-card-resolvers';
 
 export default {
   type: SectionCardType,

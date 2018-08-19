@@ -3,11 +3,11 @@ import {
   connectionFromArrayWithFrame,
   attachEmptyFrame
 } from '../paging-processor/connection-from-datasource';
-
-import { fetchActivities } from '../db-handlers/activity-handle';
+import { fetchActivities } from '../db-handlers/activity-handler';
+import { logger } from '../utils/logger';
 
 export const resolveActivities = async (obj, args, viewer, info) => {
-  console.log(`in resolveActivities`);
+  logger.debug(`in resolveActivities`);
   const businessKey = '_id';
   const fetchParameters = {};
   fetchParameters.user_id = viewer.user_id;

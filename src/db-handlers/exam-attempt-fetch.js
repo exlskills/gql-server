@@ -1,9 +1,10 @@
 import { basicFind } from '../db-handlers/basic-query-handler';
 import ExamAttempt from '../db-models/exam-attempt-model.js';
 import QuestionInteraction from '../db-models/question-interaction-model';
+import { logger } from '../utils/logger';
 
 export const findById = async (obj_id, viewer, info) => {
-  console.log(`in Exam Attempt findById`);
+  logger.debug(`in Exam Attempt findById`);
   let record;
   try {
     //model, runParams, queryVal, sortVal, selectVal
@@ -19,7 +20,7 @@ export const fetchExamAttemptByUserAndUnit = async (
   unit_id,
   opts = {}
 ) => {
-  console.log(`in fetchExamAttemptByUserAndUnit`);
+  logger.debug(`in fetchExamAttemptByUserAndUnit`);
   try {
     const sortVal = opts.sort;
     if (!opts.includeExam) {
@@ -46,7 +47,7 @@ export const fetchExamAttemptByUserAndUnit = async (
 };
 
 export const computeFinalGrade = async quesInteIds => {
-  console.log(`in computeFinalGrade`);
+  logger.debug(`in computeFinalGrade`);
   const result = await QuestionInteraction.aggregate([
     { $match: { _id: { $in: quesInteIds } } }
   ]).exec();
@@ -61,7 +62,7 @@ export const computeFinalGrade = async quesInteIds => {
 };
 
 export const fetchLastCancelledExamAttempt = async (user_id, unit_id) => {
-  console.log(`in fetchLastCancelledExamAttempt`);
+  logger.debug(`in fetchLastCancelledExamAttempt`);
   let array = [];
   array.push({
     $match: {

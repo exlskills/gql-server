@@ -1,8 +1,8 @@
 import Course from '../../db-models/course-model';
 import * as QuestionFetch from '../../db-handlers/question-fetch';
 import Question from '../../db-models/question-model';
-
 import * as projectionWriter from '../../utils/projection-writer';
+import { logger } from '../../utils/logger';
 
 export const findById = async (
   courseId,
@@ -11,7 +11,7 @@ export const findById = async (
   cardId,
   viewerLocale
 ) => {
-  console.log(`in Section Card findById`);
+  logger.debug(`in Section Card findById`);
   let array = [];
   let selectFields = {};
 
@@ -159,7 +159,7 @@ export const findById = async (
 };
 
 export const fetchCardByQuestionId = async (questionId, viewerLocale) => {
-  console.log(`in fetchCardByQuestionId`);
+  logger.debug(`in fetchCardByQuestionId`);
   const question = await QuestionFetch.findById(questionId);
   if (!question) {
     return {};
@@ -191,7 +191,7 @@ export const fetchSectionCards = async (
   viewerLocale,
   fetchParameters
 ) => {
-  console.log(`in fetchSectionCards`);
+  logger.debug(`in fetchSectionCards`);
   let sort = { $sort: { index: 1 } };
   let skip = aggregateArray.find(item => !!item.$skip);
   let limit = aggregateArray.find(item => !!item.$limit);

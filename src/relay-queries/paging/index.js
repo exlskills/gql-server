@@ -3,7 +3,7 @@ import {
   unitPaging,
   sectionPaging,
   cardPaging,
-  unitStatusPaging
+  userCourseUnitExamStatusPaging
 } from './course-paging';
 import { questionPaging, questionPagingExam } from './question';
 
@@ -14,7 +14,7 @@ export default {
   notificationPaging,
   coursePaging,
   unitPaging,
-  unitStatusPaging,
+  userCourseUnitExamStatusPaging,
   sectionPaging,
   cardPaging,
   activityPaging,

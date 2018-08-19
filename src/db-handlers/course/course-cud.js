@@ -2,6 +2,7 @@ import * as CourseFetch from '../../db-handlers/course/course-fetch';
 import * as QuestionFetch from '../../db-handlers/question-fetch';
 import * as VersionedContent from '../../db-handlers/versioned-content/versioned-content-fetch';
 import { updateIntlStringObject } from '../../parsers/intl-string-parser';
+import { logger } from '../../utils/logger';
 
 export const editCard = async (
   localCourseId,
@@ -11,7 +12,7 @@ export const editCard = async (
   data,
   viewer
 ) => {
-  console.log(`in editCard`);
+  logger.debug(`in editCard`);
   const course = await CourseFetch.findById(localCourseId);
   if (!course) {
     return Promise.reject(Error('Course is not found'));

@@ -12,7 +12,8 @@ import examAttempt from './no-paging/exam-attempt';
 export default {
   node: NodeField,
   courseById: courseQueries.courseById,
-  courseUnitSummary: courseQueries.courseUnitSummary,
+  // TODO: in wc, rename courseUnitSummary to courseUserExamAttempts
+  courseUnitSummary: courseQueries.courseUserExamAttempts,
   cardEntry: courseQueries.sectionCardEntry,
   cardByQuestion: courseQueries.cardByQuestion,
   userActivity: queryUsers.userActivity,
@@ -23,12 +24,14 @@ export default {
   userActivityById: queryUsers.userActivityById,
   oneExam: queryExam.oneExam,
   specificExamAttempt: examAttempt.specificExamAttempt,
-  unitSpec: courseQueries.unitSpec,
+  // TODO: in wc, rename unitSpec to courseUnit
+  unitSpec: courseQueries.courseUnit,
   oneVersionedContent: queryVersionedContents.oneVersionedContent,
   activityPaging: pagingQueries.activityPaging,
   coursePaging: pagingQueries.coursePaging,
   unitPaging: pagingQueries.unitPaging,
-  unitStatusPaging: pagingQueries.unitStatusPaging,
+  // TODO: in wc, rename unitStatusPaging to userCourseUnitExamStatusPaging
+  unitStatusPaging: pagingQueries.userCourseUnitExamStatusPaging,
   sectionPaging: pagingQueries.sectionPaging,
   cardPaging: pagingQueries.cardPaging,
   notificationPaging: pagingQueries.notificationPaging,

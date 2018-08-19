@@ -5,11 +5,12 @@ import {
 } from '../db-handlers/user/user-fetch';
 import User from '../db-models/user-model';
 import { mdbUserToGqlUser } from '../parsers/user-parser';
-import { toGlobalId, fromGlobalId } from 'graphql-relay';
+import { fromGlobalId } from 'graphql-relay';
 import moment from 'moment';
+import { logger } from '../utils/logger';
 
 export const findUserById = async (user_id, viewer, info) => {
-  console.log(`in findUserById`);
+  logger.debug(`in findUserById`);
   let userRecord;
   try {
     //model, runParams, queryVal, sortVal, selectVal
@@ -28,7 +29,7 @@ export const findUserById = async (user_id, viewer, info) => {
 };
 
 export const resolveUserProfile = async (obj, args, viewer, info) => {
-  console.log(`in resolveUserProfile`);
+  logger.debug(`in resolveUserProfile`);
   try {
     let userId =
       args && args.user_id ? fromGlobalId(userId).id : viewer.user_id;
@@ -41,7 +42,7 @@ export const resolveUserProfile = async (obj, args, viewer, info) => {
 };
 
 export const resolveUserActivities = async (obj, args, viewer, info) => {
-  console.log(`in resolveUserActivities`);
+  logger.debug(`in resolveUserActivities`);
   if (!args || !args.start_date || !args.end_date) {
     return Promise.reject('start_date and end_date are required');
   }

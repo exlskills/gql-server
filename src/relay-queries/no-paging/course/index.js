@@ -1,15 +1,15 @@
 import courseById from './course-by-id';
-import courseUnitSummary from './course-unit-summary';
+import courseUserExamAttempts from './course-user-exam-attempts';
 import sectionCardEntry from './card-entry';
 import cardByQuestion from './card-by-question';
 import topicFilter from './topic-filter';
-import unitSpec from './unit-specific';
+import courseUnit from './course-unit';
 
 export default {
   courseById,
-  courseUnitSummary,
+  courseUserExamAttempts,
   sectionCardEntry,
   cardByQuestion,
   topicFilter,
-  unitSpec
+  courseUnit
 };
