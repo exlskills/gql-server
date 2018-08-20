@@ -25,7 +25,6 @@ export const fetchQuestionEntry = async (fetchParameters, viewer) => {
   let elem;
   let viewerLocale = viewer.locale;
   elem = { $match: { _id: fetchParameters.questionId } };
-  //elem = { $match: { _id: '1408bd3fe87b4e4c942cea8688da1e4c_q_0' } };
   array.push(elem);
   elem = {
     $project: {

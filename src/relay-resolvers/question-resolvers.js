@@ -38,6 +38,7 @@ export const resolveQuestionEntry = async (obj, args, viewer, info) => {
   let result = await fetchQuestionEntry(fetchParameters, viewer);
   return result[0];
 };
+
 export const resolveGetQuestion = (obj, args, viewer, info) => {
   logger.debug(`in resolveGetQuestion`);
   if (!args || !args.resolverArgs) {

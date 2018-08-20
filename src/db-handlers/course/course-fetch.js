@@ -250,15 +250,14 @@ export const fetchCourses = async (
   if (limit) array.push(limit);
 
   const result = await Course.aggregate(array).exec();
-  for (let item of result) {
-    item.logo_url =
-      item.logo_url ||
-      'http://drive.edge-works.net/index.php/s/Cql8UefvAA20rXi/download';
-  }
   return result;
 };
 
-export const fetchCourseById = async (course_id, viewer, info) => {
+export const fetchCourseAndCardInteraction = async (
+  course_id,
+  viewer,
+  info
+) => {
   logger.debug(`in fetchCourseById`);
   let courseRecord = await findById(course_id, viewer, info);
   courseRecord = courseRecord.toObject();

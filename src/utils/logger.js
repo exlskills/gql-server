@@ -23,10 +23,14 @@ let options = {
     colorize: true
   },
   console: {
-    level: 'debug',
+    level: process.env.NODE_ENV === 'production' ? 'info' : 'debug',
     handleExceptions: true,
-    json: false,
-    colorize: true
+    format: winston.format.combine(
+      winston.format.timestamp(),
+      winston.format.printf(
+        info => `${info.timestamp} ${info.level}: ${info.message}`
+      )
+    )
   }
 };
 

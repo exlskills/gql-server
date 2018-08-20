@@ -5,7 +5,7 @@ import {
 import * as UserFetch from '../db-handlers/user/user-fetch';
 import {
   fetchCourses,
-  fetchCourseById
+  fetchCourseAndCardInteraction
 } from '../db-handlers/course/course-fetch';
 import { fromGlobalId, toGlobalId } from 'graphql-relay';
 import { logger } from '../utils/logger';
@@ -76,7 +76,7 @@ export const resolveCourses = async (obj, args, viewer, info) => {
 export const resolveCourseById = async (obj, args, viewer, info) => {
   try {
     let course_id = fromGlobalId(args.course_id).id;
-    let result = await fetchCourseById(course_id, viewer, info);
+    let result = await fetchCourseAndCardInteraction(course_id, viewer, info);
     if (result && result.last_accessed_unit) {
       result.last_accessed_unit = toGlobalId(
         'CourseUnit',
