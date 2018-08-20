@@ -56,10 +56,12 @@ QuestionFreeResponseSchema.statics.normalizeQuestionData = function(
   question,
   viewerLocale
 ) {
-  logger.debug(`in QuestionFreeResponseSchema.statics.nomalizeQuestionData`);
+  logger.debug(`in QuestionFreeResponseSchema.statics.normalizeQuestionData`);
+  // This should pass only info to present the question, no hints or explanations
   question.data = {
-    tmpl_files: getStringByLocale(question.data.tmpl_files, viewerLocale).text,
-    explanation: getStringByLocale(question.data.explanation, viewerLocale).text
+    api_version: question.data.api_version,
+    environment_key: question.data.environment_key,
+    tmpl_files: getStringByLocale(question.data.tmpl_files, viewerLocale).text
   };
   return question;
 };

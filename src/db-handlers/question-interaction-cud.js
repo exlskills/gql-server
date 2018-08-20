@@ -22,6 +22,6 @@ export const upsertQuestionInteraction = async object => {
 
     return { result, record };
   } catch (err) {
-    return Promise.reject('Error adding QuestionInteraction to DB');
+    return Promise.reject('Error adding QuestionInteraction to DB ' + err);
   }
 };

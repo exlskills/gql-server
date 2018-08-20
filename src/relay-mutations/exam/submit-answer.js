@@ -52,6 +52,9 @@ export default mutationWithClientMutationId({
     explain_text: {
       type: GraphQLString
     },
+    grading_response: {
+      type: GraphQLString
+    },
     completionObj: {
       type: CompletionObjType
     },

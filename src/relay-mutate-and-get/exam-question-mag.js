@@ -11,7 +11,8 @@ import { fromGlobalId } from 'graphql-relay';
 
 import {
   getWsenvGradingClient,
-  callWsenvGrading
+  callWsenvGrading,
+  editGradingResponse
 } from '../utils/wsenv-connect';
 
 import { test_user_files } from '../tests/grading-test-data';
@@ -64,6 +65,8 @@ export const gradeQuestionAnswer = async (
       };
     }
 
+    logger.debug(`question ` + JSON.stringify(question));
+
     // is_correct, explain_text, points, pct_score
     let gradingObj = {};
     if (
@@ -71,6 +74,7 @@ export const gradeQuestionAnswer = async (
       question.question_type === 'MCMA'
     ) {
       gradingObj = await gradeMCQuestionAnswer(question, response_data, viewer);
+      gradingObj.grading_response = '';
     } else if (question.question_type === 'WSCQ') {
       gradingObj = await gradeWSCQQuestionAnswer(
         question,
@@ -116,9 +120,10 @@ export const gradeQuestionAnswer = async (
     }
 
     let returnData = {
-      question: question,
+      // question: question,
       is_correct: gradingObj.is_correct,
       explain_text: gradingObj.explain_text,
+      grading_response: gradingObj.grading_response,
       completionObj: {
         code: '0',
         msg: ''
@@ -185,10 +190,12 @@ export const gradeQuestionAnswer = async (
         );
       }
     }
-
+    logger.debug(
+      `gradeQuestionAnswer returnData ` + JSON.stringify(returnData)
+    );
     return returnData;
   } catch (error) {
-    logger.debug(`Error 01 ` + error);
+    logger.error(`Error ` + error);
     return { completionObj: { code: '1', msg: error.message } };
   }
 };
@@ -270,27 +277,26 @@ const gradeMCQuestionAnswer = async (question, response_data, viewer) => {
 const gradeWSCQQuestionAnswer = async (question, response_data, viewer) => {
   logger.debug(`in gradeWSCQQuestionAnswer`);
 
-  if (!response_data.user_files) {
+  logger.debug(`response_data raw ` + response_data);
+  const rd_object = JSON.parse(response_data);
+  logger.debug(`r_d u-f ` + rd_object.user_files);
+  //logger.debug(`response_data json-s ` + JSON.stringify(rd_object));
+
+  if (!rd_object.user_files) {
     return { is_correct: false, explain_text: '', points: 0, pct_score: 0 };
   }
 
   // This is run inside 'try' of the calling routine
-  let is_correct = false;
-  let explain_text = '';
-  let points = 0;
-  let pct_score = 0;
 
   const wsenvGradingUrl = await getWsenvGradingClient();
   logger.debug(`grading url ` + wsenvGradingUrl);
 
-  logger.debug(`p1_raw ` + question.data.grading_tests);
-  logger.debug(`p2_raw ` + question.data.test_files);
-  // logger.debug(`p3_raw ` + test_user_files);
-  logger.debug(`p3_raw ` + response_data.user_files);
-  logger.debug(`p1 ` + JSON.parse(question.data.grading_tests));
-  logger.debug(`p2 ` + JSON.parse(question.data.test_files));
-  // logger.debug(`p3 ` + JSON.parse(test_user_files));
-  logger.debug(`p3 ` + JSON.parse(response_data.user_files));
+  //logger.debug(`p1_raw ` + question.data.grading_tests);
+  //logger.debug(`p2_raw ` + question.data.test_files);
+  logger.debug(`p3_raw ` + rd_object.user_files);
+  //logger.debug(`p1 ` + JSON.parse(question.data.grading_tests));
+  //logger.debug(`p2 ` + JSON.parse(question.data.test_files));
+  logger.debug(`p3 ` + JSON.parse(rd_object.user_files));
 
   let gradingCallObject = {
     apiVersion: question.data.api_version,
@@ -299,13 +305,42 @@ const gradeWSCQQuestionAnswer = async (question, response_data, viewer) => {
     environmentKey: question.data.environment_key,
     testFiles: JSON.parse(question.data.test_files),
     // userFiles: JSON.parse(test_user_files)
-    userFiles: JSON.parse(response_data.user_files)
+    userFiles: JSON.parse(rd_object.user_files)
   };
 
-  const grading_response = await callWsenvGrading(
+  const call_response = await callWsenvGrading(
     wsenvGradingUrl,
     gradingCallObject
   );
+  let response = {
+    is_correct: false,
+    points: 0,
+    pct_score: 0,
+    explain_text: getStringByLocale(question.data.explanation, viewer.locale)
+      .text
+  };
+  if (call_response.success && call_response.data) {
+    if (
+      call_response.data.failedCount === 0 &&
+      call_response.data.passedCount >= 0
+    ) {
+      response.is_correct = true;
+      response.points = question.points;
+      response.pct_score = 100;
+    } else if (call_response.data.passedCount > 0) {
+      response.points =
+        (question.points /
+          (call_response.data.passedCount + call_response.data.failedCount)) *
+        call_response.data.passedCount;
+      response.pct_score = (response.points / question.points) * 100;
+    }
+    response.grading_response = editGradingResponse(
+      call_response.data.gradingTests
+    );
+  } else {
+    response.grading_response = call_response.message;
+  }
 
-  return { is_correct, explain_text, points, pct_score };
+  logger.debug(`response ` + JSON.stringify(response));
+  return response;
 };

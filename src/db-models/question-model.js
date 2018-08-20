@@ -63,7 +63,7 @@ QuestionSchema.statics.normalizeQuestionData = function(
   question,
   viewerLocale
 ) {
-  logger.debug(`in QuestionSchema.statics.nomalizeQuestionData`);
+  logger.debug(`in QuestionSchema.statics.normalizeQuestionData`);
   // logger.debug(`q_raw ` + JSON.stringify(question));
   question.question_text = getStringByLocale(
     question.question_text,

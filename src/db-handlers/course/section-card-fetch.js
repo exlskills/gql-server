@@ -378,7 +378,7 @@ export const fetchSectionCards = async (
   if (limit) array.push(limit);
 
   let result = await Course.aggregate(array).exec();
-  logger.debug(`fetched card ` + JSON.stringify(result));
+  logger.debug(`fetched card raw ` + JSON.stringify(result));
 
   // Normalize questions for Locale and remove extra Qs fields
   // TODO: see suggestion above to pull Locale-only Qs data from the DB
@@ -395,5 +395,6 @@ export const fetchSectionCards = async (
     card.questions = allQuestions;
   }
 
+  logger.debug(`result with qs ` + JSON.stringify(result));
   return result;
 };
