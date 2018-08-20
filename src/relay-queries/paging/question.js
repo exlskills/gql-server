@@ -25,6 +25,7 @@ export const questionPaging = {
   resolve: (obj, args, viewer, info) =>
     resolveGetQuestion(obj, args, viewer, info)
 };
+
 export const questionPagingExam = {
   type: QuestionConnection,
   description: 'get Question by Exam',

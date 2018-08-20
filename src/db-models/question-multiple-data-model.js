@@ -32,26 +32,6 @@ const QuestionMultipleSchema = new mongoose.Schema(
   }
 );
 
-QuestionMultipleSchema.statics.normalizeQuestionData = function(
-  question,
-  viewerLocale
-) {
-  logger.debug(`in QuestionMultipleSchema.statics.normalizeQuestionData`);
-  // This should pass only info to present the question, no hints or explanations
-  question.data = {
-    _id: question._id,
-    options: question.data.map(item => ({
-      _id: item._id,
-      seq: item.seq,
-      text: getStringByLocale(item.text, viewerLocale).text
-      //is_answer: item.is_answer,
-      //explanation: getStringByLocale(item.explanation, viewerLocale).text
-    }))
-  };
-
-  return question;
-};
-
 export default mongoose.model(
   'QuestionMultiple',
   QuestionMultipleSchema,

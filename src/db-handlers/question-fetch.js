@@ -102,6 +102,9 @@ export const getQuestions = async (
       }
     }
   }
+
+  logger.debug(`getQuestions result ` + JSON.stringify(result));
+
   return result;
 };
 

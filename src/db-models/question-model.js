@@ -59,29 +59,6 @@ const QuestionSchema = new mongoose.Schema(
   }
 );
 
-QuestionSchema.statics.normalizeQuestionData = function(
-  question,
-  viewerLocale
-) {
-  logger.debug(`in QuestionSchema.statics.normalizeQuestionData`);
-  // logger.debug(`q_raw ` + JSON.stringify(question));
-  question.question_text = getStringByLocale(
-    question.question_text,
-    viewerLocale
-  ).text;
-  question.hint = getStringByLocale(question.hint, viewerLocale).text;
-  if (question.question_type === 'MCSA' || question.question_type === 'MCMA') {
-    question = QuestionMultiple.normalizeQuestionData(question, viewerLocale);
-  } else if (question.question_type === 'WSCQ') {
-    question = QuestionFreeResponse.normalizeQuestionData(
-      question,
-      viewerLocale
-    );
-  }
-  // logger.debug(`q_normalized ` + JSON.stringify(question));
-  return question;
-};
-
 QuestionSchema.methods.updateInfo = async function(data, viewerLocale) {
   logger.debug(`in QuestionSchema.methods.updateInfo`);
   if ('tags' in data) {

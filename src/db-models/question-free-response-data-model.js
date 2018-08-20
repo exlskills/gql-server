@@ -52,20 +52,6 @@ const QuestionFreeResponseSchema = new mongoose.Schema(
   }
 );
 
-QuestionFreeResponseSchema.statics.normalizeQuestionData = function(
-  question,
-  viewerLocale
-) {
-  logger.debug(`in QuestionFreeResponseSchema.statics.normalizeQuestionData`);
-  // This should pass only info to present the question, no hints or explanations
-  question.data = {
-    api_version: question.data.api_version,
-    environment_key: question.data.environment_key,
-    tmpl_files: getStringByLocale(question.data.tmpl_files, viewerLocale).text
-  };
-  return question;
-};
-
 export default mongoose.model(
   'QuestionFreeResponse',
   QuestionFreeResponseSchema,
