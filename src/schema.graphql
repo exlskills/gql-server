@@ -394,7 +394,7 @@ type Question implements Node {
   question_text: String!
   data: QuestionData!
   question_answer: String
-  hint: String!
+  hint: String
   hint_exists: Boolean
 
   # The ID of an object

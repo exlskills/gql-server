@@ -71,7 +71,7 @@ export const QuestionType = new GraphQLObjectType({
       type: GraphQLString
     },
     hint: {
-      type: new GraphQLNonNull(GraphQLString)
+      type: GraphQLString
     },
     hint_exists: {
       type: GraphQLBoolean

@@ -30,6 +30,7 @@ export const gradeQuestionAnswer = async (
   viewer
 ) => {
   logger.debug(`in gradeQuestionAnswer`);
+  logger.debug(`check_answer ` + check_answer);
 
   try {
     let questionInteractionInfo = {
@@ -68,55 +69,66 @@ export const gradeQuestionAnswer = async (
     logger.debug(`question ` + JSON.stringify(question));
 
     // is_correct, explain_text, points, pct_score
-    let gradingObj = {};
-    if (
-      question.question_type === 'MCSA' ||
-      question.question_type === 'MCMA'
-    ) {
-      gradingObj = await gradeMCQuestionAnswer(question, response_data, viewer);
-      gradingObj.grading_response = '';
-    } else if (question.question_type === 'WSCQ') {
-      gradingObj = await gradeWSCQQuestionAnswer(
-        question,
-        response_data,
-        viewer
+    let gradingObj = {
+      is_correct: false,
+      explain_text: '',
+      grading_response: ''
+    };
+
+    if (check_answer) {
+      if (
+        question.question_type === 'MCSA' ||
+        question.question_type === 'MCMA'
+      ) {
+        gradingObj = await gradeMCQuestionAnswer(
+          question,
+          response_data,
+          viewer
+        );
+        gradingObj.grading_response = '';
+      } else if (question.question_type === 'WSCQ') {
+        gradingObj = await gradeWSCQQuestionAnswer(
+          question,
+          response_data,
+          viewer
+        );
+      } else {
+        return {
+          completionObj: {
+            code: '1',
+            msg:
+              'Grading logic not implemented for question type ' +
+              question.question_type
+          }
+        };
+      }
+
+      questionInteractionInfo.points = gradingObj.points;
+      questionInteractionInfo.pct_score = gradingObj.pct_score;
+      const { dummy1, qi_record } = await upsertQuestionInteraction(
+        questionInteractionInfo
       );
-    } else {
-      return {
-        completionObj: {
-          code: '1',
-          msg:
-            'Grading logic not implemented for question type ' +
-            question.question_type
+
+      if (!quiz) {
+        const examattempt = await ExamAttemptFetch.findById(
+          questionInteractionInfo.exam_attempt_id
+        );
+        const quesInterIdx = examattempt.question_interaction_ids.findIndex(
+          item => item.toString() === qi_record._id.toString()
+        );
+        if (quesInterIdx === -1) {
+          examattempt.question_interaction_ids.push(qi_record._id);
         }
-      };
-    }
-
-    questionInteractionInfo.points = gradingObj.points;
-    questionInteractionInfo.pct_score = gradingObj.pct_score;
-    const { dummy1, qi_record } = await upsertQuestionInteraction(
-      questionInteractionInfo
-    );
-
-    if (!quiz) {
-      const examattempt = await ExamAttemptFetch.findById(
-        questionInteractionInfo.exam_attempt_id
-      );
-      const quesInterIdx = examattempt.question_interaction_ids.findIndex(
-        item => item.toString() === qi_record._id.toString()
-      );
-      if (quesInterIdx === -1) {
-        examattempt.question_interaction_ids.push(qi_record._id);
+        examattempt.final_grade_pct = await ExamAttemptFetch.computeFinalGrade(
+          examattempt.question_interaction_ids
+        );
+        if (isNaN(examattempt.final_grade_pct)) {
+          examattempt.final_grade_pct = 0;
+        }
+        examattempt.final_grade_pct =
+          examattempt.final_grade_pct / examattempt.question_ids.length;
+        await examattempt.save();
       }
-      examattempt.final_grade_pct = await ExamAttemptFetch.computeFinalGrade(
-        examattempt.question_interaction_ids
-      );
-      if (isNaN(examattempt.final_grade_pct)) {
-        examattempt.final_grade_pct = 0;
-      }
-      examattempt.final_grade_pct =
-        examattempt.final_grade_pct / examattempt.question_ids.length;
-      await examattempt.save();
     }
 
     let returnData = {
@@ -278,6 +290,9 @@ const gradeWSCQQuestionAnswer = async (question, response_data, viewer) => {
   logger.debug(`in gradeWSCQQuestionAnswer`);
 
   logger.debug(`response_data raw ` + response_data);
+  if (!response_data) {
+    return { is_correct: false, explain_text: '', points: 0, pct_score: 0 };
+  }
   const rd_object = JSON.parse(response_data);
   logger.debug(`r_d u-f ` + rd_object.user_files);
   //logger.debug(`response_data json-s ` + JSON.stringify(rd_object));

@@ -265,6 +265,7 @@ export const fetchQuestionsGeneric = async (
       question.data.tmpl_files = question.tmpl_files;
     }
     delete question.tmpl_files;
+    //question.hint = 'get hint';
   }
 
   logger.debug(`question fetch generic result ` + JSON.stringify(result));
