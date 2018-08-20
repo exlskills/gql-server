@@ -35,7 +35,8 @@ export default {
   sectionPaging: pagingQueries.sectionPaging,
   cardPaging: pagingQueries.cardPaging,
   notificationPaging: pagingQueries.notificationPaging,
-  questionEntry: questionQueries.questionEntry,
+  // TODO: in wc, rename questionEntry to questionHint
+  questionEntry: questionQueries.questionHint,
   langType: langQueries.langType,
   questionPaging: pagingQueries.questionPaging,
   questionPagingExam: pagingQueries.questionPagingExam,

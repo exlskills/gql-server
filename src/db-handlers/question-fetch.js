@@ -19,8 +19,8 @@ export const findById = async (obj_id, viewer, info) => {
   return record;
 };
 
-export const fetchQuestionEntry = async (fetchParameters, viewer) => {
-  logger.debug(`in fetchQuestionEntry`);
+export const fetchQuestionHint = async (fetchParameters, viewer) => {
+  logger.debug(`in fetchQuestionHint`);
   let array = [];
   let elem;
   let viewerLocale = viewer.locale;
@@ -53,8 +53,9 @@ export const getQuestions = async (
   viewerLocale,
   fetchParameters
 ) => {
+  // This should only return the "question" part, no hints or answers
   logger.debug(`in getQuestions`);
-  let array = [];
+  let filterArray = [];
   let elem;
   let sort = { $sort: { index: 1 } };
   let skip = aggregateArray.find(item => !!item.$skip);
@@ -67,7 +68,7 @@ export const getQuestions = async (
           fetchParameters.unitId
       }
     };
-    array.push(elem);
+    filterArray.push(elem);
   } else {
     elem = {
       $match: {
@@ -76,80 +77,18 @@ export const getQuestions = async (
           fetchParameters.sectionId
       }
     };
-    array.push(elem);
+    filterArray.push(elem);
   }
-  elem = {
-    $project: {
-      doc_ref: 1,
-      question_type: 1,
-      question_text: 1,
-      data: {
-        _id: 1,
-        text: 1,
-        seq: 1,
-        tmpl_files: 1
-      },
-      'hint.intlString': projectionWriter.writeIntlStringFilter(
-        'hint',
-        viewerLocale
-      )
-    }
-  };
-  array.push(elem);
-  elem = {
-    $project: {
-      doc_ref: 1,
-      question_type: 1,
-      question_text: 1,
-      data: {
-        _id: 1,
-        text: 1,
-        seq: 1,
-        tmpl_files: 1
-      },
-      hint: projectionWriter.writeIntlStringEval('hint', viewerLocale),
-      hint_exists: {
-        $cond: {
-          if: {
-            $ne: [
-              projectionWriter.writeIntlStringEval('hint', viewerLocale),
-              ''
-            ]
-          },
-          then: true,
-          else: false
-        }
-      }
-    }
-  };
-  array.push(elem);
-  if (sort) array.push(sort);
-  if (skip) array.push(skip);
-  if (limit) array.push(limit);
-  let result = await Question.aggregate(array).exec();
-  for (let question of result) {
-    question.question_text = getStringByLocale(
-      question.question_text,
-      viewerLocale
-    ).text;
-    if (
-      question.question_type === 'MCSA' ||
-      question.question_type === 'MCMA'
-    ) {
-      question.data = {
-        options: question.data.map(item => ({
-          _id: item._id,
-          seq: item.seq,
-          text: getStringByLocale(item.text, viewerLocale).text
-        }))
-      };
-    } else if (question.question_type === 'WSCQ') {
-      question.data.tmpl_files = getStringByLocale(
-        question.data.tmpl_files,
-        viewerLocale
-      ).text;
-    }
 
+  let result = await fetchQuestionsGeneric(
+    filterArray,
+    sort,
+    skip,
+    limit,
+    viewerLocale
+  );
+
+  for (let question of result) {
     if (
       question.doc_ref &&
       question.doc_ref.EmbeddedDocRef &&
@@ -165,6 +104,7 @@ export const getQuestions = async (
   }
   return result;
 };
+
 export const getQuestionsByExam = async (
   filterValues,
   aggregateArray,
@@ -172,9 +112,9 @@ export const getQuestionsByExam = async (
   fetchParameters
 ) => {
   logger.debug(`in getQuestionsByExam`);
-  let array = [];
+  let filterArray = [];
   let elem;
-  let sort = { $sort: { sequence: 1 } };
+  let sort = { $sort: { sort_sequence: 1 } };
   let skip = aggregateArray.find(item => !!item.$skip);
   let limit = aggregateArray.find(item => !!item.$limit);
   let viewer = {
@@ -188,22 +128,75 @@ export const getQuestionsByExam = async (
   );
   const quesIds = arrayReturn.arrayQuestion;
   elem = { $match: { _id: { $in: quesIds } } };
-  array.push(elem);
-  array.push({
-    $addFields: { sequence: { $indexOfArray: [quesIds, '$_id'] } }
-  });
+  filterArray.push(elem);
   elem = {
+    $addFields: { sort_sequence: { $indexOfArray: [quesIds, '$_id'] } }
+  };
+  filterArray.push(elem);
+
+  let result = await fetchQuestionsGeneric(
+    filterArray,
+    sort,
+    skip,
+    limit,
+    viewerLocale
+  );
+
+  // Load latest user answer
+  for (let question of result) {
+    let userAnswer;
+    if (fetchParameters.exam_attempt_id != null) {
+      userAnswer = await getUserAnswer(
+        fetchParameters.exam_attempt_id,
+        question._id,
+        fetchParameters.userId
+      );
+    }
+
+    if (userAnswer && userAnswer.length > 0) {
+      const lastResp = userAnswer.pop();
+      userAnswer = {
+        selected_ids: lastResp.selected_ids.map(selId =>
+          toGlobalId('QuestionMultipleData', selId)
+        )
+      };
+      question.question_answer = JSON.stringify(userAnswer);
+    }
+  }
+
+  return result;
+};
+
+export const fetchQuestionsGeneric = async (
+  filterArray,
+  sort,
+  skip,
+  limit,
+  viewerLocale
+) => {
+  logger.debug(`in fetchQuestionsGeneric`);
+
+  let array = filterArray;
+  let elem = {
     $project: {
-      sequence: 1,
-      points: 1,
+      sort_sequence: 1,
+      doc_ref: 1,
       question_type: 1,
-      question_text: 1,
+      'question_text.intlString': projectionWriter.writeIntlStringFilter(
+        'question_text',
+        viewerLocale
+      ),
       data: {
         _id: 1,
-        text: 1,
         seq: 1,
-        tmpl_files: 1
+        text: 1,
+        api_version: 1,
+        environment_key: 1
       },
+      'data.tmpl_files.intlString': projectionWriter.writeIntlStringFilter(
+        'data.tmpl_files',
+        viewerLocale
+      ),
       'hint.intlString': projectionWriter.writeIntlStringFilter(
         'hint',
         viewerLocale
@@ -213,17 +206,24 @@ export const getQuestionsByExam = async (
   array.push(elem);
   elem = {
     $project: {
-      sequence: 1,
-      points: 1,
+      sort_sequence: 1,
+      doc_ref: 1,
       question_type: 1,
-      question_text: 1,
+      question_text: projectionWriter.writeIntlStringEval(
+        'question_text',
+        viewerLocale
+      ),
+      tmpl_files: projectionWriter.writeIntlStringEval(
+        'data.tmpl_files',
+        viewerLocale
+      ),
       data: {
         _id: 1,
-        text: 1,
         seq: 1,
-        tmpl_files: 1
+        text: 1,
+        api_version: 1,
+        environment_key: 1
       },
-      hint: projectionWriter.writeIntlStringEval('hint', viewerLocale),
       hint_exists: {
         $cond: {
           if: {
@@ -243,46 +243,27 @@ export const getQuestionsByExam = async (
   if (skip) array.push(skip);
   if (limit) array.push(limit);
   let result = await Question.aggregate(array).exec();
+
+  // logger.debug(`question extract ` + JSON.stringify(result));
+
   for (let question of result) {
-    let response;
-    if (fetchParameters.exam_attempt_id != null) {
-      response = await getUserAnswer(
-        fetchParameters.exam_attempt_id,
-        question._id,
-        fetchParameters.userId
-      );
-    }
-    question.question_text = getStringByLocale(
-      question.question_text,
-      viewerLocale
-    ).text;
     if (
       question.question_type === 'MCSA' ||
       question.question_type === 'MCMA'
     ) {
       question.data = {
-        _id: question._id,
         options: question.data.map(item => ({
           _id: item._id,
           seq: item.seq,
           text: getStringByLocale(item.text, viewerLocale).text
         }))
       };
-      if (response && response.length > 0) {
-        const lastResp = response.pop();
-        response = {
-          selected_ids: lastResp.selected_ids.map(selId =>
-            toGlobalId('QuestionMultipleData', selId)
-          )
-        };
-        question.question_answer = JSON.stringify(response);
-      }
     } else if (question.question_type === 'WSCQ') {
-      question.data.tmpl_files = getStringByLocale(
-        question.data.tmpl_files,
-        viewerLocale
-      ).text;
+      question.data.tmpl_files = question.tmpl_files;
     }
+    delete question.tmpl_files;
   }
+
+  logger.debug(`question fetch generic result ` + JSON.stringify(result));
   return result;
 };

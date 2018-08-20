@@ -5,6 +5,7 @@ import {
   reverseSortByObject
 } from '../utils/paging-utils';
 import aggregateBuilder from './aggregate-array-builder';
+import { logger } from '../utils/logger';
 
 /*
   anchor     - record count from the beginning (0) or end (1) of the dataset
@@ -22,6 +23,7 @@ import aggregateBuilder from './aggregate-array-builder';
 */
 
 export async function findWithPaging(execDetails, args, viewerLocale) {
+  logger.debug(`in findWithPaging`);
   let sortVal;
   var skipVal;
   let limitVal;
@@ -45,18 +47,18 @@ export async function findWithPaging(execDetails, args, viewerLocale) {
     beforeInfo = cursorToDocument(args.before);
   }
 
-  if (afterInfo && beforeInfo && afterInfo.anchor != beforeInfo.anchor) {
+  if (afterInfo && beforeInfo && afterInfo.anchor !== beforeInfo.anchor) {
     // TODO input problem
   } else if (
-    (afterInfo && afterInfo.anchor == 1) ||
-    (beforeInfo && beforeInfo.anchor == 1)
+    (afterInfo && afterInfo.anchor === 1) ||
+    (beforeInfo && beforeInfo.anchor === 1)
   ) {
     anchor = 1;
   } else if (args.last && !afterInfo && !beforeInfo) {
     anchor = 1;
   }
 
-  if (anchor == 0) {
+  if (anchor === 0) {
     sortVal = gqlOrderByToMdbSort(args.orderBy);
     takeFirst = args.first;
     takeLast = args.last;
@@ -66,7 +68,7 @@ export async function findWithPaging(execDetails, args, viewerLocale) {
     if (beforeInfo) {
       lowerLim = beforeInfo;
     }
-  } else if (anchor == 1) {
+  } else if (anchor === 1) {
     sortVal = reverseSortByObject(gqlOrderByToMdbSort(args.orderBy));
     takeFirst = args.last;
     takeLast = args.first;
@@ -111,7 +113,7 @@ export async function findWithPaging(execDetails, args, viewerLocale) {
   if (upperLim) {
     if (array[0]) {
       upperKey = getValueByPathToKey(array[0], execDetails.businessKey);
-      if (upperKey == upperLim.businessKey) {
+      if (upperKey === upperLim.businessKey) {
         array.shift();
         hasPreviousPage = true;
         offset = offset + 1;
@@ -128,7 +130,7 @@ export async function findWithPaging(execDetails, args, viewerLocale) {
         array[array.length - 1],
         execDetails.businessKey
       );
-      if (lowerKey == lowerLim.businessKey) {
+      if (lowerKey === lowerLim.businessKey) {
         array.pop();
         hasNextPage = true;
       } else {
@@ -161,7 +163,7 @@ export async function findWithPaging(execDetails, args, viewerLocale) {
 
     if (upperLim) {
       let upperIndex = findCursorIndex(execDetails, array, upperLim);
-      if (upperIndex != -1) {
+      if (upperIndex !== -1) {
         offset = offset + upperIndex + 1;
         hasPreviousPage = true;
         array.splice(0, upperIndex + 1);
@@ -169,7 +171,7 @@ export async function findWithPaging(execDetails, args, viewerLocale) {
     }
     if (lowerLim) {
       let lowerIndex = findCursorIndex(execDetails, array, lowerLim);
-      if (lowerIndex != -1) {
+      if (lowerIndex !== -1) {
         array.splice(lowerIndex, array.length - lowerIndex);
         hasNextPage = true;
       }
@@ -184,7 +186,7 @@ export async function findWithPaging(execDetails, args, viewerLocale) {
       hasPreviousPage = true;
     }
   }
-  if (anchor == 1) {
+  if (anchor === 1) {
     array.reverse();
     let temp = hasNextPage;
     hasNextPage = hasPreviousPage;
@@ -201,6 +203,7 @@ export async function findOptimisticArray(
   skipVal,
   limitVal
 ) {
+  logger.debug(`in findOptimisticArray`);
   let aggregateArray = aggregateBuilder(sortVal, skipVal, limitVal);
   try {
     return await execDetails.queryFunction(
@@ -210,6 +213,7 @@ export async function findOptimisticArray(
       execDetails.fetchParameters
     );
   } catch (error) {
+    logger.error(`catch in findOptimisticArray ` + error);
     return Promise.reject(error);
   }
 }
@@ -218,7 +222,7 @@ export function findCursorIndex(execDetails, array, cursorInfo) {
   let cursorIndex = -1;
   for (var i = 0; i < array.length; i++) {
     let businessKey = getValueByPathToKey(array[i], execDetails.businessKey);
-    if (businessKey == cursorInfo.businessKey) {
+    if (businessKey === cursorInfo.businessKey) {
       cursorIndex = i;
       break;
     }

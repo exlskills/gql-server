@@ -1,13 +1,11 @@
 import { connectionArgs } from 'graphql-relay';
-
 import * as inputTypes from '../input-types';
-
 import { QuestionConnection } from '../../relay-models';
-
 import {
   resolveGetQuestion,
   resolveGetQuestionByExam
 } from '../../relay-resolvers/question-resolvers';
+import { logger } from '../../utils/logger';
 
 export const questionPaging = {
   type: QuestionConnection,

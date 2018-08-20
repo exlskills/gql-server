@@ -1,5 +1,5 @@
-import questionEntry from './question-entry.js';
+import questionHint from './question-hint.js';
 
 export default {
-  questionEntry
+  questionHint
 };

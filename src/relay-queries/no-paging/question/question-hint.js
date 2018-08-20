@@ -1,7 +1,7 @@
 import { connectionArgs } from 'graphql-relay';
 import * as inputTypes from '../../input-types';
 import { QuestionType } from '../../../relay-models';
-import { resolveQuestionEntry } from '../../../relay-resolvers/question-resolvers';
+import { resolveQuestionHint } from '../../../relay-resolvers/question-resolvers';
 
 export default {
   type: QuestionType,
@@ -19,5 +19,5 @@ export default {
     ...connectionArgs
   },
   resolve: (obj, args, viewer, info) =>
-    resolveQuestionEntry(obj, args, viewer, info)
+    resolveQuestionHint(obj, args, viewer, info)
 };

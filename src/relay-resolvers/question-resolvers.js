@@ -4,38 +4,35 @@ import {
 } from '../paging-processor/connection-from-datasource';
 import { logger } from '../utils/logger';
 import {
-  fetchQuestionEntry,
+  fetchQuestionHint,
   getQuestions,
   getQuestionsByExam
 } from '../db-handlers/question-fetch';
 import { fromGlobalId } from 'graphql-relay';
 
-export const resolveQuestionEntry = async (obj, args, viewer, info) => {
-  logger.debug(`in resolveQuestionEntry`);
+export const resolveQuestionHint = async (obj, args, viewer, info) => {
+  logger.debug(`in resolveQuestionHint`);
   const businessKey = '_id';
   const fetchParameters = {};
-  if (obj) {
-    fetchParameters.courseId = obj.currentCourseId;
-    fetchParameters.unitId = obj.currentUnitId;
-    fetchParameters.sectionId = obj._id;
-  } else {
-    if (args.resolverArgs) {
-      const questionParam = args.resolverArgs.find(
-        e => e.param === 'question_id'
+  if (args.resolverArgs) {
+    const questionParam = args.resolverArgs.find(
+      e => e.param === 'question_id'
+    );
+    if (questionParam) {
+      logger.debug(`question param ` + questionParam.value);
+      fetchParameters.questionId = fromGlobalId(questionParam.value).id;
+      logger.debug(
+        `question param - from global id ` +
+          fromGlobalId(questionParam.value).id
       );
-      if (questionParam) {
-        logger.debug(`question param ` + questionParam.value);
-        fetchParameters.questionId = fromGlobalId(questionParam.value).id;
-        logger.debug(
-          `question param - from global id ` +
-            fromGlobalId(questionParam.value).id
-        );
-      }
     } else {
-      return Promise.reject('invalid args');
+      return Promise.reject('invalid args - missing question id');
     }
+  } else {
+    return Promise.reject('invalid args - missing question id');
   }
-  let result = await fetchQuestionEntry(fetchParameters, viewer);
+
+  let result = await fetchQuestionHint(fetchParameters, viewer);
   return result[0];
 };
 
@@ -64,6 +61,7 @@ export const resolveGetQuestion = (obj, args, viewer, info) => {
 
   return connectionFromDataSource(execDetails, obj, args, viewer, info);
 };
+
 export const resolveGetQuestionByExam = (obj, args, viewer, info) => {
   logger.debug(`in resolveQuestionByExam`);
   if (!args || !args.resolverArgs) {

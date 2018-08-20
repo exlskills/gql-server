@@ -3,6 +3,8 @@ import * as QuestionFetch from '../../db-handlers/question-fetch';
 import Question from '../../db-models/question-model';
 import * as projectionWriter from '../../utils/projection-writer';
 import { logger } from '../../utils/logger';
+import { fetchQuestionsGeneric } from '../question-fetch';
+import { getStringByLocale } from '../../parsers/intl-string-parser';
 
 export const findById = async (
   courseId,
@@ -353,48 +355,49 @@ export const fetchSectionCards = async (
   });
   selectFields.content = 1;
 
-  // Pull all card's questions data using lookup
-  // TODO: consider pulling questions separately to filter Q's content by Locale and required fields
-  array.push({
-    $lookup: {
-      from: 'question',
-      localField: 'question_ids',
-      foreignField: '_id',
-      as: 'questionsList'
-    }
-  });
-  delete selectFields.question_ids;
-
-  // filter for output fields
-  array.push({
-    $project: {
-      ...selectFields,
-      questionsList: 1
-    }
-  });
-
   if (sort) array.push(sort);
   if (skip) array.push(skip);
   if (limit) array.push(limit);
 
   let result = await Course.aggregate(array).exec();
-  logger.debug(`fetched card raw ` + JSON.stringify(result));
+  logger.debug(`fetched cards raw ` + JSON.stringify(result));
 
-  // Normalize questions for Locale and remove extra Qs fields
-  // TODO: see suggestion above to pull Locale-only Qs data from the DB
-  let question;
   for (let card of result) {
-    let allQuestions = [];
-    for (let question of card.questionsList) {
-      allQuestions.push(Question.normalizeQuestionData(question, viewerLocale));
-    }
+    logger.debug(`card quest ids ` + card.question_ids);
+    let questionFilterArrayElem = {
+      $match: { _id: { $in: card.question_ids } }
+    };
+    let questionsFilterArray = [];
+    questionsFilterArray.push(questionFilterArrayElem);
+
+    let cardQuestions = await fetchQuestionsGeneric(
+      questionsFilterArray,
+      null,
+      null,
+      null,
+      viewerLocale
+    );
+
     // pick a random question to show
     card.question =
-      allQuestions[Math.floor(Math.random() * allQuestions.length)];
+      cardQuestions[Math.floor(Math.random() * cardQuestions.length)];
 
-    card.questions = allQuestions;
+    // add question ID into `data` for MC questions
+    for (let question of cardQuestions) {
+      if (
+        question.question_type === 'MCSA' ||
+        question.question_type === 'MCMA'
+      ) {
+        question.data._id = question._id;
+      }
+    }
+
+    card.questions = cardQuestions;
   }
 
+  delete result.question_ids;
+
   logger.debug(`result with qs ` + JSON.stringify(result));
+
   return result;
 };

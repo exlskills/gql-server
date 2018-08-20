@@ -4,6 +4,7 @@ var POSTFIX2 = '|';
 
 import { findWithPaging } from './find-with-paging';
 import { getValueByPathToKey } from '../utils/paging-utils';
+import { logger } from '../utils/logger';
 
 export function connectionFromDataSource(
   execDetails,
@@ -12,12 +13,14 @@ export function connectionFromDataSource(
   context,
   info
 ) {
+  logger.debug(`in connectionFromDataSource`);
   return waitForPromisedArray(execDetails, args, context.locale).then(
     result => result
   );
 }
 
 async function waitForPromisedArray(execDetails, args, viewerLocale) {
+  logger.debug(`in waitForPromisedArray`);
   const dataWithFrame = await findWithPaging(execDetails, args, viewerLocale);
   return connectionFromArrayWithFrame(dataWithFrame, execDetails.businessKey);
 }

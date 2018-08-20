@@ -24,7 +24,11 @@ const cfg = {
   },
   wsenv_signalling_url:
     process.env.WSENV_SIGNALLING_URL ||
-    'https://wsenv-signalling-api.exlcode.com/v0/connect-grading'
+    'https://wsenv-signalling-api.exlcode.com/v0/connect-grading',
+  logging_level:
+    process.env.LOGGING_LEVEL || process.env.NODE_ENV === 'production'
+      ? 'info'
+      : 'debug'
 };
 
 export default cfg;

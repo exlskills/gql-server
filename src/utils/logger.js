@@ -1,5 +1,6 @@
 import appRoot from 'app-root-path';
 import winston from 'winston';
+import config from '../config';
 
 let options = {
   file: {
@@ -23,7 +24,7 @@ let options = {
     colorize: true
   },
   console: {
-    level: process.env.NODE_ENV === 'production' ? 'info' : 'debug',
+    level: config.logging_level,
     handleExceptions: true,
     format: winston.format.combine(
       winston.format.timestamp(),
