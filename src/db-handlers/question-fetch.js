@@ -260,6 +260,7 @@ export const fetchQuestionsGeneric = async (
       question.question_type === 'MCMA'
     ) {
       question.data = {
+        _id: question._id,
         options: question.data.map(item => ({
           _id: item._id,
           seq: item.seq,
