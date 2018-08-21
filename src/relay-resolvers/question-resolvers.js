@@ -6,7 +6,7 @@ import { logger } from '../utils/logger';
 import {
   fetchQuestionHint,
   getQuestions,
-  getQuestionsByExam
+  getQuestionsForExam
 } from '../db-handlers/question-fetch';
 import { fromGlobalId } from 'graphql-relay';
 
@@ -62,8 +62,8 @@ export const resolveGetQuestion = (obj, args, viewer, info) => {
   return connectionFromDataSource(execDetails, obj, args, viewer, info);
 };
 
-export const resolveGetQuestionByExam = (obj, args, viewer, info) => {
-  logger.debug(`in resolveQuestionByExam`);
+export const resolveGetQuestionsForExam = (obj, args, viewer, info) => {
+  logger.debug(`in resolveGetQuestionsForExam`);
   if (!args || !args.resolverArgs) {
     return attachEmptyFrame();
   }
@@ -80,7 +80,7 @@ export const resolveGetQuestionByExam = (obj, args, viewer, info) => {
     fetchParameters.exam_attempt_id = fromGlobalId(attempt.value).id;
   }
   const execDetails = {
-    queryFunction: getQuestionsByExam,
+    queryFunction: getQuestionsForExam,
     businessKey: '_id',
     fetchParameters: fetchParameters
   };

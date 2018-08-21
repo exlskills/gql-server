@@ -1,6 +1,6 @@
 import { GraphQLString } from 'graphql';
 import { ExamType } from '../../../relay-models/exam';
-import { resolveExam } from '../../../relay-resolvers/exam-resolvers';
+import { resolveExamToTake } from '../../../relay-resolvers/exam-resolvers';
 
 export default {
   type: ExamType,
@@ -12,5 +12,5 @@ export default {
       type: GraphQLString
     }
   },
-  resolve: resolveExam
+  resolve: resolveExamToTake
 };

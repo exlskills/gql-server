@@ -6,7 +6,7 @@ import {
 } from '../paging-processor/connection-from-datasource';
 import {
   fetchCourseUnitById,
-  fetchCourseUnits,
+  fetchCourseUnitsWithDetailedStatus,
   fetchUserCourseUnitExamStatus,
   fetchUserCourseExamAttemptsByUnit
 } from '../db-handlers/course/course-unit-fetch';
@@ -35,7 +35,7 @@ export const resolveCourseUnits = (obj, args, viewer, info) => {
   }
 
   const execDetails = {
-    queryFunction: fetchCourseUnits,
+    queryFunction: fetchCourseUnitsWithDetailedStatus,
     businessKey: businessKey,
     fetchParameters: fetchParameters
   };
@@ -56,6 +56,7 @@ export const resolveUserCourseExamAttempts = async (
   viewer,
   info
 ) => {
+  // NOT USED - REMOVE
   logger.debug(`in resolveUserCourseUnitExamAttempts`);
   try {
     let course_id = fromGlobalId(args.course_id).id;

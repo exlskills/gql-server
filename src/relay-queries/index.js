@@ -12,8 +12,8 @@ import examAttempt from './no-paging/exam-attempt';
 export default {
   node: NodeField,
   courseById: courseQueries.courseById,
-  // TODO: in wc, rename courseUnitSummary to courseUserExamAttempts
-  courseUnitSummary: courseQueries.courseUserExamAttempts,
+  // TODO: in wc, ensure courseUnitSummary is not used (courseUserExamAttempts)
+  // courseUnitSummary: courseQueries.courseUserExamAttempts,
   cardEntry: courseQueries.sectionCardEntry,
   cardByQuestion: courseQueries.cardByQuestion,
   userActivity: queryUsers.userActivity,
@@ -22,7 +22,8 @@ export default {
   userProfile: queryUsers.userProfile,
   // TODO: in wc, change userActivityById to userActivity
   userActivityById: queryUsers.userActivityById,
-  oneExam: queryExam.oneExam,
+  // TODO: in wc, rename oneExam to examToTake
+  oneExam: queryExam.examToTake,
   specificExamAttempt: examAttempt.specificExamAttempt,
   // TODO: in wc, rename unitSpec to courseUnit
   unitSpec: courseQueries.courseUnit,

@@ -3,7 +3,7 @@ import * as inputTypes from '../input-types';
 import { QuestionConnection } from '../../relay-models';
 import {
   resolveGetQuestion,
-  resolveGetQuestionByExam
+  resolveGetQuestionsForExam
 } from '../../relay-resolvers/question-resolvers';
 import { logger } from '../../utils/logger';
 
@@ -28,7 +28,7 @@ export const questionPaging = {
 
 export const questionPagingExam = {
   type: QuestionConnection,
-  description: 'get Question by Exam',
+  description: 'get Questions For Exam',
   args: {
     orderBy: {
       type: inputTypes.OrderByType
@@ -42,5 +42,5 @@ export const questionPagingExam = {
     ...connectionArgs
   },
   resolve: (obj, args, viewer, info) =>
-    resolveGetQuestionByExam(obj, args, viewer, info)
+    resolveGetQuestionsForExam(obj, args, viewer, info)
 };

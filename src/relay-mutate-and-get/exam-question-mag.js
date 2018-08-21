@@ -19,7 +19,7 @@ import { test_user_files } from '../tests/grading-test-data';
 
 const ObjectId = mongoose.Types.ObjectId;
 
-export const gradeQuestionAnswer = async (
+export const processQuestionAction = async (
   question_id,
   exam_attempt_id,
   response_data,
@@ -29,10 +29,21 @@ export const gradeQuestionAnswer = async (
   is_last_question,
   viewer
 ) => {
-  logger.debug(`in gradeQuestionAnswer`);
+  logger.debug(`in processQuestionAction`);
   logger.debug(`check_answer ` + check_answer);
 
   try {
+    let returnData = {
+      // question: question,
+      is_correct: false,
+      explain_text: '',
+      grading_response: '',
+      completionObj: {
+        code: '0',
+        msg: ''
+      }
+    };
+
     let questionInteractionInfo = {
       user_id: viewer.user_id,
       question_id: question_id,
@@ -68,14 +79,14 @@ export const gradeQuestionAnswer = async (
 
     logger.debug(`question ` + JSON.stringify(question));
 
-    // is_correct, explain_text, points, pct_score
-    let gradingObj = {
-      is_correct: false,
-      explain_text: '',
-      grading_response: ''
-    };
-
     if (check_answer) {
+      // is_correct, explain_text, points, pct_score
+      let gradingObj = {
+        is_correct: false,
+        explain_text: '',
+        grading_response: ''
+      };
+
       if (
         question.question_type === 'MCSA' ||
         question.question_type === 'MCMA'
@@ -105,9 +116,10 @@ export const gradeQuestionAnswer = async (
 
       questionInteractionInfo.points = gradingObj.points;
       questionInteractionInfo.pct_score = gradingObj.pct_score;
-      const { dummy1, qi_record } = await upsertQuestionInteraction(
-        questionInteractionInfo
-      );
+
+      returnData.is_correct = gradingObj.is_correct;
+      returnData.explain_text = gradingObj.explain_text;
+      returnData.grading_response = gradingObj.grading_response;
 
       if (!quiz) {
         const examattempt = await ExamAttemptFetch.findById(
@@ -131,22 +143,9 @@ export const gradeQuestionAnswer = async (
       }
     }
 
-    let returnData = {
-      // question: question,
-      is_correct: gradingObj.is_correct,
-      explain_text: gradingObj.explain_text,
-      grading_response: gradingObj.grading_response,
-      completionObj: {
-        code: '0',
-        msg: ''
-      }
-    };
-
-    if (!check_answer) {
-      // Do not return grading to the client
-      returnData.is_correct = false;
-      returnData.explain_text = '';
-    }
+    const { dummy1, qi_record } = await upsertQuestionInteraction(
+      questionInteractionInfo
+    );
 
     if (is_last_question) {
       const docRefs = question.doc_ref.EmbeddedDocRef.embedded_doc_refs;
@@ -203,7 +202,7 @@ export const gradeQuestionAnswer = async (
       }
     }
     logger.debug(
-      `gradeQuestionAnswer returnData ` + JSON.stringify(returnData)
+      `processQuestionAction returnData ` + JSON.stringify(returnData)
     );
     return returnData;
   } catch (error) {

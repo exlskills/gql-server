@@ -10,9 +10,9 @@ import { fromGlobalId, mutationWithClientMutationId } from 'graphql-relay';
 
 import { CompletionObjType } from '../../relay-models/completion-obj';
 
-import { gradeQuestionAnswer } from '../../relay-mutate-and-get/exam-question-mag';
+import { processQuestionAction } from '../../relay-mutate-and-get/exam-question-mag';
 import { CourseUnitType } from '../../relay-models/course-unit';
-import { fetchCourseUnits } from '../../db-handlers/course/course-unit-fetch';
+import { fetchCourseUnitsWithDetailedStatus } from '../../db-handlers/course/course-unit-fetch';
 import { logger } from '../../utils/logger';
 
 export default mutationWithClientMutationId({
@@ -42,7 +42,7 @@ export default mutationWithClientMutationId({
           courseId: course.doc_id,
           unitId: unit.doc_id
         };
-        const courses = await fetchCourseUnits({}, [], viewer.locale, params);
+        const courses = await fetchCourseUnitsWithDetailedStatus({}, [], viewer.locale, params);
         return courses[0] ? courses[0] : {};
       }
     },
@@ -93,7 +93,7 @@ export default mutationWithClientMutationId({
     logger.debug(`response_data raw ` + response_data);
     const localQuestionId = fromGlobalId(question_id).id;
     const localExamAttemptId = fromGlobalId(exam_attempt_id).id;
-    return gradeQuestionAnswer(
+    return processQuestionAction(
       localQuestionId,
       localExamAttemptId,
       response_data,

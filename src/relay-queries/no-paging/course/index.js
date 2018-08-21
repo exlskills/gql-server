@@ -7,7 +7,7 @@ import courseUnit from './course-unit';
 
 export default {
   courseById,
-  courseUserExamAttempts,
+  // courseUserExamAttempts,
   sectionCardEntry,
   cardByQuestion,
   topicFilter,

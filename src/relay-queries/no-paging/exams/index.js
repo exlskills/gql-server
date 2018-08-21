@@ -1,4 +1,4 @@
-import oneExam from './exam-specific.js';
+import examToTake from './exam-to-take.js';
 export default {
-  oneExam
+  examToTake
 };

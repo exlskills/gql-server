@@ -108,13 +108,13 @@ export const getQuestions = async (
   return result;
 };
 
-export const getQuestionsByExam = async (
+export const getQuestionsForExam = async (
   filterValues,
   aggregateArray,
   viewerLocale,
   fetchParameters
 ) => {
-  logger.debug(`in getQuestionsByExam`);
+  logger.debug(`in getQuestionsForExam`);
   let filterArray = [];
   let elem;
   let sort = { $sort: { sort_sequence: 1 } };
@@ -167,6 +167,7 @@ export const getQuestionsByExam = async (
     }
   }
 
+  logger.debug(`getQuestionsForExam result ` + JSON.stringify(result));
   return result;
 };
 
@@ -178,6 +179,10 @@ export const fetchQuestionsGeneric = async (
   viewerLocale
 ) => {
   logger.debug(`in fetchQuestionsGeneric`);
+
+  logger.debug(`sort ` + JSON.stringify(sort));
+  logger.debug(`skip ` + JSON.stringify(skip));
+  logger.debug(`limit ` + JSON.stringify(limit));
 
   let array = filterArray;
   let elem = {

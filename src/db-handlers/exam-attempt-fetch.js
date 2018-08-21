@@ -15,12 +15,14 @@ export const findById = async (obj_id, viewer, info) => {
   return record;
 };
 
-export const fetchExamAttemptByUserAndUnit = async (
+export const fetchExamAttemptsByUserAndUnitJoinExam = async (
   user_id,
   unit_id,
   opts = {}
 ) => {
-  logger.debug(`in fetchExamAttemptByUserAndUnit`);
+  logger.debug(`in fetchExamAttemptsByUserAndUnitJoinExam`);
+  logger.debug(`user_id ` + user_id);
+  logger.debug(`opts ` + JSON.stringify(opts));
   try {
     const sortVal = opts.sort;
     if (!opts.includeExam) {
@@ -61,8 +63,10 @@ export const computeFinalGrade = async quesInteIds => {
   return sumOfSoc;
 };
 
-export const fetchLastCancelledExamAttempt = async (user_id, unit_id) => {
-  logger.debug(`in fetchLastCancelledExamAttempt`);
+export const fetchLastCancExamAttemptByUserUnit = async (user_id, unit_id) => {
+  logger.debug(`in fetchLastCancExamAttemptByUserUnit`);
+  logger.debug(`user_id ` + user_id);
+  logger.debug(`unit_id ` + unit_id);
   let array = [];
   array.push({
     $match: {
@@ -106,5 +110,22 @@ export const fetchLastCancelledExamAttempt = async (user_id, unit_id) => {
       ExamAttempt.update({ _id: record._id }, { is_active: false });
     }
   }
+  logger.debug(
+    `fetchLastCancelledExamAttempt result ` + JSON.stringify(record)
+  );
   return record;
+};
+
+export const checkUserTookThisExam = async (exam_id, user_id, unit_id) => {
+  logger.debug(`in checkUserTookThisExam`);
+  let array = [];
+  let elem;
+  if (exam_id) {
+    elem = { $match: { exam_id: exam_id, unit_id: unit_id, user_id: user_id } };
+  } else {
+    elem = { $match: { unit_id: unit_id, user_id: user_id } };
+  }
+  array.push(elem);
+  const response = await ExamAttempt.aggregate(array).exec();
+  return response.length > 0;
 };

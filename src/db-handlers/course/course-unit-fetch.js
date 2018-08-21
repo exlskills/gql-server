@@ -7,7 +7,7 @@ import moment from 'moment';
 import { getStringByLocale } from '../../parsers/intl-string-parser';
 import { computeCardEMA } from './unit-section-fetch';
 import ExamAttempt from '../../db-models/exam-attempt-model';
-import { fetchLastCancelledExamAttempt } from '../exam-attempt-fetch';
+import { fetchLastCancExamAttemptByUserUnit } from '../exam-attempt-fetch';
 import { logger } from '../../utils/logger';
 
 export const fetchCourseUnitsBase = async (
@@ -36,61 +36,32 @@ export const fetchCourseUnitsBase = async (
     elem = { $match: { 'Units._id': fetchParameters.unitId } };
     array.push(elem);
   }
-  array.push(
-    {
-      $lookup: {
-        from: 'exam_attempt',
-        localField: 'Units._id',
-        foreignField: 'unit_id',
-        as: 'exam_attempt'
-      }
-    },
-    {
-      $project: {
-        attempt_today: {
-          $filter: {
-            input: '$exam_attempt',
-            cond: [
-              {
-                $and: [{ $eq: ['$$this.user_id', userId] }]
-              }
-            ]
-          }
-        },
-        user_attempted: {
-          $filter: {
-            input: '$exam_attempt',
-            cond: { $eq: ['$$this.user_id', userId] }
-          }
-        },
-        index: '$Units.index',
-        title: '$Units.title',
-        attempts_allowed_per_day: '$Units.attempts_allowed_per_day',
-        headline: '$Units.headline',
-        _id: '$Units._id',
-        currentCourseId: '$Units.currentCourseId',
-        sections_list: '$Units.sections.Sections'
-      }
-    },
-    {
-      $project: {
-        count_exam: { $size: '$attempt_today' },
-        attempts_allowed_per_day: 1,
-        _id: '$_id',
-        user_attempted: 1,
-        index: 1,
-        title: 1,
-        headline: 1,
-        currentCourseId: 1,
-        sections_list: 1
-      }
-    }
-  );
   elem = {
     $project: {
-      attempts_left: {
-        $subtract: ['$attempts_allowed_per_day', '$count_exam']
-      },
+      index: '$Units.index',
+      title: '$Units.title',
+      attempts_allowed_per_day: '$Units.attempts_allowed_per_day',
+      headline: '$Units.headline',
+      _id: '$Units._id',
+      currentCourseId: '$Units.currentCourseId',
+      sections_list: '$Units.sections.Sections'
+    }
+  };
+  array.push(elem);
+  elem = {
+    $project: {
+      attempts_allowed_per_day: 1,
+      _id: '$_id',
+      index: 1,
+      title: 1,
+      headline: 1,
+      currentCourseId: 1,
+      sections_list: 1
+    }
+  };
+  array.push(elem);
+  elem = {
+    $project: {
       'title.intlString': projectionWriter.writeIntlStringFilter(
         'title',
         viewerLocale
@@ -103,12 +74,10 @@ export const fetchCourseUnitsBase = async (
       _id: 1,
       index: 1,
       currentCourseId: 1,
-      user_attempted: 1,
       sections_list: 1
     }
   };
   array.push(elem);
-
   elem = {
     $project: {
       title: projectionWriter.writeIntlStringEval('title', viewerLocale),
@@ -116,9 +85,7 @@ export const fetchCourseUnitsBase = async (
       attempts_allowed_per_day: 1,
       _id: 1,
       index: 1,
-      user_attempted: 1,
       currentCourseId: 1,
-      attempts_left: 1,
       sections_list: 1
     }
   };
@@ -137,18 +104,22 @@ export const fetchCourseUnitsBase = async (
   }
 
   let result = await Course.aggregate(array).exec();
+
+  logger.debug('fetchCourseUnitsBase result ' + JSON.stringify(result));
   return result;
 };
 
-export const fetchCourseUnits = async (
+export const fetchCourseUnitsWithDetailedStatus = async (
   filterValues,
   aggregateArray,
   viewerLocale,
   fetchParameters
 ) => {
-  logger.debug(`in fetchCourseUnits`);
+  logger.debug(`in fetchCourseUnitsWithDetailedStatus`);
 
-  let arrayRet = await fetchCourseUnitsBase(
+  // TODO: rewrite to pull the necessary Section and Card details and then run the calc logic
+
+  let arrayCourseUnitsDetails = await fetchCourseUnitsBase(
     filterValues,
     aggregateArray,
     viewerLocale,
@@ -158,7 +129,17 @@ export const fetchCourseUnits = async (
   const userId = fetchParameters.userId;
 
   let userData = await UserFetch.findById(userId);
-  for (let unitElem of arrayRet) {
+
+  // TODO: consider replacing with a more simple function
+  let examStatusByCourseUnit = await fetchUserCourseUnitExamStatus(
+    filterValues,
+    aggregateArray,
+    viewerLocale,
+    fetchParameters
+  );
+
+  // Get individual Secions and Cards and calculate the progress status
+  for (let unitElem of arrayCourseUnitsDetails) {
     unitElem.ema = 0.0;
     unitElem.quiz_lvl = 0;
     unitElem.attempts_left = 0;
@@ -171,6 +152,8 @@ export const fetchCourseUnits = async (
         (it1, it2) => (it1.index || 0) - (it2.index || 0)
       );
     }
+
+    // Unit Sections
     if (sectionArray.length > 0) {
       for (let sectionElem of sectionArray) {
         sectionElem.ema = 0.0;
@@ -182,6 +165,8 @@ export const fetchCourseUnits = async (
           sectionElem.headline,
           viewerLocale
         ).text;
+
+        // Section Cards
         let cardArray = [];
         if (sectionElem.cards.Cards) {
           cardArray = sectionElem.cards.Cards.sort(
@@ -205,23 +190,6 @@ export const fetchCourseUnits = async (
       unitElem.ema = unitElem.ema / sectionArray.length;
     }
 
-    const userattempted = unitElem.user_attempted || [];
-    unitElem.unit_processing = has_quiz ? 0 : -1;
-    unitElem.grade = 0;
-    if (userattempted.length > 0) {
-      unitElem.unit_processing = 0;
-      try {
-        const unitexam = await ExamFetch.findById(userattempted[0].exam_id);
-        const unitGrade = Math.max(
-          ...userattempted.map(item => item.final_grade_pct || 0)
-        );
-        // Assuming that all attempts for the Unit's exam were for the same exam_id
-        unitElem.grade = unitGrade;
-        unitElem.unit_processing = unitGrade >= unitexam.pass_mark_pct;
-      } catch (err) {
-        return Promise.reject(err);
-      }
-    }
     let arrayCourseRole = userData.course_roles;
     for (let courserole of arrayCourseRole) {
       if (
@@ -236,29 +204,44 @@ export const fetchCourseUnits = async (
         }
       }
     }
-    let arrayAttemp = await ExamAttempt.find({
-      started_at: {
-        $gte: moment().format('YYYY-MM-DD 00:00:00'),
-        $lte: moment().format('YYYY-MM-DD HH:mm:ss')
-      },
-      unit_id: { $eq: unitElem._id }
-    }).exec();
-    if (arrayAttemp.length > 0) {
-      unitElem.attempts_left =
-        unitElem.attempts_allowed_per_day - arrayAttemp.length;
-    } else {
-      unitElem.attempts_left = unitElem.attempts_allowed_per_day;
-    }
-    let lastCancelled = await fetchLastCancelledExamAttempt(
-      userId,
-      unitElem._id
+
+    unitElem.unit_processing = has_quiz ? 0 : -1;
+
+    unitElem.grade = 0;
+    unitElem.attempts_left = unitElem.attempts_allowed_per_day;
+    unitElem.user_attempted = 0;
+
+    // Course Unit Exam Attempts
+    const examStatusUnitIndex = examStatusByCourseUnit.findIndex(
+      x => x._id === unitElem._id
     );
-    if (lastCancelled && lastCancelled.isContinue === true) {
-      unitElem.is_continue_exam = true;
-      unitElem.exam_ = lastCancelled._id;
+
+    if (examStatusUnitIndex >= 0) {
+      unitElem.grade = examStatusByCourseUnit[examStatusUnitIndex].grade;
+      if (examStatusByCourseUnit[examStatusUnitIndex].passed) {
+        // TODO: what is this value used for in the wc? What should it be set to here?
+        unitElem.unit_processing = 1;
+      }
+
+      unitElem.attempts_left =
+        examStatusByCourseUnit[examStatusUnitIndex].attempts_left;
+
+      let lastCancelled = await fetchLastCancExamAttemptByUserUnit(
+        userId,
+        unitElem._id
+      );
+      if (lastCancelled && lastCancelled.isContinue === true) {
+        unitElem.is_continue_exam = true;
+        unitElem.exam_ = lastCancelled._id;
+      }
     }
-  }
-  return arrayRet;
+  } // End of loop on Course Units
+
+  logger.debug(
+    `fetchCourseUnitsWithDetailedStatus result ` +
+      JSON.stringify(arrayCourseUnitsDetails)
+  );
+  return arrayCourseUnitsDetails;
 };
 
 export const fetchUserCourseUnitExamStatus = async (
@@ -270,6 +253,8 @@ export const fetchUserCourseUnitExamStatus = async (
   logger.debug(`in fetchUserCourseUnitExamStatus`);
   let array = [];
   let selectFields = {};
+
+  // TODO: test and adjust with multiple exams per Course Unit
 
   // Find the course
   array.push({ $match: { _id: fetchParameters.courseId } });
@@ -299,12 +284,16 @@ export const fetchUserCourseUnitExamStatus = async (
   selectFields.title = 1;
 
   const result = await Course.aggregate(array).exec();
+  logger.debug(
+    `fetchUserCourseUnitExamStatus Course-Unit fetch result ` +
+      JSON.stringify(result)
+  );
 
   const attemptSort = { submitted_at: -1, started_at: -1 };
   for (let unit of result) {
     let examAttempts = [];
     try {
-      examAttempts = await ExamAttemptFetch.fetchExamAttemptByUserAndUnit(
+      examAttempts = await ExamAttemptFetch.fetchExamAttemptsByUserAndUnitJoinExam(
         fetchParameters.userId,
         unit._id,
         {
@@ -346,6 +335,9 @@ export const fetchUserCourseUnitExamStatus = async (
     }
   }
 
+  logger.debug(
+    `fetchUserCourseUnitExamStatus result ` + JSON.stringify(result)
+  );
   return result;
 };
 
@@ -354,6 +346,7 @@ export const fetchUserCourseExamAttemptsByUnit = async (
   viewer,
   info
 ) => {
+  // NOT USED - REMOVE
   logger.debug(`in fetchUserCourseUnitExamAttempts`);
   const array = [
     {
