@@ -5,8 +5,10 @@ import * as ExamAttemptFetch from '../db-handlers/exam-attempt-fetch';
 import { createActivity } from '../db-handlers/activities-cud';
 import { getStringByLocale } from '../parsers/intl-string-parser';
 import { toClientUrlId } from '../utils/client-url';
+import { logger } from '../utils/logger';
 
 export const takeExam = async (courseId, unitId, viewer, info) => {
+  logger.debug(`in takeExam`);
   try {
     let arrayReturn = await ExamFetch.returnObjectExamAttempt(
       unitId,
@@ -71,6 +73,7 @@ export const takeExam = async (courseId, unitId, viewer, info) => {
 };
 
 export const leaveExam = async (exam_attempt_id, cancel, viewer, info) => {
+  logger.debug(`in leaveExam`);
   try {
     let examattempt = await ExamAttemptFetch.findById(exam_attempt_id);
     examattempt.submitted_at = new Date();

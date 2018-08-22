@@ -251,6 +251,11 @@ export const fetchUserCourseUnitExamStatus = async (
   fetchParameters
 ) => {
   logger.debug(`in fetchUserCourseUnitExamStatus`);
+  logger.debug(`   filterValues ` + JSON.stringify(filterValues));
+  logger.debug(`   aggregateArray ` + JSON.stringify(aggregateArray));
+  logger.debug(`   viewerLocale ` + viewerLocale);
+  logger.debug(`   fetchParameters ` + JSON.stringify(fetchParameters));
+
   let array = [];
   let selectFields = {};
 
@@ -305,19 +310,31 @@ export const fetchUserCourseUnitExamStatus = async (
       // Ignore
     }
 
+    logger.debug(
+      `fetchExamAttemptsByUserAndUnitJoinExam fetch result ` +
+        JSON.stringify(examAttempts)
+    );
+
+    unit.attempts = 0;
+    unit.attempts_left = unit.attempts_allowed_per_day;
+    unit.grade = 0;
+    unit.passed = false;
     if (examAttempts.length > 0) {
+      logger.debug(`in the attempts analysis`);
+
+      unit.attempts = examAttempts.length;
       const latestAttempt = examAttempts[0];
       unit.last_attempted_at =
         latestAttempt.submitted_at || latestAttempt.started_at;
 
       const today = new Date().toDateString();
-      unit.attempts = examAttempts.filter(
+      const attemptsToday = examAttempts.filter(
         item =>
           item.started_at.toDateString() === today ||
           (item.submitted_at && item.submitted_at.toDateString() === today)
       ).length;
 
-      unit.attempts_left = unit.attempts_allowed_per_day - unit.attempts;
+      unit.attempts_left = unit.attempts_allowed_per_day - attemptsToday;
       if (unit.attempts_left < 0) {
         unit.attempts_left = 0;
       }
@@ -325,18 +342,18 @@ export const fetchUserCourseUnitExamStatus = async (
       unit.grade = Math.max(
         ...examAttempts.map(item => item.final_grade_pct || 0)
       );
-      // Assuming that all attempts for the Unit's exam were for the same exam_id
-      unit.passed = unit.grade >= latestAttempt.exam.pass_mark_pct;
-    } else {
-      unit.attempts = 0;
-      unit.attempts_left = unit.attempts_allowed_per_day;
-      unit.grade = 0;
-      unit.passed = false;
-    }
+
+      for (let examAttempt of examAttempts) {
+        if (examAttempt.final_grade_pct >= examAttempt.exam.pass_mark_pct) {
+          unit.passed = true;
+          break;
+        }
+      }
+    } // End of work with Exam Attempts
   }
 
   logger.debug(
-    `fetchUserCourseUnitExamStatus result ` + JSON.stringify(result)
+    `OUTPUT fetchUserCourseUnitExamStatus result ` + JSON.stringify(result)
   );
   return result;
 };

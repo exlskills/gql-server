@@ -20,6 +20,8 @@ export const upsertQuestionInteraction = async object => {
       exam_attempt_id: object.exam_attempt_id
     }).exec();
 
+    logger.debug(`upsertQuestionInteraction record ` + JSON.stringify(record));
+
     return { result, record };
   } catch (err) {
     return Promise.reject('Error adding QuestionInteraction to DB ' + err);

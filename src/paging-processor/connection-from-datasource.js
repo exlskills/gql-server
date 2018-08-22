@@ -13,14 +13,14 @@ export function connectionFromDataSource(
   context,
   info
 ) {
-  logger.debug(`in connectionFromDataSource`);
+  logger.debug(`in (.....) connectionFromDataSource`);
   return waitForPromisedArray(execDetails, args, context.locale).then(
     result => result
   );
 }
 
 async function waitForPromisedArray(execDetails, args, viewerLocale) {
-  logger.debug(`in waitForPromisedArray`);
+  logger.debug(`in (.....) waitForPromisedArray`);
   const dataWithFrame = await findWithPaging(execDetails, args, viewerLocale);
   return connectionFromArrayWithFrame(dataWithFrame, execDetails.businessKey);
 }
@@ -28,7 +28,7 @@ async function waitForPromisedArray(execDetails, args, viewerLocale) {
 export function connectionFromArrayWithFrame(dataWithFrame, pathToKey) {
   if (dataWithFrame.array) {
     let amountOfAddedNodes = 0;
-    if (dataWithFrame.anchor == 0) {
+    if (dataWithFrame.anchor === 0) {
       dataWithFrame.array.forEach(node => {
         node.anchor = dataWithFrame.anchor;
         node.index = dataWithFrame.offset + amountOfAddedNodes;

@@ -203,7 +203,7 @@ export async function findOptimisticArray(
   skipVal,
   limitVal
 ) {
-  logger.debug(`in findOptimisticArray`);
+  logger.debug(`in (.....) findOptimisticArray`);
   let aggregateArray = aggregateBuilder(sortVal, skipVal, limitVal);
   try {
     return await execDetails.queryFunction(

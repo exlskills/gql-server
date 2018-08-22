@@ -1,7 +1,7 @@
 import { logger } from '../utils/logger';
 
 export default function aggregateBuilder(sortVal, skipVal, limitVal) {
-  logger.debug(`in aggregateBuilder`);
+  logger.debug(`in (.....) aggregateBuilder`);
   let returnArray = [];
 
   if (limitVal >= 0 && sortVal) {

@@ -30,7 +30,10 @@ export const processQuestionAction = async (
   viewer
 ) => {
   logger.debug(`in processQuestionAction`);
-  logger.debug(`check_answer ` + check_answer);
+  logger.debug(`   check_answer ` + check_answer);
+  logger.debug(`   quiz ` + quiz);
+  logger.debug(`   is_quiz_start ` + is_quiz_start);
+  logger.debug(`   is_last_question ` + is_last_question);
 
   try {
     let returnData = {
@@ -79,7 +82,7 @@ export const processQuestionAction = async (
 
     logger.debug(`question ` + JSON.stringify(question));
 
-    if (check_answer) {
+    if (check_answer || !quiz) {
       // is_correct, explain_text, points, pct_score
       let gradingObj = {
         is_correct: false,
@@ -120,32 +123,30 @@ export const processQuestionAction = async (
       returnData.is_correct = gradingObj.is_correct;
       returnData.explain_text = gradingObj.explain_text;
       returnData.grading_response = gradingObj.grading_response;
-
-      if (!quiz) {
-        const examattempt = await ExamAttemptFetch.findById(
-          questionInteractionInfo.exam_attempt_id
-        );
-        const quesInterIdx = examattempt.question_interaction_ids.findIndex(
-          item => item.toString() === qi_record._id.toString()
-        );
-        if (quesInterIdx === -1) {
-          examattempt.question_interaction_ids.push(qi_record._id);
-        }
-        examattempt.final_grade_pct = await ExamAttemptFetch.computeFinalGrade(
-          examattempt.question_interaction_ids
-        );
-        if (isNaN(examattempt.final_grade_pct)) {
-          examattempt.final_grade_pct = 0;
-        }
-        examattempt.final_grade_pct =
-          examattempt.final_grade_pct / examattempt.question_ids.length;
-        await examattempt.save();
-      }
     }
 
-    const { dummy1, qi_record } = await upsertQuestionInteraction(
-      questionInteractionInfo
-    );
+    const uqi_output = await upsertQuestionInteraction(questionInteractionInfo);
+
+    if (!quiz) {
+      const examattempt = await ExamAttemptFetch.findById(
+        questionInteractionInfo.exam_attempt_id
+      );
+      const quesInterIdx = examattempt.question_interaction_ids.findIndex(
+        item => item.toString() === uqi_output.record._id.toString()
+      );
+      if (quesInterIdx === -1) {
+        examattempt.question_interaction_ids.push(uqi_output.record._id);
+      }
+      examattempt.final_grade_pct = await ExamAttemptFetch.computeFinalGrade(
+        examattempt.question_interaction_ids
+      );
+      if (isNaN(examattempt.final_grade_pct)) {
+        examattempt.final_grade_pct = 0;
+      }
+      examattempt.final_grade_pct =
+        examattempt.final_grade_pct / examattempt.question_ids.length;
+      await examattempt.save();
+    }
 
     if (is_last_question) {
       const docRefs = question.doc_ref.EmbeddedDocRef.embedded_doc_refs;

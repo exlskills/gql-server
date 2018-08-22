@@ -12,7 +12,7 @@ import {
 } from '../db-handlers/course/course-unit-fetch';
 
 export const resolveCourseUnits = (obj, args, viewer, info) => {
-  logger.debug(`in resolveCourseUnits`);
+  logger.debug(`in -----> resolveCourseUnits`);
   const businessKey = '_id';
   const fetchParameters = {
     userId: viewer.user_id
@@ -67,7 +67,7 @@ export const resolveUserCourseExamAttempts = async (
 };
 
 export const resolveUserCourseUnitExamStatus = (obj, args, viewer, info) => {
-  logger.debug(`in resolveUserCourseUnitExamStatus`);
+  logger.debug(`in -----> resolveUserCourseUnitExamStatus`);
   if (!args || !args.resolverArgs) {
     return attachEmptyFrame();
   }

@@ -5,6 +5,7 @@ import { logger } from '../utils/logger';
 
 export const findById = async (obj_id, viewer, info) => {
   logger.debug(`in Exam Attempt findById`);
+  logger.debug(`  obj_id ` + obj_id);
   let record;
   try {
     //model, runParams, queryVal, sortVal, selectVal
@@ -21,8 +22,9 @@ export const fetchExamAttemptsByUserAndUnitJoinExam = async (
   opts = {}
 ) => {
   logger.debug(`in fetchExamAttemptsByUserAndUnitJoinExam`);
-  logger.debug(`user_id ` + user_id);
-  logger.debug(`opts ` + JSON.stringify(opts));
+  logger.debug(`   user_id ` + user_id);
+  logger.debug(`   unit_id ` + unit_id);
+  logger.debug(`   opts ` + JSON.stringify(opts));
   try {
     const sortVal = opts.sort;
     if (!opts.includeExam) {

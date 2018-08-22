@@ -42,7 +42,12 @@ export default mutationWithClientMutationId({
           courseId: course.doc_id,
           unitId: unit.doc_id
         };
-        const courses = await fetchCourseUnitsWithDetailedStatus({}, [], viewer.locale, params);
+        const courses = await fetchCourseUnitsWithDetailedStatus(
+          {},
+          [],
+          viewer.locale,
+          params
+        );
         return courses[0] ? courses[0] : {};
       }
     },
@@ -89,7 +94,7 @@ export default mutationWithClientMutationId({
     viewer,
     info
   ) => {
-    logger.debug(`in SubmitAnswer mutateAndGetPayload`);
+    logger.debug(`in relay-mutation SubmitAnswer mutateAndGetPayload`);
     logger.debug(`response_data raw ` + response_data);
     const localQuestionId = fromGlobalId(question_id).id;
     const localExamAttemptId = fromGlobalId(exam_attempt_id).id;
