@@ -13,7 +13,7 @@ export const findById = async (obj_id, viewer, info) => {
   try {
     //model, runParams, queryVal, sortVal, selectVal
     record = await basicFind(Question, { isById: true }, obj_id);
-  } catch (errInternalAllreadyReported) {
+  } catch (errInternalAlreadyReported) {
     return null;
   }
   return record;
@@ -108,13 +108,13 @@ export const getQuestions = async (
   return result;
 };
 
-export const getQuestionsForExam = async (
+export const getQuestionsInExamAttempt = async (
   filterValues,
   aggregateArray,
   viewerLocale,
   fetchParameters
 ) => {
-  logger.debug(`in getQuestionsForExam`);
+  logger.debug(`in getQuestionsInExamAttempt`);
   let filterArray = [];
   let elem;
   let sort = { $sort: { sort_sequence: 1 } };

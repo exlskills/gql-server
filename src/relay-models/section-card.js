@@ -21,28 +21,28 @@ export const SectionCardType = new GraphQLObjectType({
   fields: () => ({
     id: globalIdField('SectionCard', obj => obj._id),
     index: {
-      type: new GraphQLNonNull(GraphQLInt)
+      type: GraphQLInt
     },
     title: {
-      type: new GraphQLNonNull(GraphQLString)
+      type: GraphQLString
     },
     headline: {
-      type: new GraphQLNonNull(GraphQLString)
+      type: GraphQLString
     },
     content_id: {
-      type: new GraphQLNonNull(GraphQLID)
+      type: GraphQLID
     },
     tags: {
-      type: new GraphQLNonNull(new GraphQLList(GraphQLString)) // TODO: needs more testing
+      type: new GraphQLList(GraphQLString) // TODO: needs more testing
     },
     question_ids: {
-      type: new GraphQLNonNull(new GraphQLList(GraphQLID)) // TODO: needs more testing
+      type: new GraphQLList(GraphQLID) // TODO: needs more testing
     },
     ema: {
       type: GraphQLFloat
     },
     card_ref: {
-      type: new GraphQLNonNull(EmbeddedDocRefType)
+      type: EmbeddedDocRefType
     },
     content: {
       type: VersionedContentRecordType

@@ -18,7 +18,7 @@ export const findById = async (obj_id, viewer, info) => {
       },
       obj_id
     );
-  } catch (errInternalAllreadyReported) {
+  } catch (errInternalAlreadyReported) {
     return null;
   }
   return record;

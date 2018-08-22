@@ -2,19 +2,21 @@ import Course from '../../db-models/course-model';
 import * as UserFetch from '../../db-handlers/user/user-fetch';
 import * as projectionWriter from '../../utils/projection-writer';
 import * as ExamAttemptFetch from '../../db-handlers/exam-attempt-fetch';
-import * as ExamFetch from '../../db-handlers/exam-fetch';
 import moment from 'moment';
 import { getStringByLocale } from '../../parsers/intl-string-parser';
-import { computeCardEMA } from './unit-section-fetch';
+import { computeQuestionsEMA } from '../question-interaction-fetch';
 import ExamAttempt from '../../db-models/exam-attempt-model';
 import { fetchLastCancExamAttemptByUserUnit } from '../exam-attempt-fetch';
 import { logger } from '../../utils/logger';
+import { checkUserViewedCard } from '../../db-handlers/card-interaction-fetch';
+import { fetchSectionCardIDsForUnit } from './section-card-fetch';
 
 export const fetchCourseUnitsBase = async (
   filterValues,
   aggregateArray,
   viewerLocale,
-  fetchParameters
+  fetchParameters,
+  include_sections = false
 ) => {
   logger.debug(`in fetchCourseUnitsBase`);
   let array = [];
@@ -43,10 +45,12 @@ export const fetchCourseUnitsBase = async (
       attempts_allowed_per_day: '$Units.attempts_allowed_per_day',
       headline: '$Units.headline',
       _id: '$Units._id',
-      currentCourseId: '$Units.currentCourseId',
-      sections_list: '$Units.sections.Sections'
+      currentCourseId: '$Units.currentCourseId'
     }
   };
+  if (include_sections) {
+    elem.$project.sections_list = '$Units.sections.Sections';
+  }
   array.push(elem);
   elem = {
     $project: {
@@ -55,10 +59,12 @@ export const fetchCourseUnitsBase = async (
       index: 1,
       title: 1,
       headline: 1,
-      currentCourseId: 1,
-      sections_list: 1
+      currentCourseId: 1
     }
   };
+  if (include_sections) {
+    elem.$project.sections_list = 1;
+  }
   array.push(elem);
   elem = {
     $project: {
@@ -73,10 +79,13 @@ export const fetchCourseUnitsBase = async (
       attempts_allowed_per_day: 1,
       _id: 1,
       index: 1,
-      currentCourseId: 1,
-      sections_list: 1
+      currentCourseId: 1
     }
   };
+  if (include_sections) {
+    elem.$project.sections_list = 1;
+  }
+
   array.push(elem);
   elem = {
     $project: {
@@ -85,10 +94,13 @@ export const fetchCourseUnitsBase = async (
       attempts_allowed_per_day: 1,
       _id: 1,
       index: 1,
-      currentCourseId: 1,
-      sections_list: 1
+      currentCourseId: 1
     }
   };
+  if (include_sections) {
+    elem.$project.sections_list = 1;
+  }
+
   array.push(elem);
 
   if (aggregateArray) {
@@ -123,7 +135,8 @@ export const fetchCourseUnitsWithDetailedStatus = async (
     filterValues,
     aggregateArray,
     viewerLocale,
-    fetchParameters
+    fetchParameters,
+    true
   );
 
   const userId = fetchParameters.userId;
@@ -141,7 +154,6 @@ export const fetchCourseUnitsWithDetailedStatus = async (
   // Get individual Secions and Cards and calculate the progress status
   for (let unitElem of arrayCourseUnitsDetails) {
     unitElem.ema = 0.0;
-    unitElem.quiz_lvl = 0;
     unitElem.attempts_left = 0;
     unitElem.is_continue_exam = false;
     unitElem.exam_ = '';
@@ -178,9 +190,21 @@ export const fetchCourseUnitsWithDetailedStatus = async (
           for (let card of cardArray) {
             card.title = getStringByLocale(card.title, viewerLocale).text;
             card.headline = getStringByLocale(card.headline, viewerLocale).text;
-            const ema = await computeCardEMA(userId, card.question_ids);
-            has_quiz = has_quiz || ema !== null;
-            card.ema = ema ? ema : 0;
+
+            card.ema = 0;
+            if (card.question_ids && card.question_ids.length > 0) {
+              card.ema = await computeQuestionsEMA(userId, card.question_ids);
+              has_quiz = has_quiz ? true : card.ema !== null;
+            } else {
+              const user_card_view = await checkUserViewedCard(
+                userId,
+                card._id
+              );
+              if (user_card_view) {
+                card.ema = 100;
+              }
+            }
+
             sectionElem.ema += card.ema;
           }
           sectionElem.ema = sectionElem.ema / cardArray.length;
@@ -190,22 +214,7 @@ export const fetchCourseUnitsWithDetailedStatus = async (
       unitElem.ema = unitElem.ema / sectionArray.length;
     }
 
-    let arrayCourseRole = userData.course_roles;
-    for (let courserole of arrayCourseRole) {
-      if (
-        courserole.course_unit_status ||
-        courserole.course_unit_status.length > 0
-      ) {
-        let arrayCourseUnitStatus = courserole.course_unit_status;
-        for (let unitStatus of arrayCourseUnitStatus) {
-          if (unitStatus.unit_id === unitElem._id) {
-            unitElem.quiz_lvl = unitStatus.quiz_lvl;
-          }
-        }
-      }
-    }
-
-    unitElem.unit_processing = has_quiz ? 0 : -1;
+    unitElem.unit_progress_state = has_quiz ? 0 : -1;
 
     unitElem.grade = 0;
     unitElem.attempts_left = unitElem.attempts_allowed_per_day;
@@ -220,7 +229,7 @@ export const fetchCourseUnitsWithDetailedStatus = async (
       unitElem.grade = examStatusByCourseUnit[examStatusUnitIndex].grade;
       if (examStatusByCourseUnit[examStatusUnitIndex].passed) {
         // TODO: what is this value used for in the wc? What should it be set to here?
-        unitElem.unit_processing = 1;
+        unitElem.unit_progress_state = 1;
       }
 
       unitElem.attempts_left =
@@ -296,6 +305,7 @@ export const fetchUserCourseUnitExamStatus = async (
 
   const attemptSort = { submitted_at: -1, started_at: -1 };
   for (let unit of result) {
+    // Process Exam Attempts for the User - Course Unit
     let examAttempts = [];
     try {
       examAttempts = await ExamAttemptFetch.fetchExamAttemptsByUserAndUnitJoinExam(
@@ -350,74 +360,49 @@ export const fetchUserCourseUnitExamStatus = async (
         }
       }
     } // End of work with Exam Attempts
-  }
+
+    const cardsAndQuestions = await fetchSectionCardIDsForUnit(
+      fetchParameters.courseId,
+      unit._id
+    );
+
+    unit.sections_list = [];
+    for (let section of cardsAndQuestions.unit.sections.Sections) {
+      logger.debug(`   section ` + section._id);
+      let sectionObj = { _id: section._id };
+
+      let sectionCardsList = [];
+      for (let card of section.cards.Cards) {
+        let cardObj = { _id: card._id };
+        cardObj.ema = 0;
+        if (card.question_ids && card.question_ids.length > 0) {
+          cardObj.ema = await computeQuestionsEMA(
+            fetchParameters.userId,
+            card.question_ids
+          );
+          cardObj.ema = cardObj.ema === null ? 0 : cardObj.ema;
+        } else {
+          const user_card_view = await checkUserViewedCard(
+            fetchParameters.userId,
+            card._id
+          );
+          if (user_card_view) {
+            cardObj.ema = 100;
+          }
+        }
+        sectionCardsList.push(cardObj);
+      }
+
+      sectionObj.cards_list = sectionCardsList;
+
+      unit.sections_list.push(sectionObj);
+    } // End of loop on sections
+  } // End of loop on Units of the Course
 
   logger.debug(
     `OUTPUT fetchUserCourseUnitExamStatus result ` + JSON.stringify(result)
   );
   return result;
-};
-
-export const fetchUserCourseExamAttemptsByUnit = async (
-  obj_id,
-  viewer,
-  info
-) => {
-  // NOT USED - REMOVE
-  logger.debug(`in fetchUserCourseUnitExamAttempts`);
-  const array = [
-    {
-      $match: {
-        _id: obj_id
-      }
-    },
-    {
-      $project: {
-        units: '$units.Units'
-      }
-    },
-    {
-      $unwind: '$units'
-    },
-    {
-      $project: {
-        'units._id': 1,
-        'units.attempts_allowed_per_day': 1
-      }
-    },
-    {
-      $lookup: {
-        from: 'exam_attempt',
-        localField: 'units._id',
-        foreignField: 'course_unit_id',
-        as: 'exam_attempt'
-      }
-    },
-    {
-      $project: {
-        exam_attempt: {
-          $filter: {
-            input: '$exam_attempt',
-            cond: {
-              $eq: ['$$this.user_id', viewer.user_id]
-            }
-          }
-        },
-        count_exam: {
-          $size: '$exam_attempt'
-        },
-        'units.attempts_allowed_per_day': 1
-      }
-    },
-    {
-      $project: {
-        total: {
-          $subtract: ['$units.attempts_allowed_per_day', '$count_exam']
-        }
-      }
-    }
-  ];
-  return await Course.aggregate(array).exec();
 };
 
 export const fetchCourseUnitById = async (
@@ -442,7 +427,8 @@ export const fetchCourseUnitById = async (
     null,
     null,
     viewerLocale,
-    fetchParameters
+    fetchParameters,
+    true
   );
 
   for (let unitElem of arrayRet) {
@@ -457,11 +443,10 @@ export const fetchCourseUnitById = async (
       ).text;
     }
     unitElem.ema = 0.0;
-    unitElem.quiz_lvl = 0;
     unitElem.attempts_left = 0;
     let has_quiz = false;
     const userattempted = unitElem.user_attempted || [];
-    unitElem.unit_processing = has_quiz ? 0 : -1;
+    unitElem.unit_progress_state = has_quiz ? 0 : -1;
     unitElem.grade = 0;
     let arrayAttemp = await ExamAttempt.find({
       started_at: {

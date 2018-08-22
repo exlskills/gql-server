@@ -1,6 +1,5 @@
 import mongoose from 'mongoose';
 import EmbeddedDocRefSchema from './embedded-doc-ref-model';
-import UserCourseUnitStatus from './user-course-unit-status-model';
 
 export default new mongoose.Schema(
   {
@@ -23,9 +22,6 @@ export default new mongoose.Schema(
     },
     last_accessed_item: {
       type: EmbeddedDocRefSchema
-    },
-    course_unit_status: {
-      type: [UserCourseUnitStatus]
     }
   },
   {

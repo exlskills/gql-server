@@ -25,13 +25,13 @@ export const UnitSectionType = new GraphQLObjectType({
   fields: () => ({
     id: globalIdField('UnitSection', obj => obj._id),
     index: {
-      type: new GraphQLNonNull(GraphQLInt)
+      type: GraphQLInt
     },
     title: {
-      type: new GraphQLNonNull(GraphQLString)
+      type: GraphQLString
     },
     headline: {
-      type: new GraphQLNonNull(GraphQLString)
+      type: GraphQLString
     },
     ema: {
       type: GraphQLFloat

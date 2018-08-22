@@ -1,4 +1,5 @@
 import * as UserCud from '../db-handlers/user/user-cud';
+import { logger } from '../utils/logger';
 
 export const updateUserProfile = async (locale, profile, viewer) => {
   try {
@@ -10,14 +11,11 @@ export const updateUserProfile = async (locale, profile, viewer) => {
 };
 
 export const updateUserUnitStatus = async (unit_id, course_id, viewer) => {
+  logger.debug(`in =====> updateUserUnitStatus`);
   try {
-    const result = await UserCud.updateUserQuizLvl(
-      viewer.user_id,
-      unit_id,
-      course_id
-    );
+    // TODO - FUTURE this is not currently updating anything
     return { completionObj: { code: '0', msg: '' } };
   } catch (err) {
-    return { completionObj: { code: '0', msg: err.message } };
+    return { completionObj: { code: '1', msg: err.message } };
   }
 };

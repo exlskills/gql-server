@@ -9,7 +9,7 @@ export const findById = async (obj_id, viewer, info) => {
   try {
     //model, runParams, queryVal, sortVal, selectVal
     record = await basicFind(VersionedContent, { isById: true }, obj_id);
-  } catch (errInternalAllreadyReported) {
+  } catch (errInternalAlreadyReported) {
     return null;
   }
   return record;

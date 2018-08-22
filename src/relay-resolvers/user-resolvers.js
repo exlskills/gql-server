@@ -15,13 +15,13 @@ export const findUserById = async (user_id, viewer, info) => {
   try {
     //model, runParams, queryVal, sortVal, selectVal
     userRecord = await basicFind(User, { isById: true }, user_id);
-  } catch (errInternalAllreadyReported) {
+  } catch (errInternalAlreadyReported) {
     return null;
   }
 
   try {
     userRecord = await mdbUserToGqlUser(userRecord, viewer);
-  } catch (errInternalAllreadyReported) {
+  } catch (errInternalAlreadyReported) {
     return null;
   }
 

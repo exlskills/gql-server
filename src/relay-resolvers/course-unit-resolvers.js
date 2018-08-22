@@ -61,7 +61,7 @@ export const resolveUserCourseExamAttempts = async (
   try {
     let course_id = fromGlobalId(args.course_id).id;
     return await fetchUserCourseExamAttemptsByUnit(course_id, viewer, info);
-  } catch (errInternalAllreadyReported) {
+  } catch (errInternalAlreadyReported) {
     return {};
   }
 };

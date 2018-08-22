@@ -9,6 +9,10 @@ import questionQueries from './no-paging/question';
 import langQueries from './no-paging/lang';
 import examAttempt from './no-paging/exam-attempt';
 
+// TODO on wc:
+// rename unit_processing to unit_progress_state
+// delete quiz_lvl
+
 export default {
   node: NodeField,
   courseById: courseQueries.courseById,

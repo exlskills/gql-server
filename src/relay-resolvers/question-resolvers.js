@@ -6,7 +6,7 @@ import { logger } from '../utils/logger';
 import {
   fetchQuestionHint,
   getQuestions,
-  getQuestionsForExam
+  getQuestionsInExamAttempt
 } from '../db-handlers/question-fetch';
 import { fromGlobalId } from 'graphql-relay';
 
@@ -80,7 +80,7 @@ export const resolveGetQuestionsForExam = (obj, args, viewer, info) => {
     fetchParameters.exam_attempt_id = fromGlobalId(attempt.value).id;
   }
   const execDetails = {
-    queryFunction: getQuestionsForExam,
+    queryFunction: getQuestionsInExamAttempt,
     businessKey: '_id',
     fetchParameters: fetchParameters
   };

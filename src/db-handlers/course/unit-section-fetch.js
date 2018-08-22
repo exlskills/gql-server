@@ -1,43 +1,6 @@
 import Course from '../../db-models/course-model';
-import * as QuestionInteractionFetch from '../../db-handlers/question-interaction-fetch';
 import * as projectionWriter from '../../utils/projection-writer';
-import Config from '../.././config';
 import { logger } from '../../utils/logger';
-
-export const computeCardEMA = async (userId, questionIds) => {
-  logger.debug(`in computeCardEMA`);
-  const N = Config.card_ema.n;
-  const K = 2 / (N + 1);
-  let quesInters = [];
-
-  try {
-    quesInters = await QuestionInteractionFetch.findByQuestionIds(
-      userId,
-      questionIds,
-      'quiz',
-      { sort: { updated_at: -1 }, limit: N }
-    );
-  } catch (err) {
-    return Promise.reject(err);
-  }
-
-  if (quesInters.length > 0) {
-    let arrayScores = [];
-    let sumQuesInters = 0.0;
-    for (let item of quesInters) {
-      const pct_score = item.pct_score ? item.pct_score : 0;
-      arrayScores.push(pct_score);
-      sumQuesInters += pct_score;
-    }
-    let currEma = sumQuesInters / quesInters.length;
-    for (let score of arrayScores) {
-      currEma = (score - currEma) * K + currEma;
-    }
-    return currEma;
-  }
-
-  return null;
-};
 
 export const fetchUnitSections = async (
   filterValues,
@@ -130,12 +93,5 @@ export const fetchUnitSections = async (
 
   let arrayRet = await Course.aggregate(array).exec();
 
-  // for (let section of arrayRet) {
-  //   for (let card of section.cards_list) {
-  //     card.title = getStringByLocale(card.title, viewerLocale).text;
-  //     card.headline = getStringByLocale(card.headline, viewerLocale).text;
-  //     card.ema = await computeCardEMA(userId, card.question_ids);
-  //   }
-  // }
   return arrayRet;
 };

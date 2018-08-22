@@ -9,7 +9,7 @@ export const findById = async (obj_id, viewer, info) => {
   let record;
   try {
     record = await basicFind(Activity, { isById: true }, obj_id);
-  } catch (errInternalAllreadyReported) {
+  } catch (errInternalAlreadyReported) {
     return null;
   }
   return record;

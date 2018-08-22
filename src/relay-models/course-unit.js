@@ -67,7 +67,7 @@ export const CourseUnitType = new GraphQLObjectType({
     attempts_left: {
       type: GraphQLInt
     },
-    unit_processing: {
+    unit_progress_state: {
       type: GraphQLInt
     },
     ema: {
@@ -80,10 +80,6 @@ export const CourseUnitType = new GraphQLObjectType({
       type: GraphQLBoolean
     },
     exam_attempt_id: globalIdField('ExamAttempt', obj => obj.exam_attempt_id),
-    quiz_lvl: {
-      type: GraphQLInt
-    },
-    // Begin UnitStatusPaging query
     last_attempted_at: {
       type: GraphQLString
     },
@@ -93,7 +89,6 @@ export const CourseUnitType = new GraphQLObjectType({
     passed: {
       type: GraphQLBoolean
     }
-    // End UnitStatusPaging query
   }),
   interfaces: [NodeInterface]
 });

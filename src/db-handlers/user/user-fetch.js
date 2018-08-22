@@ -20,7 +20,7 @@ export const findById = async (obj_id, viewer, info) => {
       },
       obj_id
     );
-  } catch (errInternalAllreadyReported) {
+  } catch (errInternalAlreadyReported) {
     return null;
   }
   return record;
@@ -81,7 +81,7 @@ export const fetchUserOrgsList = async (obj_id, viewer, info) => {
     for (let org of arrayOrganization) {
       arrayRet.push(org.organization_name);
     }
-  } catch (errInternalAllreadyReported) {
+  } catch (errInternalAlreadyReported) {
     return null;
   }
   return {

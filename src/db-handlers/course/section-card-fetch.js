@@ -401,3 +401,38 @@ export const fetchSectionCards = async (
 
   return result;
 };
+
+export const fetchSectionCardIDsForUnit = async (course_id, unit_id) => {
+  logger.debug(`in fetchSectionCardIDsForUnit`);
+
+  let array = [];
+
+  // Find the course
+  array.push({ $match: { _id: course_id } });
+
+  // Find the unit
+  array.push({
+    $project: {
+      unit: {
+        $filter: {
+          input: '$units.Units',
+          cond: { $eq: ['$$this._id', unit_id] }
+        }
+      }
+    }
+  });
+  array.push({ $unwind: '$unit' });
+
+  array.push({
+    $project: {
+      'unit.sections.Sections._id': 1,
+      'unit.sections.Sections.cards.Cards._id': 1,
+      'unit.sections.Sections.cards.Cards.question_ids': 1
+    }
+  });
+
+  let result = await Course.aggregate(array).exec();
+  logger.debug(`   fetched cards with question ID ` + JSON.stringify(result));
+
+  return result[0];
+};
