@@ -13,15 +13,15 @@ import examAttempt from './no-paging/exam-attempt';
 // (1) rename unit_processing to unit_progress_state
 // (2) delete quiz_lvl
 // (3a) app/pages/Course/components/grades/index.tsx: add inside const rootQuery = graphql`, `gradesList: unitStatusPaging`
-// sections_list {
+//          sections_list {
 //             id
 //             cards_list {
 //               id
 //               ema
 //             }
 //           }
-// (3b) app/pages/Course/components/grades/index.tsx: remove from const rootQuery = graphql`
-//
+// (3b) app/pages/Course/components/grades/index.tsx: remove the query part below from const rootQuery = graphql`
+//              units: unitPaging(first: $first, resolverArgs: $resolverArgs) {
 
 export default {
   node: NodeField,
