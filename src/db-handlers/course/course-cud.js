@@ -12,6 +12,8 @@ export const editCard = async (
   data,
   viewer
 ) => {
+  // THIS IS NOT USED IN regular processing
+
   logger.debug(`in editCard`);
   const course = await CourseFetch.findById(localCourseId);
   if (!course) {

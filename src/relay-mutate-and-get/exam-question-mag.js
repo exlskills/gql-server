@@ -153,6 +153,8 @@ export const processQuestionAction = async (
       const courseId = docRefs.find(item => item.level === 'course');
       const unitId = docRefs.find(item => item.level === 'unit');
       const sectionId = docRefs.find(item => item.level === 'section');
+
+      // TODO replace with aggregation over Course to get the IDs needed below
       const courseData = await CourseFetch.findById(courseId.doc_id);
 
       let unitIndex = courseData.units.Units.findIndex(

@@ -31,6 +31,10 @@ const CardInteractionSchema = new mongoose.Schema(
   }
 );
 
+CardInteractionSchema.index({
+  'card_ref.EmbeddedDocRef.embedded_doc_refs.doc_id': 1
+});
+
 export default mongoose.model(
   'CardInteraction',
   CardInteractionSchema,

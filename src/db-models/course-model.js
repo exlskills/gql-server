@@ -55,7 +55,8 @@ const CourseSchema = new mongoose.Schema(
       type: CourseUnitObjSchema
     },
     topics: {
-      type: [String]
+      type: [String],
+      index: true
     },
     enrolled_count: {
       type: Number,
@@ -111,8 +112,5 @@ CourseSchema.index(
     language_override: 'locale'
   }
 );
-CourseSchema.index({
-  topics: 1
-});
 
 export default mongoose.model('Course', CourseSchema, 'course');

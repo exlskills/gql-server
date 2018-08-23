@@ -16,16 +16,19 @@ const UserSchema = new mongoose.Schema(
       default: id_gen
     },
     full_name: {
-      type: IntlStringSchema
+      type: IntlStringSchema,
+      index: true
     },
     headline: {
       type: IntlStringSchema
     },
     username: {
-      type: String
+      type: String,
+      index: true
     },
     primary_email: {
-      type: String
+      type: String,
+      index: true
     },
     secondary_emails: {
       type: [String]
@@ -80,9 +83,5 @@ const UserSchema = new mongoose.Schema(
     timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' }
   }
 );
-
-UserSchema.index({ full_name: 1 });
-UserSchema.index({ username: 1 });
-UserSchema.index({ primary_email: 1 });
 
 export default mongoose.model('User', UserSchema, 'user');

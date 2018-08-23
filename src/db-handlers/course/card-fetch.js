@@ -5,6 +5,9 @@ import Question from '../../db-models/question-model';
 
 export const fetchCardEntry = async (fetchParameters, viewer) => {
   logger.debug(`in fetchCardEntry`);
+
+  // TODO: THIS IS not used. Remove at some point if no need identified
+
   let arrayQuestion = [];
   let elemQuestion = { $match: { _id: fetchParameters.questionId } };
   arrayQuestion.push(elemQuestion);
@@ -239,7 +242,7 @@ export const fetchCardEntry = async (fetchParameters, viewer) => {
       )
     }
   });
-  let result = await Course.aggregate(array).exec();
+  const result = await Course.aggregate(array).exec();
   return result;
   // return Course.aggregate(array).exec();
 };

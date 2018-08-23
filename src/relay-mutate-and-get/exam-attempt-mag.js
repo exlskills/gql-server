@@ -29,7 +29,7 @@ export const takeExam = async (courseId, unitId, viewer, info) => {
     if (!attempt) {
       return { completionObj: { code: '1', msg: 'Invalid attempt' } };
     }
-    const course = await CourseFetch.findById(courseId);
+    const course = await CourseFetch.findById(courseId, { _id: 1, title: 1 });
     const courseTitle = getStringByLocale(course.title, viewer.locale).text;
     const courseUrlId = toClientUrlId(courseTitle, course._id);
 

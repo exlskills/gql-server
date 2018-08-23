@@ -9,5 +9,6 @@ export default {
       type: GraphQLString
     }
   },
-  resolve: resolveCourseById
+  resolve: (obj, args, viewer, info) =>
+    resolveCourseById(obj, args, viewer, info)
 };

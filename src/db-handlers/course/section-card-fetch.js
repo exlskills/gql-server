@@ -1,19 +1,17 @@
 import Course from '../../db-models/course-model';
 import * as QuestionFetch from '../../db-handlers/question-fetch';
-import Question from '../../db-models/question-model';
 import * as projectionWriter from '../../utils/projection-writer';
 import { logger } from '../../utils/logger';
 import { fetchQuestionsGeneric } from '../question-fetch';
-import { getStringByLocale } from '../../parsers/intl-string-parser';
 
-export const findById = async (
+export const fetchCardDetailsById = async (
   courseId,
   unitId,
   sectionId,
   cardId,
   viewerLocale
 ) => {
-  logger.debug(`in Section Card findById`);
+  logger.debug(`in fetchCardDetailsById`);
   let array = [];
   let selectFields = {};
 
@@ -156,7 +154,7 @@ export const findById = async (
   });
   selectFields.content = 1;
 
-  let result = await Course.aggregate(array).exec();
+  const result = await Course.aggregate(array).exec();
   return result.length > 0 ? result[0] : {};
 };
 
@@ -177,7 +175,7 @@ export const fetchCardByQuestionId = async (questionId, viewerLocale) => {
     return {};
   }
 
-  const result = await findById(
+  const result = await fetchCardDetailsById(
     course.doc_id,
     unit.doc_id,
     section.doc_id,
@@ -359,7 +357,7 @@ export const fetchSectionCards = async (
   if (skip) array.push(skip);
   if (limit) array.push(limit);
 
-  let result = await Course.aggregate(array).exec();
+  const result = await Course.aggregate(array).exec();
   logger.debug(`fetched cards raw ` + JSON.stringify(result));
 
   for (let card of result) {

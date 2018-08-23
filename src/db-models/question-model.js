@@ -1,13 +1,8 @@
 import mongoose from 'mongoose';
 import { id_gen } from '../utils/url-id-generator';
-import {
-  getStringByLocale,
-  updateIntlStringObject
-} from '../parsers/intl-string-parser';
+import { updateIntlStringObject } from '../parsers/intl-string-parser';
 import IntlStringSchema from './intl-string-model';
 import EmbeddedDocRefSchema from './embedded-doc-ref-model';
-import QuestionFreeResponse from './question-free-response-data-model';
-import QuestionMultiple from './question-multiple-data-model';
 import { logger } from '../utils/logger';
 
 const QuestionSchema = new mongoose.Schema(
@@ -58,6 +53,8 @@ const QuestionSchema = new mongoose.Schema(
     timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' }
   }
 );
+
+QuestionSchema.index({ 'doc_ref.EmbeddedDocRef.embedded_doc_refs.doc_id': 1 });
 
 QuestionSchema.methods.updateInfo = async function(data, viewerLocale) {
   logger.debug(`in QuestionSchema.methods.updateInfo`);

@@ -6,8 +6,12 @@ import { getStringByLocale } from '../../parsers/intl-string-parser';
 import CardInteraction from '../../db-models/card-interaction-model';
 import { logger } from '../../utils/logger';
 
-export const findById = async (obj_id, viewer, info) => {
+export const findById = async (obj_id, selectVal, viewer, info) => {
   logger.debug(`in Course findById`);
+
+  // NOTE: always specify selectVal to pull only fields required - or use aggregations
+  // E.g., { _id: 1, title: 1, headline: 1, description: 1 } or { units: 0 }
+
   let record;
   try {
     //model, runParams, queryVal, sortVal, selectVal
@@ -16,7 +20,9 @@ export const findById = async (obj_id, viewer, info) => {
       {
         isById: true
       },
-      obj_id
+      obj_id,
+      null,
+      selectVal
     );
   } catch (errInternalAlreadyReported) {
     return null;
@@ -258,8 +264,14 @@ export const fetchCourseAndCardInteraction = async (
   viewer,
   info
 ) => {
-  logger.debug(`in fetchCourseById`);
-  let courseRecord = await findById(course_id, viewer, info);
+  logger.debug(`in fetchCourseAndCardInteraction`);
+  logger.debug(`   course_id ` + course_id);
+  logger.debug(`   user_id ` + viewer.user_id);
+  const selectVal = {
+    units: 0
+  };
+  let courseRecord = await findById(course_id, selectVal, viewer, info);
+  logger.debug(`  courseRecord ` + courseRecord);
   courseRecord = courseRecord.toObject();
   courseRecord.title = getStringByLocale(
     courseRecord.title,
@@ -283,7 +295,9 @@ export const fetchCourseAndCardInteraction = async (
       'card_ref.EmbeddedDocRef.embedded_doc_refs.0.doc_id': courseRecord._id
     })
       .sort({ updated_at: -1 })
+      .select({ card_id: 1, card_ref: 1 })
       .exec();
+    // logger.debug(`  lastAccessRefsResp ` + lastAccessRefsResp);
     courseRecord.last_accessed_card = lastAccessRefsResp.card_id;
     const lastAccessRefs =
       lastAccessRefsResp.card_ref.EmbeddedDocRef.embedded_doc_refs;
@@ -298,6 +312,7 @@ export const fetchCourseAndCardInteraction = async (
       }
     });
   } catch (err) {
+    logger.debug(`  course-fetch error ` + err);
     courseRecord.last_accessed_unit = '';
     courseRecord.last_accessed_section = '';
     courseRecord.last_accessed_card = '';

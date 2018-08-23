@@ -36,4 +36,8 @@ const ActivitySchema = new mongoose.Schema(
   }
 );
 
+ActivitySchema.index({
+  'doc_ref.EmbeddedDocRef.embedded_doc_refs.doc_id': 1
+});
+
 export default mongoose.model('Activity', ActivitySchema, 'activity');

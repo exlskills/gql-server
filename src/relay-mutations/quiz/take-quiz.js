@@ -37,11 +37,13 @@ export default mutationWithClientMutationId({
   ) => {
     const localUnitId = fromGlobalId(unitId).id;
     const localCourseId = fromGlobalId(courseId).id;
+
+    // TODO replace with Aggregation to find the values needed below
     const course = await CourseFetch.findById(localCourseId);
     const courseTitle = getStringByLocale(course.title, viewer.locale).text;
     const courseUrlId = toClientUrlId(courseTitle, course._id);
     const unit = course.units.Units.find(
-      item => item._id.toString() == localUnitId
+      item => item._id.toString() === localUnitId
     );
     const unitTitle = getStringByLocale(unit.title, viewer.locale).text;
     const unitUrlId = toClientUrlId(unitTitle, unit._id);

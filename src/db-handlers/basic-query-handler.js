@@ -1,5 +1,15 @@
 import { logger } from '../utils/logger';
 
+/**
+ *
+ * @param model
+ * @param runParams
+ * @param queryVal
+ * @param sortVal
+ * @param selectVal  e.g., { name: 1, occupation: 1 }
+ * @returns {Promise<*>}
+ */
+
 export async function basicFind(
   model,
   runParams,

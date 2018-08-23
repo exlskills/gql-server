@@ -74,6 +74,9 @@ export const resolveCourses = async (obj, args, viewer, info) => {
 };
 
 export const resolveCourseById = async (obj, args, viewer, info) => {
+  logger.debug(`in resolveCourseById`);
+  logger.debug(`   obj ` + JSON.stringify(obj));
+  logger.debug(`   args ` + JSON.stringify(args));
   try {
     let course_id = fromGlobalId(args.course_id).id;
     let result = await fetchCourseAndCardInteraction(course_id, viewer, info);

@@ -115,7 +115,7 @@ export const fetchCourseUnitsBase = async (
     if (limit) array.push(limit);
   }
 
-  let result = await Course.aggregate(array).exec();
+  const result = await Course.aggregate(array).exec();
 
   logger.debug('fetchCourseUnitsBase result ' + JSON.stringify(result));
   return result;
@@ -267,8 +267,6 @@ export const fetchUserCourseUnitExamStatus = async (
 
   let array = [];
   let selectFields = {};
-
-  // TODO: test and adjust with multiple exams per Course Unit
 
   // Find the course
   array.push({ $match: { _id: fetchParameters.courseId } });

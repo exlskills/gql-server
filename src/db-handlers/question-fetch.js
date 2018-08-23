@@ -6,6 +6,7 @@ import { returnObjectExamAttempt } from '../db-handlers/exam-fetch';
 import { getUserAnswer } from '../db-handlers/question-interaction-fetch';
 import { toGlobalId } from 'graphql-relay';
 import { logger } from '../utils/logger';
+import Course from '../db-models/course-model';
 
 export const findById = async (obj_id, viewer, info) => {
   logger.debug(`in Question findById`);
@@ -137,7 +138,7 @@ export const getQuestionsInExamAttempt = async (
   };
   filterArray.push(elem);
 
-  let result = await fetchQuestionsGeneric(
+  const result = await fetchQuestionsGeneric(
     filterArray,
     sort,
     skip,
@@ -250,9 +251,8 @@ export const fetchQuestionsGeneric = async (
   if (sort) array.push(sort);
   if (skip) array.push(skip);
   if (limit) array.push(limit);
-  let result = await Question.aggregate(array).exec();
 
-  // logger.debug(`question extract ` + JSON.stringify(result));
+  const result = await Question.aggregate(array).exec();
 
   for (let question of result) {
     if (
