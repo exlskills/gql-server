@@ -69,7 +69,8 @@ export const userCourseUnitExamStatusPaging = {
     },
     ...connectionArgs
   },
-  resolve: resolveUserCourseUnitExamStatus
+  resolve: (obj, args, viewer, info) =>
+    resolveUserCourseUnitExamStatus(obj, args, viewer, info)
 };
 
 export const sectionPaging = {

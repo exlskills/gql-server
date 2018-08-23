@@ -10,8 +10,18 @@ import langQueries from './no-paging/lang';
 import examAttempt from './no-paging/exam-attempt';
 
 // TODO on wc:
-// rename unit_processing to unit_progress_state
-// delete quiz_lvl
+// (1) rename unit_processing to unit_progress_state
+// (2) delete quiz_lvl
+// (3a) app/pages/Course/components/grades/index.tsx: add inside const rootQuery = graphql`, `gradesList: unitStatusPaging`
+// sections_list {
+//             id
+//             cards_list {
+//               id
+//               ema
+//             }
+//           }
+// (3b) app/pages/Course/components/grades/index.tsx: remove from const rootQuery = graphql`
+//
 
 export default {
   node: NodeField,
