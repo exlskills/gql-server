@@ -50,22 +50,6 @@ export const resolveCourseUnit = async (obj, args, viewer, info) => {
   return await fetchCourseUnitById(unitId, courseId, viewer.user_id, viewer);
 };
 
-export const resolveUserCourseExamAttempts = async (
-  obj,
-  args,
-  viewer,
-  info
-) => {
-  // NOT USED - REMOVE
-  logger.debug(`in resolveUserCourseUnitExamAttempts`);
-  try {
-    let course_id = fromGlobalId(args.course_id).id;
-    return await fetchUserCourseExamAttemptsByUnit(course_id, viewer, info);
-  } catch (errInternalAlreadyReported) {
-    return {};
-  }
-};
-
 export const resolveUserCourseUnitExamStatus = (obj, args, viewer, info) => {
   logger.debug(`in -----> resolveUserCourseUnitExamStatus`);
   if (!args || !args.resolverArgs) {

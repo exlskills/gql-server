@@ -1,5 +1,5 @@
-import specificExamAttempt from './specific-exam-attempt';
+import examAttempt from './exam-attempt';
 
 export default {
-  specificExamAttempt
+  examAttempt
 };
