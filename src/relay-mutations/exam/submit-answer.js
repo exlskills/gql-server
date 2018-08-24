@@ -27,30 +27,6 @@ export default mutationWithClientMutationId({
     is_last_question: { type: GraphQLBoolean }
   },
   outputFields: {
-    unit: {
-      type: CourseUnitType,
-      resolve: async (obj, whatisthis, viewer) => {
-        const docRefs = obj.question.doc_ref.EmbeddedDocRef.embedded_doc_refs;
-        const course = docRefs.find(item => item.level === 'course');
-        const unit = docRefs.find(item => item.level === 'unit');
-
-        if (!course || !unit) {
-          return Promise.reject('invalid docrefs');
-        }
-        const params = {
-          userId: viewer.user_id,
-          courseId: course.doc_id,
-          unitId: unit.doc_id
-        };
-        const courses = await fetchCourseUnitsWithDetailedStatus(
-          {},
-          [],
-          viewer.locale,
-          params
-        );
-        return courses[0] ? courses[0] : {};
-      }
-    },
     is_correct: {
       type: GraphQLBoolean
     },

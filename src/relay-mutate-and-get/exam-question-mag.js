@@ -15,8 +15,6 @@ import {
   editGradingResponse
 } from '../utils/wsenv-connect';
 
-import { test_user_files } from '../tests/grading-test-data';
-
 const ObjectId = mongoose.Types.ObjectId;
 
 export const processQuestionAction = async (
@@ -81,6 +79,11 @@ export const processQuestionAction = async (
     }
 
     logger.debug(`question ` + JSON.stringify(question));
+
+    const docRefs = question.doc_ref.EmbeddedDocRef.embedded_doc_refs;
+    const courseId = docRefs.find(item => item.level === 'course');
+    const unitId = docRefs.find(item => item.level === 'unit');
+    const sectionId = docRefs.find(item => item.level === 'section');
 
     if (check_answer || !quiz) {
       // is_correct, explain_text, points, pct_score
@@ -149,10 +152,6 @@ export const processQuestionAction = async (
     }
 
     if (is_last_question) {
-      const docRefs = question.doc_ref.EmbeddedDocRef.embedded_doc_refs;
-      const courseId = docRefs.find(item => item.level === 'course');
-      const unitId = docRefs.find(item => item.level === 'unit');
-      const sectionId = docRefs.find(item => item.level === 'section');
 
       // TODO replace with aggregation over Course to get the IDs needed below
       const courseData = await CourseFetch.findById(courseId.doc_id);
@@ -204,6 +203,7 @@ export const processQuestionAction = async (
         );
       }
     }
+
     logger.debug(
       `processQuestionAction returnData ` + JSON.stringify(returnData)
     );

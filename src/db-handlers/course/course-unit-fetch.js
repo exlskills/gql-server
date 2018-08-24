@@ -19,6 +19,7 @@ export const fetchCourseUnitsBase = async (
   include_sections = false
 ) => {
   logger.debug(`in fetchCourseUnitsBase`);
+  logger.debug(`  fetchParameters ` + JSON.stringify(fetchParameters));
   let array = [];
   let elem;
 

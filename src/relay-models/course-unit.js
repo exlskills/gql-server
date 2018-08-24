@@ -3,7 +3,6 @@ import {
   GraphQLFloat,
   GraphQLInt,
   GraphQLList,
-  GraphQLNonNull,
   GraphQLObjectType,
   GraphQLString
 } from 'graphql';
@@ -26,13 +25,13 @@ export const CourseUnitType = new GraphQLObjectType({
   fields: () => ({
     id: globalIdField('CourseUnit', obj => obj._id),
     index: {
-      type: new GraphQLNonNull(GraphQLInt)
+      type: GraphQLInt
     },
     title: {
-      type: new GraphQLNonNull(GraphQLString)
+      type: GraphQLString
     },
     headline: {
-      type: new GraphQLNonNull(GraphQLString)
+      type: GraphQLString
     },
     sections: {
       type: UnitSectionConnection,
@@ -62,7 +61,7 @@ export const CourseUnitType = new GraphQLObjectType({
       type: new GraphQLList(GraphQLString)
     },
     final_exam_weight_pct: {
-      type: new GraphQLNonNull(GraphQLFloat)
+      type: GraphQLFloat
     },
     attempts_left: {
       type: GraphQLInt

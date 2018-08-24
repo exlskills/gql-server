@@ -11,15 +11,17 @@ import examAttempt from './no-paging/exam-attempt';
 
 export default {
   node: NodeField,
+  // Individual
   courseById: courseQueries.courseById,
+  courseUnit: courseQueries.courseUnit,
   cardEntry: courseQueries.sectionCardEntry,
   cardByQuestion: courseQueries.cardByQuestion,
   userActivity: queryUsers.userActivity,
   userProfile: queryUsers.userProfile,
   examToTake: queryExam.examToTake,
   examAttempt: examAttempt.examAttempt,
-  courseUnit: courseQueries.courseUnit,
   oneVersionedContent: queryVersionedContents.oneVersionedContent,
+  // Paging
   activityPaging: pagingQueries.activityPaging,
   coursePaging: pagingQueries.coursePaging,
   unitPaging: pagingQueries.unitPaging,
