@@ -3,12 +3,18 @@ import Notification from '../db-models/notification-model';
 import * as projectionWriter from '../utils/projection-writer';
 import { logger } from '../utils/logger';
 
-export const findById = async (obj_id, viewer, info) => {
-  logger.debug(`in Notification findById`);
+export const fetchById = async (obj_id, selectVal, viewer, info) => {
+  logger.debug(`in Notification fetchById`);
   let record;
   try {
     //model, runParams, queryVal, sortVal, selectVal
-    record = await basicFind(Notification, { isById: true }, obj_id);
+    record = await basicFind(
+      Notification,
+      { isById: true },
+      obj_id,
+      null,
+      selectVal
+    );
   } catch (errInternalAlreadyReported) {
     return null;
   }

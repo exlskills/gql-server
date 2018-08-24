@@ -1,5 +1,4 @@
 import Course from '../../db-models/course-model';
-import * as UserFetch from '../../db-handlers/user/user-fetch';
 import * as projectionWriter from '../../utils/projection-writer';
 import * as ExamAttemptFetch from '../../db-handlers/exam-attempt-fetch';
 import moment from 'moment';
@@ -23,8 +22,6 @@ export const fetchCourseUnitsBase = async (
   let array = [];
   let elem;
 
-  const userId = fetchParameters.userId;
-
   elem = { $match: { _id: fetchParameters.courseId } };
   array.push(elem);
 
@@ -35,10 +32,18 @@ export const fetchCourseUnitsBase = async (
   array.push(elem);
   elem = { $unwind: '$Units' };
   array.push(elem);
+
+  // Filter By specific Unit
   if (fetchParameters.unitId) {
     elem = { $match: { 'Units._id': fetchParameters.unitId } };
     array.push(elem);
   }
+
+  if (fetchParameters.unitIndex) {
+    elem = { $match: { 'Units.index': fetchParameters.unitIndex } };
+    array.push(elem);
+  }
+
   elem = {
     $project: {
       index: '$Units.index',
@@ -132,7 +137,7 @@ export const fetchCourseUnitsWithDetailedStatus = async (
 
   // TODO: rewrite to pull the necessary Section and Card details and then run the calc logic
 
-  let arrayCourseUnitsDetails = await fetchCourseUnitsBase(
+  const arrayCourseUnitsDetails = await fetchCourseUnitsBase(
     filterValues,
     aggregateArray,
     viewerLocale,
@@ -142,10 +147,8 @@ export const fetchCourseUnitsWithDetailedStatus = async (
 
   const userId = fetchParameters.userId;
 
-  let userData = await UserFetch.findById(userId);
-
   // TODO: consider replacing with a more simple function
-  let examStatusByCourseUnit = await fetchUserCourseUnitExamStatus(
+  const examStatusByCourseUnit = await fetchUserCourseUnitExamStatus(
     filterValues,
     aggregateArray,
     viewerLocale,
@@ -229,7 +232,6 @@ export const fetchCourseUnitsWithDetailedStatus = async (
     if (examStatusUnitIndex >= 0) {
       unitElem.grade = examStatusByCourseUnit[examStatusUnitIndex].grade;
       if (examStatusByCourseUnit[examStatusUnitIndex].passed) {
-        // TODO: what is this value used for in the wc? What should it be set to here?
         unitElem.unit_progress_state = 1;
       }
 
@@ -417,7 +419,6 @@ export const fetchCourseUnitById = async (
   let viewerLocale = viewer.locale;
 
   let fetchParameters = {
-    userId: user_id,
     courseId: course_id,
     unitId: unit_id
   };

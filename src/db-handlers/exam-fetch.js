@@ -5,12 +5,12 @@ import Course from '../db-models/course-model';
 import { logger } from '../utils/logger';
 import * as Randomization from '../utils/randomization';
 
-export const findById = async (obj_id, viewer, info) => {
-  logger.debug(`in Exam findById`);
+export const fetchById = async (obj_id, selectVal, viewer, info) => {
+  logger.debug(`in Exam fetchById`);
   let record;
   try {
     //model, runParams, queryVal, sortVal, selectVal
-    record = await basicFind(Exam, { isById: true }, obj_id);
+    record = await basicFind(Exam, { isById: true }, obj_id, null, selectVal);
   } catch (errInternalAlreadyReported) {
     return null;
   }
@@ -84,7 +84,7 @@ export const searchExamIdToTake = async (unit_id, course_id, viewer, info) => {
 };
 
 async function getRandomQuestionIds(exam_id) {
-  const exam = await findById(exam_id);
+  const exam = await fetchById(exam_id, { question_ids: 1, question_count: 1 });
   let secret_seed = Randomization.make_random_string();
   let arrayQuestion = Randomization.shuffleArray(
     exam.question_ids,

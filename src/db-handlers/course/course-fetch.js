@@ -6,8 +6,8 @@ import { getStringByLocale } from '../../parsers/intl-string-parser';
 import CardInteraction from '../../db-models/card-interaction-model';
 import { logger } from '../../utils/logger';
 
-export const findById = async (obj_id, selectVal, viewer, info) => {
-  logger.debug(`in Course findById`);
+export const fetchById = async (obj_id, selectVal, viewer, info) => {
+  logger.debug(`in Course fetchById`);
 
   // NOTE: always specify selectVal to pull only fields required - or use aggregations
   // E.g., { _id: 1, title: 1, headline: 1, description: 1 } or { units: 0 }
@@ -270,7 +270,7 @@ export const fetchCourseAndCardInteraction = async (
   const selectVal = {
     units: 0
   };
-  let courseRecord = await findById(course_id, selectVal, viewer, info);
+  let courseRecord = await fetchById(course_id, selectVal, viewer, info);
   // logger.debug(`  courseRecord ` + courseRecord);
   courseRecord = courseRecord.toObject();
   courseRecord.title = getStringByLocale(

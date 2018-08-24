@@ -29,7 +29,7 @@ export const takeExam = async (courseId, unitId, viewer, info) => {
     if (!attempt) {
       return { completionObj: { code: '1', msg: 'Invalid attempt' } };
     }
-    const course = await CourseFetch.findById(courseId, { _id: 1, title: 1 });
+    const course = await CourseFetch.fetchById(courseId, { _id: 1, title: 1 });
     const courseTitle = getStringByLocale(course.title, viewer.locale).text;
     const courseUrlId = toClientUrlId(courseTitle, course._id);
 
@@ -55,7 +55,7 @@ export const takeExam = async (courseId, unitId, viewer, info) => {
         }
       }
     });
-    const exam = await ExamFetch.findById(attempt.exam_id);
+    const exam = await ExamFetch.fetchById(attempt.exam_id, { time_limit: 1 });
     const time_limit = exam.time_limit;
 
     return {
@@ -75,11 +75,17 @@ export const takeExam = async (courseId, unitId, viewer, info) => {
 export const leaveExam = async (exam_attempt_id, cancel, viewer, info) => {
   logger.debug(`in leaveExam`);
   try {
-    let examattempt = await ExamAttemptFetch.findById(exam_attempt_id);
+    const examattempt = await ExamAttemptFetch.fetchById(exam_attempt_id, {
+      _id: 1,
+      exam_id: 1,
+      started_at: 1
+    });
     examattempt.submitted_at = new Date();
     examattempt.is_cancelled = cancel !== false;
 
-    let exam = await ExamFetch.findById(examattempt.exam_id);
+    const exam = await ExamFetch.fetchById(examattempt.exam_id, {
+      time_limit: 1
+    });
     const timeDiff =
       (examattempt.submitted_at - examattempt.started_at) / 1000 / 60;
     examattempt.time_limit_exceeded = timeDiff > exam.time_limit;

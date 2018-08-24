@@ -8,12 +8,18 @@ import { toGlobalId } from 'graphql-relay';
 import { logger } from '../utils/logger';
 import Course from '../db-models/course-model';
 
-export const findById = async (obj_id, viewer, info) => {
-  logger.debug(`in Question findById`);
+export const fetchById = async (obj_id, selectVal, viewer, info) => {
+  logger.debug(`in Question fetchById`);
   let record;
   try {
     //model, runParams, queryVal, sortVal, selectVal
-    record = await basicFind(Question, { isById: true }, obj_id);
+    record = await basicFind(
+      Question,
+      { isById: true },
+      obj_id,
+      null,
+      selectVal
+    );
   } catch (errInternalAlreadyReported) {
     return null;
   }

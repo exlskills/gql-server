@@ -4,11 +4,17 @@ import Activity from '../db-models/activity-model';
 import moment from 'moment';
 import { logger } from '../utils/logger';
 
-export const findById = async (obj_id, viewer, info) => {
-  logger.debug(`in Activity findById`);
+export const fetchById = async (obj_id, selectVal, viewer, info) => {
+  logger.debug(`in Activity fetchById`);
   let record;
   try {
-    record = await basicFind(Activity, { isById: true }, obj_id);
+    record = await basicFind(
+      Activity,
+      { isById: true },
+      obj_id,
+      null,
+      selectVal
+    );
   } catch (errInternalAlreadyReported) {
     return null;
   }
@@ -27,7 +33,9 @@ export const fetchActivities = async (
   let startDate = moment(input_date)
     .startOf('day')
     .format('YYYY-MM-DDT00:00:00');
-  let endDate = moment(input_date).add(1, 'day').format('YYYY-MM-DDTHH:mm:ss');
+  let endDate = moment(input_date)
+    .add(1, 'day')
+    .format('YYYY-MM-DDTHH:mm:ss');
   let arrayStartDate = startDate.split('T');
   let arrayEndDate = endDate.split('T');
   let startDay = new Date(arrayStartDate[0]);

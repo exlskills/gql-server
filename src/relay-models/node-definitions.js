@@ -45,7 +45,7 @@ export const {
         return null;
     }
     // TODO add the other objects once we have a way to manage permissions for getting these...
-    return modelType.findById(id);
+    return modelType.fetchById(id);
   },
   obj => {}
 );

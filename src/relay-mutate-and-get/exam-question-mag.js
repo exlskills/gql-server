@@ -2,7 +2,8 @@ import { upsertQuestionInteraction } from '../db-handlers/question-interaction-c
 import * as QuestionFetch from '../db-handlers/question-fetch';
 import { getStringByLocale } from '../parsers/intl-string-parser';
 import * as ExamAttemptFetch from '../db-handlers/exam-attempt-fetch';
-import * as CourseFetch from '../db-handlers/course/course-fetch';
+import { fetchById } from '../db-handlers/course/course-fetch';
+import { fetchUnitSections } from '../db-handlers/course/unit-section-fetch';
 import { toClientUrlId } from '../utils/client-url';
 import { logger } from '../utils/logger';
 import mongoose from 'mongoose';
@@ -14,6 +15,7 @@ import {
   callWsenvGrading,
   editGradingResponse
 } from '../utils/wsenv-connect';
+import { fetchCourseUnitsBase } from '../db-handlers/course/course-unit-fetch';
 
 const ObjectId = mongoose.Types.ObjectId;
 
@@ -71,7 +73,9 @@ export const processQuestionAction = async (
       questionInteractionInfo.$push.response_data = response_data;
     }
 
-    const question = await QuestionFetch.findById(question_id, viewer);
+    const question = await QuestionFetch.fetchById(question_id, {
+      question_text: 0
+    });
     if (!question) {
       return {
         completionObj: { code: '1', msg: 'ERROR cannot find question' }
@@ -131,8 +135,9 @@ export const processQuestionAction = async (
     const uqi_output = await upsertQuestionInteraction(questionInteractionInfo);
 
     if (!quiz) {
-      const examattempt = await ExamAttemptFetch.findById(
-        questionInteractionInfo.exam_attempt_id
+      const examattempt = await ExamAttemptFetch.fetchById(
+        questionInteractionInfo.exam_attempt_id,
+        { _id: 1, question_ids: 1, question_interaction_ids: 1 }
       );
       const quesInterIdx = examattempt.question_interaction_ids.findIndex(
         item => item.toString() === uqi_output.record._id.toString()
@@ -152,53 +157,72 @@ export const processQuestionAction = async (
     }
 
     if (is_last_question) {
+      const courseData = await fetchById(courseId.doc_id, { title: 1 });
 
-      // TODO replace with aggregation over Course to get the IDs needed below
-      const courseData = await CourseFetch.findById(courseId.doc_id);
+      let fetchParameters = {
+        courseId: courseId.doc_id,
+        unitId: unitId.doc_id
+      };
 
-      let unitIndex = courseData.units.Units.findIndex(
-        item => item._id === unitId.doc_id
+      let unitSectionData = await fetchUnitSections(
+        null,
+        [],
+        viewer.locale,
+        fetchParameters
       );
-      if (unitIndex === -1) {
-        unitIndex = 0;
-      }
-      const currUnit = courseData.units.Units[unitIndex];
 
-      let sectionIdx = currUnit.sections.Sections.findIndex(
+      let nextUnit = null;
+      let nextSection = null;
+      const currSectionArrayPos = unitSectionData.findIndex(
         item => item._id === sectionId.doc_id
       );
-      if (sectionIdx === -1) {
-        sectionIdx = 0;
+      if (currSectionArrayPos < unitSectionData.length - 1) {
+        nextUnit = await fetchCourseUnitsBase(
+          null,
+          null,
+          viewer.locale,
+          fetchParameters,
+          false
+        );
+        nextUnit = nextUnit[0];
+        nextSection = unitSectionData[currSectionArrayPos + 1];
+      } else {
+        delete fetchParameters.unitId;
+        fetchParameters.unitIndex = unitSectionData[0].currentUnitIndex + 1;
+        nextUnit = await fetchCourseUnitsBase(
+          null,
+          null,
+          viewer.locale,
+          fetchParameters,
+          false
+        );
+        if (nextUnit && nextUnit.length > 0) {
+          nextUnit = nextUnit[0];
+          delete fetchParameters.unitIndex;
+          fetchParameters.unitId = nextUnit._id;
+          unitSectionData = await fetchUnitSections(
+            null,
+            [],
+            viewer.locale,
+            fetchParameters
+          );
+          nextSection = unitSectionData[0];
+        }
       }
 
       const courseTitle = getStringByLocale(courseData.title, viewer.locale);
+
       returnData.next_question = {
         course_id: toClientUrlId(courseTitle.text, courseData._id)
       };
 
-      let nextUnit;
-      let nextSection;
-
-      if (currUnit.sections.Sections[sectionIdx + 1]) {
-        nextUnit = currUnit;
-        nextSection = currUnit.sections.Sections[sectionIdx + 1];
-      } else if (courseData.units.Units[unitIndex + 1]) {
-        nextUnit = courseData.units.Units[unitIndex + 1];
-        nextSection = nextUnit.sections.Sections[0];
-      }
-
       if (nextUnit && nextSection) {
-        const unitTitle = getStringByLocale(nextUnit.title, viewer.locale);
-        const sectionTitle = getStringByLocale(
-          nextSection.title,
-          viewer.locale
-        );
         returnData.next_question.unit_id = toClientUrlId(
-          unitTitle.text,
+          nextUnit.title,
           nextUnit._id
         );
         returnData.next_question.section_id = toClientUrlId(
-          sectionTitle.text,
+          nextSection.title,
           nextSection._id
         );
       }

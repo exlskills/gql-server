@@ -11,10 +11,12 @@ import {
   toGlobalId
 } from 'graphql-relay';
 import { id_gen } from '../../utils/url-id-generator';
-import * as CourseFetch from '../../db-handlers/course/course-fetch';
+import { fetchById } from '../../db-handlers/course/course-fetch';
+import { fetchCourseUnitsBase } from '../../db-handlers/course/course-unit-fetch';
 import { createActivity } from '../../db-handlers/activities-cud';
 import { getStringByLocale } from '../../parsers/intl-string-parser';
 import { toClientUrlId } from '../../utils/client-url';
+import { logger } from '../../utils/logger';
 
 export default mutationWithClientMutationId({
   name: 'TakeQuiz',
@@ -35,18 +37,27 @@ export default mutationWithClientMutationId({
     viewer,
     info
   ) => {
-    const localUnitId = fromGlobalId(unitId).id;
-    const localCourseId = fromGlobalId(courseId).id;
+    logger.debug(` in TakeQuiz mutateAndGetPayload`);
+    const course_id = fromGlobalId(courseId).id;
+    const unit_id = fromGlobalId(unitId).id;
 
-    // TODO replace with Aggregation to find the values needed below
-    const course = await CourseFetch.findById(localCourseId);
+    const course = await fetchById(course_id, {
+      title: 1
+    });
     const courseTitle = getStringByLocale(course.title, viewer.locale).text;
-    const courseUrlId = toClientUrlId(courseTitle, course._id);
-    const unit = course.units.Units.find(
-      item => item._id.toString() === localUnitId
+    const courseUrlId = toClientUrlId(courseTitle, course_id);
+    const fetchParameters = {
+      courseId: course_id,
+      unitId: unit_id
+    };
+    const unit = await fetchCourseUnitsBase(
+      null,
+      null,
+      viewer.locale,
+      fetchParameters,
+      false
     );
-    const unitTitle = getStringByLocale(unit.title, viewer.locale).text;
-    const unitUrlId = toClientUrlId(unitTitle, unit._id);
+    const unitUrlId = toClientUrlId(unit[0].title, unit_id);
 
     let activity = {
       listDef_value: 'attempted_quiz',
@@ -56,23 +67,24 @@ export default mutationWithClientMutationId({
           embedded_doc_refs: [
             {
               level: 'course',
-              doc_id: localCourseId
+              doc_id: course_id
             },
             {
               level: 'unit',
-              doc_id: localUnitId
+              doc_id: unit_id
             }
           ]
         }
       }
     };
     if (sectionId) {
-      let localSectionId = fromGlobalId(sectionId).id;
+      let section_id = fromGlobalId(sectionId).id;
       activity.doc_ref.EmbeddedDocRef.embedded_doc_refs.push({
         level: 'section',
-        doc_id: localSectionId
+        doc_id: section_id
       });
     }
+    logger.debug(`  result activity ` + JSON.stringify(activity));
     createActivity(viewer.user_id, activity);
     return {};
   }

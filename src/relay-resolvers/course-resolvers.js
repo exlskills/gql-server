@@ -35,17 +35,16 @@ export const resolveCourses = async (obj, args, viewer, info) => {
       if (listType.value === 'mine') {
         fetchParameters.userId = viewer.user_id;
         fetchParameters.mine = true;
-
+        /*
         // get the courses IDs from the UserCourseRole of the current user
-        const user = await UserFetch.findById(viewer.user_id, viewer, info);
+        const user = await UserFetch.fetchById(viewer.user_id, viewer, info);
         fetchParameters.courseIds = user
           ? user.course_roles.map(item => item.course_id)
           : [];
-
         // roles of the user on the enrolled courses
         const courseRoles = args.resolverArgs.find(e => e.param === 'roles');
-        // TODO: what if no roles given? fetch all for the moment
         fetchParameters.roles = courseRoles ? courseRoles.value : null;
+        */
       } else if (listType.value === 'relevant') {
         // to show Enrolled courses first, then all other courses
         fetchParameters.userId = viewer.user_id;

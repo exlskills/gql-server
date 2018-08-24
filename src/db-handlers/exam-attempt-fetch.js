@@ -3,13 +3,19 @@ import ExamAttempt from '../db-models/exam-attempt-model.js';
 import QuestionInteraction from '../db-models/question-interaction-model';
 import { logger } from '../utils/logger';
 
-export const findById = async (obj_id, viewer, info) => {
-  logger.debug(`in Exam Attempt findById`);
+export const fetchById = async (obj_id, selectVal, viewer, info) => {
+  logger.debug(`in Exam Attempt fetchById`);
   logger.debug(`  obj_id ` + obj_id);
   let record;
   try {
     //model, runParams, queryVal, sortVal, selectVal
-    record = await basicFind(ExamAttempt, { isById: true }, obj_id);
+    record = await basicFind(
+      ExamAttempt,
+      { isById: true },
+      obj_id,
+      null,
+      selectVal
+    );
   } catch (errInternalAlreadyReported) {
     return null;
   }

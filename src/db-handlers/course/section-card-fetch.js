@@ -160,7 +160,7 @@ export const fetchCardDetailsById = async (
 
 export const fetchCardByQuestionId = async (questionId, viewerLocale) => {
   logger.debug(`in fetchCardByQuestionId`);
-  const question = await QuestionFetch.findById(questionId);
+  const question = await QuestionFetch.fetchById(questionId, { doc_ref: 1 });
   if (!question) {
     return {};
   }

@@ -3,12 +3,18 @@ import QuestionInteraction from '../db-models/question-interaction-model.js';
 import { logger } from '../utils/logger';
 import Config from '../config';
 
-export const findById = async (obj_id, viewer, info) => {
-  logger.debug(`in Quest Interact findById`);
+export const fetchById = async (obj_id, selectVal, viewer, info) => {
+  logger.debug(`in Quest Interact fetchById`);
   let record;
   try {
     //model, runParams, queryVal, sortVal, selectVal
-    record = await basicFind(QuestionInteraction, { isById: true }, obj_id);
+    record = await basicFind(
+      QuestionInteraction,
+      { isById: true },
+      obj_id,
+      null,
+      selectVal
+    );
   } catch (errInternalAlreadyReported) {
     return null;
   }

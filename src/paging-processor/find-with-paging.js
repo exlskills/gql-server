@@ -23,22 +23,22 @@ import { logger } from '../utils/logger';
 */
 
 export async function findWithPaging(execDetails, args, viewerLocale) {
-  logger.debug(`in findWithPaging`);
+  logger.debug(`in (.....) findWithPaging`);
   let sortVal;
-  var skipVal;
+  let skipVal;
   let limitVal;
-  let array = [];
+  let array;
   let hasPreviousPage = false;
   let hasNextPage = false;
-  var anchor = 0;
+  let anchor = 0;
   let afterInfo;
   let beforeInfo;
-  var upperLim;
-  var lowerLim;
-  var takeFirst;
-  var takeLast;
-  let offset = 0;
-  var movement = false;
+  let upperLim;
+  let lowerLim;
+  let takeFirst;
+  let takeLast;
+  let offset;
+  let movement = false;
 
   if (args.after) {
     afterInfo = cursorToDocument(args.after);

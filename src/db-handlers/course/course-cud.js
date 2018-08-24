@@ -12,10 +12,12 @@ export const editCard = async (
   data,
   viewer
 ) => {
+
+  // APPEARS TO BE BROKEN
   // THIS IS NOT USED IN regular processing
 
   logger.debug(`in editCard`);
-  const course = await CourseFetch.findById(localCourseId);
+  const course = await CourseFetch.fetchById(localCourseId);
   if (!course) {
     return Promise.reject(Error('Course is not found'));
   }
@@ -59,7 +61,7 @@ export const editCard = async (
 
   /// Update card content ///
   if ('content' in data) {
-    let cardContent = await VersionedContent.findById(card.content_id);
+    let cardContent = await VersionedContent.fetchById(card.content_id);
     if (!cardContent) {
       return Promise.reject(Error('Card content is not found'));
     }
@@ -79,7 +81,7 @@ export const editCard = async (
   if (data.questions && data.questions.length > 0) {
     let questions = [];
     for (let questionData of data.questions) {
-      const question = await QuestionFetch.findById(questionData.id);
+      const question = await QuestionFetch.fetchById(questionData.id);
       if (!question) {
         continue;
       }

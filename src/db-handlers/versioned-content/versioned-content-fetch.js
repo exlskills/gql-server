@@ -3,12 +3,18 @@ import VersionedContent from '../../db-models/versioned-content-model.js';
 import * as projectionWriter from '../../utils/projection-writer';
 import { logger } from '../../utils/logger';
 
-export const findById = async (obj_id, viewer, info) => {
-  logger.debug(` in Versioned Content findById`);
+export const fetchById = async (obj_id, selectVal, viewer, info) => {
+  logger.debug(` in Versioned Content fetchById`);
   let record;
   try {
     //model, runParams, queryVal, sortVal, selectVal
-    record = await basicFind(VersionedContent, { isById: true }, obj_id);
+    record = await basicFind(
+      VersionedContent,
+      { isById: true },
+      obj_id,
+      null,
+      selectVal
+    );
   } catch (errInternalAlreadyReported) {
     return null;
   }

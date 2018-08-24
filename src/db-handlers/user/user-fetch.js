@@ -8,8 +8,8 @@ import { logger } from '../../utils/logger';
 
 const ObjectId = mongoose.Types.ObjectId;
 
-export const findById = async (obj_id, viewer, info) => {
-  logger.debug(`in User findById`);
+export const fetchById = async (obj_id, selectVal, viewer, info) => {
+  logger.debug(`in User fetchById`);
   let record;
   try {
     //model, runParams, queryVal, sortVal, selectVal
@@ -18,7 +18,9 @@ export const findById = async (obj_id, viewer, info) => {
       {
         isById: true
       },
-      obj_id
+      obj_id,
+      false,
+      selectVal
     );
   } catch (errInternalAlreadyReported) {
     return null;

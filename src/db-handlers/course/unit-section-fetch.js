@@ -9,14 +9,15 @@ export const fetchUnitSections = async (
   fetchParameters
 ) => {
   logger.debug(`in fetchUnitSections`);
+  logger.debug(`   aggregateArray ` + JSON.stringify(aggregateArray));
+  logger.debug(`   fetchParameters ` + JSON.stringify(fetchParameters));
+  // let sort = aggregateArray.find(item => !!item.$sort);
   let sort = { $sort: { index: 1 } };
   let skip = aggregateArray.find(item => !!item.$skip);
   let limit = aggregateArray.find(item => !!item.$limit);
 
   let array = [];
   let elem;
-
-  const userId = fetchParameters.userId;
 
   elem = { $match: { _id: fetchParameters.courseId } };
   array.push(elem);
@@ -45,6 +46,8 @@ export const fetchUnitSections = async (
 
   elem = { $addFields: { 'Units.sections.currentUnitId': '$Units._id' } };
   array.push(elem);
+  elem = { $addFields: { 'Units.sections.currentUnitIndex': '$Units.index' } };
+  array.push(elem);
 
   elem = { $replaceRoot: { newRoot: '$Units.sections' } };
   array.push(elem);
@@ -69,7 +72,8 @@ export const fetchUnitSections = async (
       _id: '$Sections._id',
       index: '$Sections.index',
       currentCourseId: 1,
-      currentUnitId: 1
+      currentUnitId: 1,
+      currentUnitIndex: 1
     }
   };
   array.push(elem);
@@ -82,7 +86,8 @@ export const fetchUnitSections = async (
       _id: 1,
       index: 1,
       currentCourseId: 1,
-      currentUnitId: 1
+      currentUnitId: 1,
+      currentUnitIndex: 1
     }
   };
   array.push(elem);
@@ -91,7 +96,9 @@ export const fetchUnitSections = async (
   if (skip) array.push(skip);
   if (limit) array.push(limit);
 
-  let arrayRet = await Course.aggregate(array).exec();
+  logger.debug(`   array for aggregation ` + JSON.stringify(array));
 
+  const arrayRet = await Course.aggregate(array).exec();
+  logger.debug(`   arrayRet ` + JSON.stringify(arrayRet));
   return arrayRet;
 };
