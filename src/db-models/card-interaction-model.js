@@ -11,11 +11,13 @@ const CardInteractionSchema = new mongoose.Schema(
     },
     user_id: {
       type: String,
-      required: true
+      required: true,
+      index: true
     },
     card_id: {
       type: String,
-      required: true
+      required: true,
+      index: true
     },
     card_ref: {
       type: EmbeddedDocRefSchema,

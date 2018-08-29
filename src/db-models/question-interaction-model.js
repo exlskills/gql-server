@@ -11,15 +11,18 @@ const QuestionInteractionSchema = new mongoose.Schema(
     question_id: {
       type: String,
       ref: 'Question',
-      required: true
+      required: true,
+      index: true
     },
     user_id: {
       type: String,
       ref: 'User',
-      required: true
+      required: true,
+      index: true
     },
     exam_attempt_id: {
-      type: String
+      type: String,
+      index: true
     },
     is_complete: {
       type: Boolean,
