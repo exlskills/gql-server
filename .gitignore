@@ -7,8 +7,7 @@ yarn-error.log*
 
 .DS_Store
 .idea
-package-lock.json
-
+.vscode
 # Runtime data
 pids
 *.pid
@@ -60,6 +59,7 @@ typings/
 
 # dotenv environment variables file
 .env
+.docker_run.env
 
 # Build output
 build

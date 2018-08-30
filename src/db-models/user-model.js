@@ -48,6 +48,7 @@ const UserSchema = new mongoose.Schema(
     },
     primary_locale: {
       type: String,
+      default: 'en',
       required: true
     },
     locales: {
@@ -77,11 +78,22 @@ const UserSchema = new mongoose.Schema(
     course_roles: {
       type: [UserCourseRoleSchema],
       default: []
+    },
+    zoho_customer_id: {
+      type: String,
+      index: true
+    },
+    zoho_ccy_code: {
+      type: String
     }
   },
   {
     timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' }
   }
 );
+
+UserSchema.index({
+  'auth_strategies.auth_id': 1
+});
 
 export default mongoose.model('User', UserSchema, 'user');

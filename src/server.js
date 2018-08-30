@@ -21,12 +21,18 @@ mongoose.Promise = global.Promise;
 
 function startGraphQLServer(callback) {
   let promiseDb = mongoose.connect(
-    config.mongo.uri,
+    config.mongo.uri + '/' + config.mongo.db,
     {
-      dbName: config.mongo.db,
-      autoReconnect: true
+      autoReconnect: true,
+      useNewUrlParser: true
     }
   );
+
+  // mongoose.set('useCreateIndex', true);
+
+  if (config.db_debug_log) {
+    mongoose.set('debug', true);
+  }
 
   promiseDb
     .then(db => {
