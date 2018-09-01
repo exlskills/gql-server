@@ -44,6 +44,15 @@ Start a local server:
 npm start
 ```
 
+### Configuration
+
+At startup, the server reads the configuration information from the Operating System's Environment Variables and/or from the `.env` file located in the installation root directory. See [dotenv syntax rules](https://github.com/motdotla/dotenv#rules) for `.env` formatting. The same format is also generally applicable to [docker environment variables files](https://docs.docker.com/engine/reference/commandline/run/#set-environment-variables--e---env---env-file) that can be used to pass parameters into containers via `--env-file` option and to [docker-compose environment file](https://docs.docker.com/compose/compose-file/#env_file) 
+
+For local testing or development, copy the sample provided `.default.env` into `.env` and set the necessary values, e.g., set
+```
+DB_NAME=my_dev
+```
+
 ## GraphQL Schema
 
 If at any time you make changes to `src/schema.js` or `src/relay-*/*.js`, stop the server,
