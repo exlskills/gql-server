@@ -58,6 +58,7 @@
     "graphql-relay-connection": "0.0.4",
     "graphql-server-express": "^1.0.0",
     "jsonwebtoken": "^8.3.0",
+    "moment": "^2.18.1",
     "mongoose": "^5.2.10",
     "webpack": "2.5.1",
     "webpack-dev-server": "2.4.5",
