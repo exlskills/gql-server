@@ -58,7 +58,7 @@ export const resolveSectionCards = (obj, args, viewer, info) => {
 
 export const resolveCardEntry = async (obj, args, viewer, info) => {
   const businessKey = '_id';
-  const fetchParameters = {};
+  let fetchParameters = {};
   if (obj) {
     fetchParameters.courseId = obj.currentCourseId;
     fetchParameters.unitId = obj.currentUnitId;
@@ -72,6 +72,20 @@ export const resolveCardEntry = async (obj, args, viewer, info) => {
       fetchParameters.cardId = fromGlobalId(args.card_id).id;
     } else {
       return Promise.reject('invalid args');
+    }
+  }
+
+  if (args.resolverArgs) {
+    const scrolling = args.resolverArgs.find(e => e.param === 'scroll');
+    if (scrolling) {
+      var scrollingDir = 1;
+      if (scrolling.value === 'prev') {
+        scrollingDir = -1;
+      }
+      fetchParameters = await SectionCardFetch.scrollToCard(
+        scrollingDir,
+        fetchParameters
+      );
     }
   }
 

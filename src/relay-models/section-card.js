@@ -14,6 +14,7 @@ import { VersionedContentRecordType } from './versioned-content-record';
 import { QuestionType } from './question';
 import { EmbeddedDocRefType } from './embedded-doc-ref';
 import { NodeInterface } from './node-definitions';
+// import { resolveSectionCardEma } from '../relay-resolvers/ema-resolvers';
 
 export const SectionCardType = new GraphQLObjectType({
   name: 'SectionCard',

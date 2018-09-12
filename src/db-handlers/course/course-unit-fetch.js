@@ -135,7 +135,8 @@ export const fetchCourseUnitsWithDetailedStatus = async (
 ) => {
   logger.debug(`in fetchCourseUnitsWithDetailedStatus`);
 
-  // TODO: rewrite to pull the necessary Section and Card details and then run the calc logic
+  // TODO: this currently pulls everything down to the card ID level in one query
+  // Review if a layered GQL fetch can be more efficient (driven by FE design)
 
   const arrayCourseUnitsDetails = await fetchCourseUnitsBase(
     filterValues,
@@ -147,7 +148,6 @@ export const fetchCourseUnitsWithDetailedStatus = async (
 
   const userId = fetchParameters.userId;
 
-  // TODO: consider replacing with a more simple function
   const examStatusByCourseUnit = await fetchUserCourseUnitExamStatus(
     filterValues,
     aggregateArray,
@@ -157,11 +157,11 @@ export const fetchCourseUnitsWithDetailedStatus = async (
 
   // Get individual Secions and Cards and calculate the progress status
   for (let unitElem of arrayCourseUnitsDetails) {
-    unitElem.ema = 0.0;
     unitElem.attempts_left = 0;
     unitElem.is_continue_exam = false;
     unitElem.exam_ = '';
-    let has_quiz = false;
+    let unitEmaSum = 0;
+    let unitEmaCount = 0;
     let sectionArray = [];
     if (unitElem.sections_list) {
       sectionArray = unitElem.sections_list.sort(
@@ -172,7 +172,8 @@ export const fetchCourseUnitsWithDetailedStatus = async (
     // Unit Sections
     if (sectionArray.length > 0) {
       for (let sectionElem of sectionArray) {
-        sectionElem.ema = 0.0;
+        let sectEmaSum = 0;
+        let sectEmaCount = 0;
         sectionElem.title = getStringByLocale(
           sectionElem.title,
           viewerLocale
@@ -192,13 +193,11 @@ export const fetchCourseUnitsWithDetailedStatus = async (
         sectionElem.cards_list = cardArray;
         if (cardArray.length > 0) {
           for (let card of cardArray) {
+            card.ema = 0;
             card.title = getStringByLocale(card.title, viewerLocale).text;
             card.headline = getStringByLocale(card.headline, viewerLocale).text;
-
-            card.ema = 0;
             if (card.question_ids && card.question_ids.length > 0) {
               card.ema = await computeQuestionsEMA(userId, card.question_ids);
-              has_quiz = has_quiz ? true : card.ema !== null;
             } else {
               const user_card_view = await checkUserViewedCard(
                 userId,
@@ -208,23 +207,24 @@ export const fetchCourseUnitsWithDetailedStatus = async (
                 card.ema = 100;
               }
             }
-
-            sectionElem.ema += card.ema;
+            sectEmaSum += card.ema;
+            sectEmaCount++;
           }
-          sectionElem.ema = sectionElem.ema / cardArray.length;
         }
-        unitElem.ema += sectionElem.ema;
+
+        // End of Section
+        unitEmaSum += sectEmaSum;
+        unitEmaCount += sectEmaCount;
+        sectionElem.ema = sectEmaCount > 0 ? sectEmaSum / sectEmaCount : 0;
       }
-      unitElem.ema = unitElem.ema / sectionArray.length;
     }
 
-    unitElem.unit_progress_state = has_quiz ? 0 : -1;
-
-    unitElem.grade = 0;
-    unitElem.attempts_left = unitElem.attempts_allowed_per_day;
-    unitElem.user_attempted = 0;
+    unitElem.ema = unitEmaCount > 0 ? unitEmaSum / unitEmaCount : 0;
+    unitElem.unit_progress_state = unitElem.ema > 0 ? 0 : -1;
 
     // Course Unit Exam Attempts
+    unitElem.grade = 0;
+    unitElem.attempts_left = unitElem.attempts_allowed_per_day;
     const examStatusUnitIndex = examStatusByCourseUnit.findIndex(
       x => x._id === unitElem._id
     );
@@ -442,12 +442,8 @@ export const fetchCourseUnitById = async (
         viewerLocale
       ).text;
     }
-    unitElem.ema = 0.0;
+
     unitElem.attempts_left = 0;
-    let has_quiz = false;
-    const userattempted = unitElem.user_attempted || [];
-    unitElem.unit_progress_state = has_quiz ? 0 : -1;
-    unitElem.grade = 0;
     let arrayAttemp = await ExamAttempt.find({
       started_at: {
         $gte: moment().format('YYYY-MM-DD 00:00:00'),
@@ -461,6 +457,11 @@ export const fetchCourseUnitById = async (
     } else {
       unitElem.attempts_left = unitElem.attempts_allowed_per_day;
     }
+
+    // All these are undefined now
+    unitElem.ema = 0.0;
+    unitElem.unit_progress_state = 0;
+    unitElem.grade = 0;
   }
   return arrayRet[0];
 };

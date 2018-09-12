@@ -11,8 +11,6 @@ import { fromGlobalId, mutationWithClientMutationId } from 'graphql-relay';
 import { CompletionObjType } from '../../relay-models/completion-obj';
 
 import { processQuestionAction } from '../../relay-mutate-and-get/exam-question-mag';
-import { CourseUnitType } from '../../relay-models/course-unit';
-import { fetchCourseUnitsWithDetailedStatus } from '../../db-handlers/course/course-unit-fetch';
 import { logger } from '../../utils/logger';
 
 export default mutationWithClientMutationId({

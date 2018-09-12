@@ -20,5 +20,6 @@ export default {
       type: new GraphQLNonNull(GraphQLID)
     }
   },
-  resolve: resolveCardEntry
+  resolve: (obj, args, viewer, info) =>
+    resolveCardEntry(obj, args, viewer, info)
 };

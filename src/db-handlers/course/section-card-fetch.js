@@ -434,3 +434,57 @@ export const fetchSectionCardIDsForUnit = async (course_id, unit_id) => {
 
   return result[0];
 };
+
+export const fetchSectionsCardIDs = async (course_id, unit_id, section_id) => {
+  logger.debug(`in fetchSectionsCardIDs`);
+
+  let array = [];
+
+  // Find the course
+  array.push({ $match: { _id: course_id } });
+
+  // Find the unit
+  array.push({
+    $project: {
+      unit: {
+        $filter: {
+          input: '$units.Units',
+          cond: { $eq: ['$$this._id', unit_id] }
+        }
+      }
+    }
+  });
+  array.push({ $unwind: '$unit' });
+
+  // Find the section
+  array.push({
+    $project: {
+      section: {
+        $filter: {
+          input: '$unit.sections.Sections',
+          cond: { $eq: ['$$this._id', section_id] }
+        }
+      }
+    }
+  });
+  array.push({ $unwind: '$section' });
+
+  array.push({
+    $project: {
+      'section.cards.Cards._id': 1,
+      'section.cards.Cards.index': 1
+    }
+  });
+
+  let result = await Course.aggregate(array).exec();
+  logger.debug(`   section's fetched cards ` + JSON.stringify(result));
+
+  return result[0];
+};
+
+export const scrollToCard = async (scrollingDir, fetchParameters) => {
+  logger.debug(`in scrollToCard`);
+  // FUTURE - call fetchSectionsCardIDs and navigate the the next or prev
+  // Currently, the evaluation is done on the client
+  return fetchParameters;
+};
