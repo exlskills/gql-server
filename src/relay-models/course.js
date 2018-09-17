@@ -16,11 +16,10 @@ import {
 } from 'graphql-relay';
 
 import { CourseUnitConnection } from './course-unit';
-
 import { NodeInterface } from './node-definitions';
-
 import { resolveCourseUnits } from '../relay-resolvers/course-unit-resolvers';
 import * as inputTypes from '../relay-queries/input-types';
+import { CourseDeliverySchedule } from './course-delivery-schedule';
 
 export const CourseType = new GraphQLObjectType({
   name: 'Course',
@@ -113,6 +112,12 @@ export const CourseType = new GraphQLObjectType({
     },
     last_accessed_card: {
       type: GraphQLString
+    },
+    delivery_methods: {
+      type: new GraphQLList(GraphQLString)
+    },
+    delivery_schedule: {
+      type: new GraphQLList(CourseDeliverySchedule)
     }
   }),
   interfaces: [NodeInterface]
