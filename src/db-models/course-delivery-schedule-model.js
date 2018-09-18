@@ -11,6 +11,13 @@ export default new mongoose.Schema(
       type: [String],
       default: ['live']
     },
+    event_duration: {
+      months: Number,
+      weeks: Number,
+      days: Number,
+      hours: Number,
+      minutes: Number
+    },
     scheduled_event_details: {
       type: [ScheduledEventDetailsSchema]
     }

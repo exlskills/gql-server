@@ -2,7 +2,6 @@ import mongoose from 'mongoose';
 import { id_gen } from '../utils/url-id-generator';
 import IntlStringSchema from './intl-string-model';
 import CourseUnitObjSchema from './course-unit-obj-model';
-import CourseDeliveryScheduleSchema from './course-delivery-schedule-model';
 
 const CourseSchema = new mongoose.Schema(
   {
@@ -95,13 +94,6 @@ const CourseSchema = new mongoose.Schema(
       type: String,
       required: true,
       default: 'Java'
-    },
-    delivery_methods: {
-      type: [String],
-      default: ['offline']
-    },
-    delivery_schedule: {
-      type: [CourseDeliveryScheduleSchema]
     }
   },
   {

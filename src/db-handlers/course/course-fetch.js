@@ -62,7 +62,9 @@ export const fetchCourses = async (
     primary_topic: 1,
     view_count: 1,
     logo_url: 1,
-    _id: 1
+    _id: 1,
+    delivery_methods: 1,
+    delivery_schedule: 1
   };
   let intlStringFields = {
     title: 1,
@@ -256,6 +258,7 @@ export const fetchCourses = async (
   if (limit) array.push(limit);
 
   const result = await Course.aggregate(array).exec();
+  logger.debug(` fetchCourses result ` + JSON.stringify(result));
   return result;
 };
 

@@ -14,6 +14,7 @@ export default {
   // Individual
   courseById: courseQueries.courseById,
   courseUnit: courseQueries.courseUnit,
+  courseDeliverySchedule: courseQueries.courseDeliveryScheduleByMethod,
   cardEntry: courseQueries.sectionCardEntry,
   cardByQuestion: courseQueries.cardByQuestion,
   userActivity: queryUsers.userActivity,

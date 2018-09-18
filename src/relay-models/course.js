@@ -19,7 +19,7 @@ import { CourseUnitConnection } from './course-unit';
 import { NodeInterface } from './node-definitions';
 import { resolveCourseUnits } from '../relay-resolvers/course-unit-resolvers';
 import * as inputTypes from '../relay-queries/input-types';
-import { CourseDeliverySchedule } from './course-delivery-schedule';
+import { resolveCourseDeliveryMethods } from '../relay-resolvers/course-delivery-schedule-resolvers';
 
 export const CourseType = new GraphQLObjectType({
   name: 'Course',
@@ -114,10 +114,9 @@ export const CourseType = new GraphQLObjectType({
       type: GraphQLString
     },
     delivery_methods: {
-      type: new GraphQLList(GraphQLString)
-    },
-    delivery_schedule: {
-      type: new GraphQLList(CourseDeliverySchedule)
+      type: new GraphQLList(GraphQLString),
+      resolve: (obj, args, viewer, info) =>
+        resolveCourseDeliveryMethods(obj, args, viewer, info)
     }
   }),
   interfaces: [NodeInterface]

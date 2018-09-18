@@ -2,13 +2,13 @@ import {
   connectionFromDataSource,
   attachEmptyFrame
 } from '../paging-processor/connection-from-datasource';
-import * as UserFetch from '../db-handlers/user/user-fetch';
 import {
   fetchCourses,
   fetchCourseAndCardInteraction
 } from '../db-handlers/course/course-fetch';
 import { fromGlobalId, toGlobalId } from 'graphql-relay';
 import { logger } from '../utils/logger';
+import { fetchCourseDeliverySchedule } from '../db-handlers/course/course-delivery-schedule-fetch';
 
 /**
  * Resolve function for CoursePaging query
