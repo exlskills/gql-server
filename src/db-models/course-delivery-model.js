@@ -1,5 +1,5 @@
 import mongoose from 'mongoose';
-import CourseDeliveryScheduleSchema from './course-delivery-schedule-model';
+import CourseDeliveryStructureSchema from './course-delivery-structure-model';
 
 const CourseDeliverySchema = new mongoose.Schema({
   _id: {
@@ -19,12 +19,15 @@ const CourseDeliverySchema = new mongoose.Schema({
     default: 'en'
     //    index: true
   },
-  delivery_methods: {
+  available_delivery_methods: {
     type: [String],
     default: ['offline']
   },
-  delivery_schedule: {
-    type: [CourseDeliveryScheduleSchema]
+  instructors: {
+    type: [String]
+  },
+  delivery_structures: {
+    type: [CourseDeliveryStructureSchema]
   }
 });
 

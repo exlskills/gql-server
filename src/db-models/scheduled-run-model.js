@@ -1,0 +1,23 @@
+import mongoose from 'mongoose';
+import SchedRunSession from './sched-run-session-model';
+
+export default new mongoose.Schema(
+  {
+    active: {
+      type: Boolean,
+      default: true
+    },
+    run_start_date: {
+      type: Date
+    },
+    instructors: {
+      type: [String]
+    },
+    sessions: {
+      type: [SchedRunSession]
+    }
+  },
+  {
+    timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' }
+  }
+);

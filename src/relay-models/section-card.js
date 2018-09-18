@@ -3,7 +3,6 @@ import {
   GraphQLID,
   GraphQLInt,
   GraphQLList,
-  GraphQLNonNull,
   GraphQLObjectType,
   GraphQLString
 } from 'graphql';

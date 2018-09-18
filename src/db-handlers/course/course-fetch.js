@@ -64,7 +64,7 @@ export const fetchCourses = async (
     logo_url: 1,
     _id: 1,
     delivery_methods: 1,
-    delivery_schedule: 1
+    delivery_structures: 1
   };
   let intlStringFields = {
     title: 1,

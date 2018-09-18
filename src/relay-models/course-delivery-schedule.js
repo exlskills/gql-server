@@ -1,5 +1,4 @@
 import {
-  GraphQLBoolean,
   GraphQLInt,
   GraphQLList,
   GraphQLObjectType,
@@ -7,24 +6,28 @@ import {
 } from 'graphql';
 import { connectionDefinitions, globalIdField } from 'graphql-relay';
 import { NodeInterface } from './node-definitions';
-import { ScheduledEventDetails } from './scheduled-event-details';
+import { ScheduledRunType } from './scheduled-run';
+import { EventDurationType } from './event-duration';
 
 export const CourseDeliveryScheduleType = new GraphQLObjectType({
   name: 'CourseDeliverySchedule',
   description: 'Course Delivery Schedule',
   fields: () => ({
     id: globalIdField('CourseDeliverySchedule', obj => obj._id),
-    active: {
-      type: GraphQLBoolean
-    },
     delivery_methods: {
       type: new GraphQLList(GraphQLString)
     },
-    event_duration: {
+    delivery_structure: {
+      type: GraphQLString
+    },
+    combined_duration: {
       type: EventDurationType
     },
-    scheduled_event_details: {
-      type: new GraphQLList(ScheduledEventDetails)
+    session_info: {
+      type: new GraphQLList(ScheduledRunSessionInfoType)
+    },
+    scheduled_runs: {
+      type: new GraphQLList(ScheduledRunType)
     }
   }),
   interfaces: [NodeInterface]
@@ -37,24 +40,20 @@ export const {
   nodeType: CourseDeliveryScheduleType
 });
 
-const EventDurationType = new GraphQLObjectType({
-  name: 'EventDuration',
-  description: 'Event Duration',
+const ScheduledRunSessionInfoType = new GraphQLObjectType({
+  name: 'ScheduledRunSessionInfoType',
+  description: 'Scheduled Run Session Info',
   fields: () => ({
-    months: {
+    id: globalIdField('ScheduledRunSessionInfo', obj => obj._id),
+    session_seq: {
       type: GraphQLInt
     },
-    weeks: {
-      type: GraphQLInt
+    headline: {
+      type: GraphQLString
     },
-    days: {
-      type: GraphQLInt
-    },
-    hours: {
-      type: GraphQLInt
-    },
-    minutes: {
-      type: GraphQLInt
+    desc: {
+      type: GraphQLString
     }
-  })
+  }),
+  interfaces: [NodeInterface]
 });
