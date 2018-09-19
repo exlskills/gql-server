@@ -11,9 +11,6 @@ export default new mongoose.Schema(
     run_start_date: {
       type: Date
     },
-    timezone: {
-      type: String
-    },
     instructors: {
       type: [String]
     },
