@@ -136,7 +136,7 @@ const convertBase = function(value, from_base, to_base) {
   let new_value = '';
   while (dec_value > 0) {
     new_value = to_range[dec_value % to_base] + new_value;
-    dec_value = (dec_value - dec_value % to_base) / to_base;
+    dec_value = (dec_value - (dec_value % to_base)) / to_base;
   }
   return new_value || '0';
 };

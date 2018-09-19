@@ -1,0 +1,21 @@
+- username: 'javatestguru1'
+  primary_email: 'javatestguru1@mail.com'
+  full_name:
+    intlString:
+      - locale: 'en'
+        is_default: true
+        content: ' JavaTest Guru1'
+- username: 'javatestsolid1'
+  primary_email: 'javatestsolid1@mail.com'
+  full_name:
+    intlString:
+    - locale: 'en'
+      is_default: true
+      content: ' JavaTest Solid1'
+- username: 'javatestjunior1'
+  primary_email: 'javatestjunior1@mail.com'
+  full_name:
+    intlString:
+    - locale: 'en'
+      is_default: true
+      content: ' JavaTest Junior1'

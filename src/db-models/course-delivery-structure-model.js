@@ -4,6 +4,7 @@ import CourseDeliverySchedSessionSchema from './course-delivery-session-model';
 
 export default new mongoose.Schema(
   {
+    _id: false,
     delivery_methods: {
       type: [String],
       default: ['live']
@@ -12,7 +13,7 @@ export default new mongoose.Schema(
       type: String,
       default: 'standard'
     },
-    combined_duration: {
+    course_duration: {
       months: Number,
       weeks: Number,
       days: Number,

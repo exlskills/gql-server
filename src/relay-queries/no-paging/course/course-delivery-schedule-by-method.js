@@ -1,4 +1,4 @@
-import { GraphQLString, GraphQLBoolean } from 'graphql';
+import { GraphQLString } from 'graphql';
 import { GraphQLDateTime } from 'graphql-iso-date';
 import { resolveCourseDeliverySchedule } from '../../../relay-resolvers/course-delivery-schedule-resolvers';
 import { CourseDeliveryScheduleType } from '../../../relay-models/course-delivery-schedule';
@@ -11,9 +11,6 @@ export default {
     },
     delivery_method: {
       type: GraphQLString
-    },
-    active: {
-      type: GraphQLBoolean
     },
     date_on_or_after: {
       type: GraphQLDateTime

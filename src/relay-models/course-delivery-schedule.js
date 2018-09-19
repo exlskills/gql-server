@@ -20,7 +20,7 @@ export const CourseDeliveryScheduleType = new GraphQLObjectType({
     delivery_structure: {
       type: GraphQLString
     },
-    combined_duration: {
+    course_duration: {
       type: EventDurationType
     },
     session_info: {

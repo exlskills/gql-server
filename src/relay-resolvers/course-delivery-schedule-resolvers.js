@@ -21,10 +21,6 @@ export const resolveCourseDeliverySchedule = async (
       delivery_methods = [];
       delivery_methods.push(args.delivery_method);
     }
-    let active = true;
-    if (args.active) {
-      active = args.active;
-    }
     let date_on_or_after = new Date(Date.UTC(1970, 1, 1));
     if (args.date_on_or_after) {
       date_on_or_after = args.date_on_or_after;

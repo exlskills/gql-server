@@ -28,6 +28,26 @@ export const fetchById = async (obj_id, selectVal, viewer, info) => {
   return record;
 };
 
+export const fetchByKey = async (queryVal, selectVal, viewer, info) => {
+  logger.debug(`in User fetchByKey`);
+  let record;
+  try {
+    //model, runParams, queryVal, sortVal, selectVal
+    record = await basicFind(
+      User,
+      {
+        isOne: true
+      },
+      queryVal,
+      false,
+      selectVal
+    );
+  } catch (errInternalAlreadyReported) {
+    return null;
+  }
+  return record;
+};
+
 export const fetchUserOrgsList = async (obj_id, viewer, info) => {
   logger.debug(`in fetchUserOrgsList`);
   let record;

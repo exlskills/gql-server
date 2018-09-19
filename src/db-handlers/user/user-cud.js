@@ -4,7 +4,6 @@ import {
   setDefaultIntlStringLocale,
   updateIntlStringObject
 } from '../intl-string-utils';
-import { fromGlobalId } from 'graphql-relay';
 import { logger } from '../../utils/logger';
 
 export const createUser = async userObject => {

@@ -1,0 +1,92 @@
+course_id: ap_java_test
+locale: en
+available_delivery_methods:
+  - live
+instructors:
+  - javatestguru1
+delivery_structures:
+  - delivery_structure: standard
+    delivery_methods:
+      - live
+    course_duration:
+      weeks: 1
+    session_duration:
+      hours: 3
+    sessions:
+      - session_seq: 1
+        headline: Intro
+        desc: Intro to the subject
+        instructors:
+          - javatestsolid1
+        session_duration:
+          hours: 2
+          minutes: 30
+      - session_seq: 2
+        headline: Entry
+        desc: Basics of the subject
+      - session_seq: 3
+        headline: Core
+        desc: Core of the subject
+      - session_seq: 4
+        headline: Summary
+        desc: Summary of the course
+        session_duration:
+          hours: 3
+          minutes: 30
+    scheduled_runs:
+      - run_start_date: 2018-12-01 18:00
+        timezone: America/Los_Angeles
+        active: true
+        sessions:
+          - session_seq: 1
+            session_start_date: 2018-12-01 18:00
+            instructors:
+              - javatestjunior1
+          - session_seq: 2
+            session_start_date: 2018-12-03 18:00
+          - session_seq: 3
+            session_start_date: 2018-12-05 18:00
+          - session_seq: 4
+            session_start_date: 2018-12-07 18:00
+      - run_start_date: 2018-09-12 18:00
+        timezone: America/Los_Angeles
+        active: true
+        sessions:
+        - session_seq: 1
+          session_start_date: 2018-09-12 18:00
+        - session_seq: 2
+          session_start_date: 2018-09-14 18:00
+        - session_seq: 3
+          session_start_date: 2018-09-16 18:00
+        - session_seq: 4
+          session_start_date: 2018-09-18 18:00
+      - run_start_date: 2018-10-01 18:00
+        timezone: Asia/Tokyo
+        active: true
+        instructors:
+          - javatestguru1
+          - javatestsolid1
+        sessions:
+        - session_seq: 1
+          session_start_date: 2018-10-01 18:00
+        - session_seq: 2
+          session_start_date: 2018-10-03 18:00
+        - session_seq: 3
+          session_start_date: 2018-10-05 18:00
+        - session_seq: 4
+          session_start_date: 2018-10-07 18:00
+      - run_start_date: 2018-10-26 18:00
+        timezone: Asia/Tokyo
+        active: true
+        instructors:
+          - javatestsolid1
+          - javatestjunior1
+        sessions:
+        - session_seq: 1
+          session_start_date: 2018-10-26 18:00
+        - session_seq: 2
+          session_start_date: 2018-10-28 18:00
+        - session_seq: 3
+          session_start_date: 2018-10-30 18:00
+        - session_seq: 4
+          session_start_date: 2018-11-01 18:00

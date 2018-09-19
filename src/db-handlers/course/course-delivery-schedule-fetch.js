@@ -1,6 +1,8 @@
 import { logger } from '../../utils/logger';
 import { basicFind } from '../basic-query-handler';
 import CourseDelivery from '../../db-models/course-delivery-model';
+import { fetchByKey } from '../user/user-fetch';
+import { getStringByLocale } from '../../parsers/intl-string-parser';
 
 export const fetchByCourseIdAndLocale = async (
   course_id,
@@ -23,7 +25,7 @@ export const fetchByCourseIdAndLocale = async (
 };
 
 /*
-Returns ONE Schedule that is applicable to ANY of the Delivery Methods passed in; active OR inactive
+Returns ONE (active) Schedule that is applicable to ANY of the Delivery Methods passed in
 Start Dates sorted in ascending order (earliest to latest), equal or later to the date passed in
  */
 export const fetchCourseDeliverySchedule = async (
@@ -67,19 +69,20 @@ export const fetchCourseDeliverySchedule = async (
     }
     result.delivery_methods = deliveryStruct.delivery_methods;
     result.delivery_structure = deliveryStruct.delivery_structure;
-    result.combined_duration = loadDuration(deliveryStruct.combined_duration);
+    result.course_duration = loadDuration(deliveryStruct.course_duration);
 
     let deliveryStructInstructors =
       deliveryStruct.instructors && deliveryStruct.instructors.length > 0
         ? deliveryStruct.instructors
         : courseInstructors;
-    // logger.debug(` deliveryStructInstructors ` + deliveryStructInstructors);
 
     const genSessionDuration = loadDuration(deliveryStruct.session_duration);
 
     const session_info = [];
     for (let deliverySession of deliveryStruct.sessions) {
-      deliverySession.session_duration = deliverySession.session_duration
+      deliverySession.session_duration = isDuration(
+        deliverySession.session_duration
+      )
         ? loadDuration(deliverySession.session_duration)
         : genSessionDuration;
 
@@ -104,8 +107,8 @@ export const fetchCourseDeliverySchedule = async (
         scheduledRun.instructors && scheduledRun.instructors.length > 0
           ? scheduledRun.instructors
           : deliveryStructInstructors;
-      // logger.debug(` scheduledRunInstructors ` + scheduledRunInstructors);
 
+      const instructorObjArray = [];
       const run_sessions = [];
       const sortedSchedRunSessions = scheduledRun.sessions.sort(
         (it1, it2) => it1.session_seq - it2.session_seq
@@ -113,48 +116,84 @@ export const fetchCourseDeliverySchedule = async (
       for (let schedRunSession of sortedSchedRunSessions) {
         logger.debug(` schedRunSession ` + JSON.stringify(schedRunSession));
 
-        const schedSessionObj = {};
-
         const thisSessionInfo = session_info.find(
           obj => obj.session_seq === schedRunSession.session_seq
         );
-
         logger.debug(` thisSessionInfo ` + JSON.stringify(thisSessionInfo));
 
         if (
-          schedRunSession.instructors &&
-          schedRunSession.instructors.length > 0
+          !(
+            schedRunSession.instructors &&
+            schedRunSession.instructors.length > 0
+          )
         ) {
-          schedSessionObj.instructors = schedRunSession.instructors;
-        } else {
-          if (
+          schedRunSession.instructors =
             thisSessionInfo &&
             thisSessionInfo.instructors &&
             thisSessionInfo.instructors.length > 0
-          ) {
-            schedSessionObj.instructors = thisSessionInfo.instructors;
-          } else {
-            schedSessionObj.instructors = scheduledRunInstructors;
-          }
-        }
-        if (schedRunSession.session_duration) {
-          schedSessionObj.session_duration = schedRunSession.session_duration;
-        } else {
-          schedSessionObj.session_duration = thisSessionInfo.session_duration;
+              ? thisSessionInfo.instructors
+              : scheduledRunInstructors;
         }
 
+        if (!isDuration(schedRunSession.session_duration)) {
+          schedRunSession.session_duration = thisSessionInfo
+            ? thisSessionInfo.session_duration
+            : genSessionDuration;
+        }
         logger.debug(
-          ` schedRunSession updated ` + JSON.stringify(schedSessionObj)
+          ` schedRunSession updated ` + JSON.stringify(schedRunSession)
         );
-        run_sessions.push(schedSessionObj);
+
+        const sessionInstructors = [];
+        for (let instructorId of schedRunSession.instructors) {
+          const thisInstructor = instructorObjArray.find(
+            obj => obj.username === instructorId
+          );
+          if (thisInstructor) {
+            sessionInstructors.push(thisInstructor);
+          } else {
+            const instrObj = {
+              username: instructorId,
+              full_name: '',
+              primary_email: ''
+            };
+            const fetchedInstr = await fetchByKey(
+              { username: instructorId },
+              { full_name: 1, primary_email: 1 },
+              viewer,
+              info
+            );
+            if (fetchedInstr) {
+              logger.debug(` fetchedInstr ` + fetchedInstr);
+              // instrObj.primary_email = fetchedInstr.primary_email;
+              instrObj.full_name = getStringByLocale(
+                fetchedInstr.full_name,
+                viewer.locale
+              ).text;
+            }
+            logger.debug(` instrObj ` + JSON.stringify(instrObj));
+            sessionInstructors.push(instrObj);
+            instructorObjArray.push(instrObj);
+          }
+        }
+
+        const run_sessions_output = {
+          session_seq: schedRunSession.session_seq,
+          session_start_date: schedRunSession.session_start_date,
+          instructors: sessionInstructors,
+          session_duration: schedRunSession.session_duration
+        };
+
+        run_sessions.push(run_sessions_output);
       }
+
       scheduledRun.run_sessions = run_sessions;
       scheduled_runs.push(scheduledRun);
     }
 
     result.scheduled_runs = scheduled_runs;
   }
-  logger.debug(` result ` + result);
+  logger.debug(` result ` + JSON.stringify(result));
   return result;
 };
 
@@ -202,4 +241,11 @@ const loadDuration = s => {
     }
   }
   return result;
+};
+
+const isDuration = s => {
+  if (s && (s.months || s.weeks || s.days || s.hours || s.minutes)) {
+    return true;
+  }
+  return false;
 };

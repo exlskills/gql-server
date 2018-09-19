@@ -2,6 +2,7 @@ import mongoose from 'mongoose';
 
 export default new mongoose.Schema(
   {
+    _id: false,
     session_seq: {
       type: Number
     },
