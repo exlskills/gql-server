@@ -17,8 +17,8 @@ const CourseDeliverySchema = new mongoose.Schema({
     type: String,
     required: true,
     default: 'en'
-    //    index: true
   },
+  schedule_owner: String,
   available_delivery_methods: {
     type: [String],
     default: ['offline']

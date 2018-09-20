@@ -23,6 +23,9 @@ export const CourseDeliveryScheduleType = new GraphQLObjectType({
     course_duration: {
       type: EventDurationType
     },
+    course_notes: {
+      type: GraphQLString
+    },
     session_info: {
       type: new GraphQLList(ScheduledRunSessionInfoType)
     },
@@ -52,6 +55,9 @@ const ScheduledRunSessionInfoType = new GraphQLObjectType({
       type: GraphQLString
     },
     desc: {
+      type: GraphQLString
+    },
+    session_notes: {
       type: GraphQLString
     }
   }),

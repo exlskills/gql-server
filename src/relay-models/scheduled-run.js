@@ -1,4 +1,4 @@
-import { GraphQLList, GraphQLObjectType } from 'graphql';
+import { GraphQLList, GraphQLObjectType, GraphQLString } from 'graphql';
 import { GraphQLDateTime } from 'graphql-iso-date';
 import { globalIdField } from 'graphql-relay';
 import { NodeInterface } from './node-definitions';
@@ -11,6 +11,9 @@ export const ScheduledRunType = new GraphQLObjectType({
     id: globalIdField('ScheduledRunDetails', obj => obj._id),
     run_start_date: {
       type: GraphQLDateTime
+    },
+    _id: {
+      type: GraphQLString
     },
     run_sessions: {
       type: new GraphQLList(ScheduledRunSessionType)

@@ -1,8 +1,12 @@
 import mongoose from 'mongoose';
+import { id_gen } from '../utils/url-id-generator';
 
 export default new mongoose.Schema(
   {
-    _id: false,
+    _id: {
+      type: String,
+      default: id_gen
+    },
     session_seq: {
       type: Number
     },
@@ -12,6 +16,7 @@ export default new mongoose.Schema(
     instructors: {
       type: [String]
     },
+    session_run_notes: String,
     session_duration: {
       months: Number,
       weeks: Number,

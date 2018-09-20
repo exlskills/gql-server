@@ -8,6 +8,7 @@ export default new mongoose.Schema(
     },
     headline: String,
     desc: String,
+    session_notes: String,
     instructors: {
       type: [String]
     },

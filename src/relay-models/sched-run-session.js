@@ -20,6 +20,12 @@ export const ScheduledRunSessionType = new GraphQLObjectType({
     session_start_date: {
       type: GraphQLDateTime
     },
+    _id: {
+      type: GraphQLString
+    },
+    session_run_notes: {
+      type: GraphQLString
+    },
     instructors: {
       type: new GraphQLList(SessionInstructorType)
     },

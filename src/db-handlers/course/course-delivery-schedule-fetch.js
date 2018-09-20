@@ -70,6 +70,9 @@ export const fetchCourseDeliverySchedule = async (
     result.delivery_methods = deliveryStruct.delivery_methods;
     result.delivery_structure = deliveryStruct.delivery_structure;
     result.course_duration = loadDuration(deliveryStruct.course_duration);
+    result.course_notes = deliveryStruct.course_notes
+      ? deliveryStruct.course_notes
+      : '';
 
     let deliveryStructInstructors =
       deliveryStruct.instructors && deliveryStruct.instructors.length > 0
@@ -85,6 +88,10 @@ export const fetchCourseDeliverySchedule = async (
       )
         ? loadDuration(deliverySession.session_duration)
         : genSessionDuration;
+
+      deliverySession.session_notes = deliverySession.session_notes
+        ? deliverySession.session_notes
+        : '';
 
       session_info.push(deliverySession);
     }
@@ -177,14 +184,18 @@ export const fetchCourseDeliverySchedule = async (
           }
         }
 
-        const run_sessions_output = {
+        const session_run_output = {
+          _id: schedRunSession._id,
           session_seq: schedRunSession.session_seq,
           session_start_date: schedRunSession.session_start_date,
           instructors: sessionInstructors,
-          session_duration: schedRunSession.session_duration
+          session_duration: schedRunSession.session_duration,
+          session_run_notes: schedRunSession.session_run_notes
+            ? schedRunSession.session_run_notes
+            : ''
         };
 
-        run_sessions.push(run_sessions_output);
+        run_sessions.push(session_run_output);
       }
 
       scheduledRun.run_sessions = run_sessions;

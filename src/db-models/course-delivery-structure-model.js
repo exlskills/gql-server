@@ -27,6 +27,7 @@ export default new mongoose.Schema(
       hours: Number,
       minutes: Number
     },
+    course_notes: String,
     instructors: {
       type: [String]
     },

@@ -1,5 +1,6 @@
 course_id: ap_java_test
 locale: en
+schedule_owner: javatestacademy1
 available_delivery_methods:
   - live
 instructors:
@@ -12,6 +13,8 @@ delivery_structures:
       weeks: 1
     session_duration:
       hours: 3
+    course_notes: |
+      Laptop is recommended but a mobile device should be sufficient
     sessions:
       - session_seq: 1
         headline: Intro
@@ -30,12 +33,14 @@ delivery_structures:
       - session_seq: 4
         headline: Summary
         desc: Summary of the course
+        session_notes: |
+          Will have an extended Q&A session at the end. Prepare good questions
         session_duration:
           hours: 3
           minutes: 30
     scheduled_runs:
       - run_start_date: 2018-12-01 18:00
-        timezone: America/Los_Angeles
+        scheduling_timezone: America/Los_Angeles
         active: true
         sessions:
           - session_seq: 1
@@ -46,10 +51,11 @@ delivery_structures:
             session_start_date: 2018-12-03 18:00
           - session_seq: 3
             session_start_date: 2018-12-05 18:00
+            session_run_notes: Tentative time. May have to move a day earlier
           - session_seq: 4
             session_start_date: 2018-12-07 18:00
       - run_start_date: 2018-09-12 18:00
-        timezone: America/Los_Angeles
+        scheduling_timezone: America/Los_Angeles
         active: true
         sessions:
         - session_seq: 1
@@ -61,7 +67,7 @@ delivery_structures:
         - session_seq: 4
           session_start_date: 2018-09-18 18:00
       - run_start_date: 2018-10-01 18:00
-        timezone: Asia/Tokyo
+        scheduling_timezone: Asia/Tokyo
         active: true
         instructors:
           - javatestguru1
@@ -76,7 +82,7 @@ delivery_structures:
         - session_seq: 4
           session_start_date: 2018-10-07 18:00
       - run_start_date: 2018-10-26 18:00
-        timezone: Asia/Tokyo
+        scheduling_timezone: Asia/Tokyo
         active: true
         instructors:
           - javatestsolid1

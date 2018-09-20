@@ -2,7 +2,7 @@ import mongoose from 'mongoose';
 import * as fs from 'fs-extra';
 import path from 'path';
 import * as yaml from 'js-yaml';
-import User from './user-base';
+import User from './user-base-model';
 
 async function loadUsers() {
   try {
