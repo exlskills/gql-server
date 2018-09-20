@@ -6,6 +6,7 @@ query CourseDeliverySched {
   courseDeliverySchedule(course_id: "Q291cnNlOmFwX2phdmFfdGVzdA==", date_on_or_after: "2018-09-19T00:00:00.000Z") {
     delivery_structure
     delivery_methods
+    course_notes
     course_duration {
       months
       weeks
@@ -17,10 +18,16 @@ query CourseDeliverySched {
       session_seq
       headline
       desc
+      session_notes
     }
     scheduled_runs {
+      _id
+      offered_at_price {
+        amount
+      }
       run_start_date
       run_sessions {
+        _id
         session_seq
         session_duration {
           months
@@ -30,6 +37,7 @@ query CourseDeliverySched {
           minutes
         }
         session_start_date
+        session_run_notes
         instructors {
           username
           full_name

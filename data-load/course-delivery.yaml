@@ -91,6 +91,8 @@ delivery_structures:
           - session_seq: 4
             session_start_date: '2018-10-07 18:00'
             _id: 1xd7EnDIgg9C
+        offered_at_price:
+          amount: 9
         run_start_date: '2018-10-01 18:00'
         scheduling_timezone: Asia/Tokyo
         _id: 1xd7EOiPnGyE
@@ -111,8 +113,12 @@ delivery_structures:
           - session_seq: 4
             session_start_date: '2018-11-01 18:00'
             _id: 1xd7EvfcZObS
+        offered_at_price:
+          amount: 8
         run_start_date: '2018-10-26 18:00'
         scheduling_timezone: Asia/Tokyo
         _id: 1xd7EDDxF4RK
+    list_price:
+      amount: 10
     course_notes: |
       Laptop is recommended but a mobile device should be sufficient

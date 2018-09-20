@@ -1,6 +1,7 @@
 import mongoose from 'mongoose';
 import ScheduledRunSchema from './scheduled-run-model';
 import CourseDeliverySchedSessionSchema from './course-delivery-session-model';
+import ItemPrice from './item-price-model';
 
 export default new mongoose.Schema(
   {
@@ -30,6 +31,10 @@ export default new mongoose.Schema(
     course_notes: String,
     instructors: {
       type: [String]
+    },
+    list_price: {
+      type: ItemPrice,
+      required: true
     },
     sessions: {
       type: [CourseDeliverySchedSessionSchema]

@@ -78,7 +78,7 @@ async function loadData() {
       null,
       null
     );
-    // logger.debug(` courseDeliveryRecord ` + courseDeliveryRecord);
+    //logger.debug(` courseDeliveryRecord ` + courseDeliveryRecord);
 
     const yaml_out = jsyaml.safeDump(
       prepareForYaml(
@@ -89,7 +89,7 @@ async function loadData() {
         skipInvalid: true
       } */
     );
-    // logger.debug(` jaml_out ` + yaml_out);
+    logger.debug(` jaml_out ` + yaml_out);
 
     await fs.writeFile(yamlFile, yaml_out);
   } catch (err) {
@@ -103,6 +103,7 @@ const prepareForYaml = (obj, timeInputStringFormat) => {
   if (obj.instructors && obj.instructors.length < 1) {
     delete obj.instructors;
   }
+
   for (let delivery_structure of obj.delivery_structures) {
     if (
       delivery_structure.instructors &&
@@ -110,8 +111,12 @@ const prepareForYaml = (obj, timeInputStringFormat) => {
     ) {
       delete delivery_structure.instructors;
     }
+
     delete delivery_structure.created_at;
     delete delivery_structure.updated_at;
+    delete delivery_structure.list_price.created_at;
+    delete delivery_structure.list_price.updated_at;
+
     for (let session of delivery_structure.sessions) {
       if (session.instructors && session.instructors.length < 1) {
         delete session.instructors;
@@ -128,6 +133,10 @@ const prepareForYaml = (obj, timeInputStringFormat) => {
       }
       delete scheduled_run.created_at;
       delete scheduled_run.updated_at;
+      if (scheduled_run.offered_at_price) {
+        delete scheduled_run.offered_at_price.created_at;
+        delete scheduled_run.offered_at_price.updated_at;
+      }
 
       const timeZone = scheduled_run.scheduling_timezone;
 

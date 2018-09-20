@@ -1,6 +1,7 @@
 import mongoose from 'mongoose';
 import SchedRunSession from './sched-run-session-model';
 import { id_gen } from '../utils/url-id-generator';
+import ItemPrice from './item-price-model';
 
 export default new mongoose.Schema(
   {
@@ -18,6 +19,9 @@ export default new mongoose.Schema(
     },
     instructors: {
       type: [String]
+    },
+    offered_at_price: {
+      type: ItemPrice
     },
     sessions: {
       type: [SchedRunSession]

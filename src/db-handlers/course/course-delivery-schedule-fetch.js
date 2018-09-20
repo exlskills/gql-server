@@ -27,6 +27,7 @@ export const fetchByCourseIdAndLocale = async (
 /*
 Returns ONE (active) Schedule that is applicable to ANY of the Delivery Methods passed in
 Start Dates sorted in ascending order (earliest to latest), equal or later to the date passed in
+NOTE: this assumes a single Delivery Structure and Schedule Owner per applicable content (course_is, locale)
  */
 export const fetchCourseDeliverySchedule = async (
   course_id,
@@ -59,7 +60,6 @@ export const fetchCourseDeliverySchedule = async (
     courseDeliveryRecord.instructors.length > 0
       ? courseDeliveryRecord.instructors
       : [];
-  // logger.debug(` courseInstructors ` + courseInstructors);
 
   for (let deliveryStruct of courseDeliveryRecord.delivery_structures) {
     if (
@@ -114,6 +114,13 @@ export const fetchCourseDeliverySchedule = async (
         scheduledRun.instructors && scheduledRun.instructors.length > 0
           ? scheduledRun.instructors
           : deliveryStructInstructors;
+
+      scheduledRun.offered_at_price =
+        scheduledRun.offered_at_price &&
+        scheduledRun.offered_at_price.amount &&
+        scheduledRun.offered_at_price.amount > 0
+          ? scheduledRun.offered_at_price
+          : deliveryStruct.list_price;
 
       const instructorObjArray = [];
       const run_sessions = [];
