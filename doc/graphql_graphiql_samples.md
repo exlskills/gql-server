@@ -26,6 +26,7 @@ query CourseDeliverySched {
       offered_at_price {
         amount
       }
+      seat_purchased
       run_start_date
       run_sessions {
         _id

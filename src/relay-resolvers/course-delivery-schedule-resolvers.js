@@ -4,6 +4,7 @@ import {
   fetchCourseDeliveryMethods,
   fetchCourseDeliverySchedule
 } from '../db-handlers/course/course-delivery-schedule-fetch';
+import { fetchByUserAndItem } from '../db-handlers/user/user-orders-handler';
 
 export const resolveCourseDeliverySchedule = async (
   obj,
@@ -53,4 +54,16 @@ export const resolveCourseDeliveryMethods = async (obj, args, viewer, info) => {
   } catch (err) {
     return Promise.reject(err);
   }
+};
+
+export const resolveUserSeatPurchased = async (obj, args, viewer, info) => {
+  logger.debug(`in resolveUserSeatPurchased`);
+  logger.debug(`   obj ` + JSON.stringify(obj));
+  const seatPurchased = await fetchByUserAndItem(
+    viewer.user_id,
+    'course_run',
+    'cd_run',
+    obj._id
+  );
+  return seatPurchased ? true : false;
 };
