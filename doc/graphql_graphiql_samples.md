@@ -4,6 +4,7 @@
 ```$xslt
 query CourseDeliverySched {
   courseDeliverySchedule(course_id: "Q291cnNlOmFwX2phdmFfdGVzdA==", date_on_or_after: "2018-09-19T00:00:00.000Z") {
+    _id
     delivery_structure
     delivery_methods
     course_notes

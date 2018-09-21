@@ -2,10 +2,14 @@ import mongoose from 'mongoose';
 import ScheduledRunSchema from './scheduled-run-model';
 import CourseDeliverySchedSessionSchema from './course-delivery-session-model';
 import ItemPrice from './item-price-model';
+import { id_gen } from '../utils/url-id-generator';
 
 export default new mongoose.Schema(
   {
-    _id: false,
+    _id: {
+      type: String,
+      default: id_gen
+    },
     delivery_methods: {
       type: [String],
       default: ['live']

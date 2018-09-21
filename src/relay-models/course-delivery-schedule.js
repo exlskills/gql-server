@@ -14,6 +14,9 @@ export const CourseDeliveryScheduleType = new GraphQLObjectType({
   description: 'Course Delivery Schedule',
   fields: () => ({
     id: globalIdField('CourseDeliverySchedule', obj => obj._id),
+    _id: {
+      type: GraphQLString
+    },
     delivery_methods: {
       type: new GraphQLList(GraphQLString)
     },

@@ -36,3 +36,8 @@ export default mongoose.model(
   CourseDeliverySchema,
   'course_delivery'
 );
+
+CourseDeliverySchema.index({
+  'delivery_structures._id': 1,
+  'delivery_structures.scheduled_runs._id': 1
+});

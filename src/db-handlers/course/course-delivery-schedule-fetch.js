@@ -67,6 +67,7 @@ export const fetchCourseDeliverySchedule = async (
     ) {
       continue;
     }
+    result._id = deliveryStruct._id;
     result.delivery_methods = deliveryStruct.delivery_methods;
     result.delivery_structure = deliveryStruct.delivery_structure;
     result.course_duration = loadDuration(deliveryStruct.course_duration);

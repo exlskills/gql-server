@@ -29,8 +29,7 @@ const cfg = {
     process.env.LOGGING_LEVEL ||
     (process.env.NODE_ENV === 'production' ? 'info' : 'debug'),
   db_debug_log:
-    process.env.DB_DEBUG_LOG ||
-    (process.env.NODE_ENV === 'production' ? false : true)
+    process.env.DB_DEBUG_LOG || process.env.NODE_ENV !== 'production'
 };
 
 export default cfg;
