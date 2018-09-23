@@ -8,6 +8,12 @@ import { logger } from '../utils/logger';
  * @param sortVal
  * @param selectVal  e.g., { name: 1, occupation: 1 }
  * @returns {Promise<*>}
+ *
+ * NOTE:
+ * - model.findById and model.findOne return an Object or null if not found
+ *       to ensure the record was found, check the return Object
+ * - model.find returns an array of Objects - an empty Array if nothing found
+ *       check the return value and value.length > 0
  */
 
 export async function basicFind(

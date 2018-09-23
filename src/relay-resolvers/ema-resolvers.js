@@ -63,7 +63,7 @@ export const determineCardEma = async (userId, card) => {
     ema = await computeQuestionsEMA(userId, card.question_ids);
   } else {
     const user_card_view = await checkUserViewedCard(userId, card._id);
-    if (user_card_view) {
+    if (user_card_view && user_card_view.length > 0) {
       ema = 100;
     }
   }

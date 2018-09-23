@@ -12,19 +12,18 @@ async function loadData() {
   try {
     const fileToRead = path.join(__dirname, 'user.yaml');
     const fileContents = await fs.readFile(fileToRead);
-    console.log(fileContents);
     const parsed = yaml.safeLoad(fileContents);
-    console.log(`parsed ` + JSON.stringify(parsed));
+    logger.info(`parsed ` + JSON.stringify(parsed));
 
     let promises = [];
     for (let user of parsed) {
-      console.log(`user ` + JSON.stringify(user));
+      logger.debug(`user ` + JSON.stringify(user));
       promises.push(User.create(user));
     }
     await Promise.all(promises);
-    console.log('Ok ');
+    logger.info('Ok ');
   } catch (err) {
-    console.log('error ' + err);
+    logger.error('error ' + err);
     //return Promise.reject(err);
   }
 }
@@ -33,6 +32,7 @@ startRun();
 
 async function startRun() {
   try {
+    logger.info('Connecting to ' + config.mongo.uri + '/' + config.mongo.db);
     await mongoose.connect(
       config.mongo.uri + '/' + config.mongo.db,
       {
@@ -62,6 +62,6 @@ async function startRun() {
 
 const closeConnection = () => {
   mongoose.connection.close(() => {
-    console.log('Done, mongoose connection disconnected.');
+    logger.info('Done, mongoose connection disconnected.');
   });
 };

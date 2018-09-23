@@ -86,12 +86,13 @@ export const leaveExam = async (exam_attempt_id, cancel, viewer, info) => {
     const exam = await ExamFetch.fetchById(examattempt.exam_id, {
       time_limit: 1
     });
-    const timeDiff =
-      (examattempt.submitted_at - examattempt.started_at) / 1000 / 60;
-    examattempt.time_limit_exceeded = timeDiff > exam.time_limit;
-    examattempt.is_active = false;
-    await examattempt.save();
-
+    if (exam) {
+      const timeDiff =
+        (examattempt.submitted_at - examattempt.started_at) / 1000 / 60;
+      examattempt.time_limit_exceeded = timeDiff > exam.time_limit;
+      examattempt.is_active = false;
+      await examattempt.save();
+    }
     return {
       completionObj: {
         code: '0',

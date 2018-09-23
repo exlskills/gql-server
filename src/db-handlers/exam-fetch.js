@@ -85,6 +85,9 @@ export const searchExamIdToTake = async (unit_id, course_id, viewer, info) => {
 
 async function getRandomQuestionIds(exam_id) {
   const exam = await fetchById(exam_id, { question_ids: 1, question_count: 1 });
+  if (!exam) {
+    return { quesIds: [], seed: '' };
+  }
   let secret_seed = Randomization.make_random_string();
   let arrayQuestion = Randomization.shuffleArray(
     exam.question_ids,

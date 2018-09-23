@@ -20,6 +20,7 @@ let graphQLServer;
 mongoose.Promise = global.Promise;
 
 function startGraphQLServer(callback) {
+  logger.info(`connecting to ` + config.mongo.uri + '/' + config.mongo.db);
   let promiseDb = mongoose.connect(
     config.mongo.uri + '/' + config.mongo.db,
     {
@@ -28,7 +29,6 @@ function startGraphQLServer(callback) {
     }
   );
 
-  logger.info(`connecting to ` + config.mongo.uri + '/' + config.mongo.db);
   // mongoose.set('useCreateIndex', true);
 
   if (config.db_debug_log) {

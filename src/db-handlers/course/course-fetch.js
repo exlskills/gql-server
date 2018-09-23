@@ -274,6 +274,9 @@ export const fetchCourseAndCardInteraction = async (
     units: 0
   };
   let courseRecord = await fetchById(course_id, selectVal, viewer, info);
+  if (!courseRecord) {
+    return {};
+  }
   // logger.debug(`  courseRecord ` + courseRecord);
   courseRecord = courseRecord.toObject();
   courseRecord.title = getStringByLocale(

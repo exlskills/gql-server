@@ -178,7 +178,7 @@ export const fetchCourseDeliverySchedule = async (
               viewer,
               info
             );
-            if (fetchedInstr) {
+            if (fetchedInstr && fetchedInstr.full_name) {
               logger.debug(` fetchedInstr ` + fetchedInstr);
               // instrObj.primary_email = fetchedInstr.primary_email;
               instrObj.full_name = getStringByLocale(

@@ -331,7 +331,7 @@ export const fetchUserCourseUnitExamStatus = async (
     unit.attempts_left = unit.attempts_allowed_per_day;
     unit.grade = 0;
     unit.passed = false;
-    if (examAttempts.length > 0) {
+    if (examAttempts && examAttempts.length > 0) {
       logger.debug(`in the attempts analysis`);
 
       unit.attempts = examAttempts.length;
@@ -388,7 +388,7 @@ export const fetchUserCourseUnitExamStatus = async (
             fetchParameters.userId,
             card._id
           );
-          if (user_card_view) {
+          if (user_card_view && user_card_view.lenght > 0) {
             cardObj.ema = 100;
           }
         }

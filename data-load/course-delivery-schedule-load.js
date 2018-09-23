@@ -80,6 +80,10 @@ async function loadData() {
     );
     //logger.debug(` courseDeliveryRecord ` + courseDeliveryRecord);
 
+    if (!courseDeliveryRecord || courseDeliveryRecord.length < 1) {
+      throw new Error('Load failed');
+    }
+
     const yaml_out = jsyaml.safeDump(
       prepareForYaml(
         courseDeliveryRecord.toObject({ versionKey: false }),
@@ -174,6 +178,7 @@ const prepareForYaml = (obj, timeInputStringFormat) => {
 
 async function startRun() {
   try {
+    logger.info('Connecting to ' + config.mongo.uri + '/' + config.mongo.db);
     await mongoose.connect(
       config.mongo.uri + '/' + config.mongo.db,
       {

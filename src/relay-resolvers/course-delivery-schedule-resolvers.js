@@ -65,5 +65,5 @@ export const resolveUserSeatPurchased = async (obj, args, viewer, info) => {
     'cd_run',
     obj._id
   );
-  return seatPurchased ? true : false;
+  return seatPurchased && seatPurchased._id ? true : false;
 };

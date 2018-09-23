@@ -17,7 +17,7 @@ export const editCard = async (
   // THIS IS NOT USED IN regular processing
 
   logger.debug(`in editCard`);
-  const course = await CourseFetch.fetchById(localCourseId);
+  const course = await CourseFetch.fetchById(localCourseId, null);
   if (!course) {
     return Promise.reject(Error('Course is not found'));
   }

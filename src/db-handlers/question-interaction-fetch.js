@@ -64,7 +64,7 @@ export const getUserAnswer = async (exam_attempt_id, question_id, user_id) => {
       exam_attempt_id: exam_attempt_id
     }
   );
-  return record ? record.response_data : null;
+  return record && record.response_data ? record.response_data : null;
 };
 
 export const computeQuestionsEMA = async (userId, questionIds) => {

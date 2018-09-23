@@ -16,7 +16,7 @@ export const updateUserCourseRole_Role = async (
     return Promise.reject('Find User failed', err);
   }
 
-  if (!userObj || typeof userObj != 'object') {
+  if (!userObj) {
     return Promise.reject('User Not Found');
   }
 
@@ -89,9 +89,11 @@ export const createUserCourseRole_Object = async (
     const userObj = await basicFind(
       User,
       { isOne: true },
-      { _id: user_id, 'course_roles.course_id': course_id }
+      { _id: user_id, 'course_roles.course_id': course_id },
+      null,
+      { _id: 1 }
     );
-    if (userObj) {
+    if (userObj && userObj._id) {
       return Promise.reject('User is already associated with the Course');
     }
   } catch (ignoring_should_not_happen) {

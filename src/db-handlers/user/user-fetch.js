@@ -19,7 +19,7 @@ export const fetchById = async (obj_id, selectVal, viewer, info) => {
         isById: true
       },
       obj_id,
-      false,
+      null,
       selectVal
     );
   } catch (errInternalAlreadyReported) {
@@ -39,7 +39,7 @@ export const fetchByKey = async (queryVal, selectVal, viewer, info) => {
         isOne: true
       },
       queryVal,
-      false,
+      null,
       selectVal
     );
   } catch (errInternalAlreadyReported) {
