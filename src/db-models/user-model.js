@@ -56,11 +56,12 @@ const UserSchema = new mongoose.Schema(
     },
     subscription: {
       type: [UserSubscriptionSchema],
-      required: true
+      default: []
     },
     avatar_url: {
       type: String,
-      required: true
+      required: true,
+      default: ' '
     },
     is_verified: {
       type: Boolean,

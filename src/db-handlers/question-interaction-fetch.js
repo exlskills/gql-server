@@ -59,9 +59,9 @@ export const getUserAnswer = async (exam_attempt_id, question_id, user_id) => {
     QuestionInteraction,
     { isOne: true },
     {
-      user_id,
-      question_id,
-      exam_attempt_id
+      user_id: user_id,
+      question_id: question_id,
+      exam_attempt_id: exam_attempt_id
     }
   );
   return record ? record.response_data : null;

@@ -4,7 +4,7 @@ schedule_owner: javatestacademy1
 available_delivery_methods:
   - live
 instructors:
-  - javatestguru1
+  - testjavaguru1
 delivery_structures:
   - delivery_structure: standard
     delivery_methods:
@@ -20,7 +20,7 @@ delivery_structures:
         headline: Intro
         desc: Intro to the subject
         instructors:
-          - javatestsolid1
+          - testjavasolid1
         session_duration:
           hours: 2
           minutes: 30
@@ -46,7 +46,7 @@ delivery_structures:
           - session_seq: 1
             session_start_date: 2018-12-01 18:00
             instructors:
-              - javatestjunior1
+              - testjavajunior1
           - session_seq: 2
             session_start_date: 2018-12-03 18:00
           - session_seq: 3
@@ -70,8 +70,8 @@ delivery_structures:
         scheduling_timezone: Asia/Tokyo
         active: true
         instructors:
-          - javatestguru1
-          - javatestsolid1
+          - testjavaguru1
+          - testjavasolid1
         sessions:
         - session_seq: 1
           session_start_date: 2018-10-01 18:00
@@ -85,8 +85,8 @@ delivery_structures:
         scheduling_timezone: Asia/Tokyo
         active: true
         instructors:
-          - javatestsolid1
-          - javatestjunior1
+          - testjavasolid1
+          - testjavajunior1
         sessions:
         - session_seq: 1
           session_start_date: 2018-10-26 18:00

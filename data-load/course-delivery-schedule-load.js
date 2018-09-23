@@ -1,4 +1,4 @@
-// npx babel-node data/course-delivery-schedule-load.js
+// npx babel-node data-load/course-delivery-schedule-load.js
 
 import mongoose from 'mongoose';
 import config from '../src/config';

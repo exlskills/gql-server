@@ -203,7 +203,8 @@ export const fetchCourseUnitsWithDetailedStatus = async (
                 userId,
                 card._id
               );
-              if (user_card_view) {
+              // logger.debug(' user_card_view ' + JSON.stringify(user_card_view));
+              if (user_card_view && user_card_view.length > 0) {
                 card.ema = 100;
               }
             }

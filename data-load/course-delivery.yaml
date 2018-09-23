@@ -2,8 +2,8 @@ locale: en
 available_delivery_methods:
   - live
 instructors:
-  - javatestguru1
-course_id: ap_java_test
+  - testjavaguru1
+course_id: ap_java
 schedule_owner: javatestacademy1
 delivery_structures:
   - course_duration:
@@ -18,7 +18,7 @@ delivery_structures:
           hours: 2
           minutes: 30
         instructors:
-          - javatestsolid1
+          - testjavasolid1
         session_seq: 1
         headline: Intro
         desc: Intro to the subject
@@ -40,7 +40,7 @@ delivery_structures:
       - active: true
         sessions:
           - instructors:
-              - javatestjunior1
+              - testjavajunior1
             session_seq: 1
             session_start_date: '2018-12-01 18:00'
             _id: 1xd7Eka4A40N
@@ -76,8 +76,8 @@ delivery_structures:
         _id: 1xd7EN2wA3Oq
       - active: true
         instructors:
-          - javatestguru1
-          - javatestsolid1
+          - testjavaguru1
+          - testjavasolid1
         sessions:
           - session_seq: 1
             session_start_date: '2018-10-01 18:00'
@@ -98,8 +98,8 @@ delivery_structures:
         _id: 1xd7EOiPnGyE
       - active: true
         instructors:
-          - javatestsolid1
-          - javatestjunior1
+          - testjavasolid1
+          - testjavajunior1
         sessions:
           - session_seq: 1
             session_start_date: '2018-10-26 18:00'

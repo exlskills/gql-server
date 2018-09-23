@@ -1,10 +1,14 @@
+// npx babel-node data-load/user-load.js
+
 import mongoose from 'mongoose';
 import * as fs from 'fs-extra';
 import path from 'path';
 import * as yaml from 'js-yaml';
-import User from './user-base-model';
+import User from '../src/db-models/user-model';
+import config from '../src/config';
+import { logger } from '../src/utils/logger';
 
-async function loadUsers() {
+async function loadData() {
   try {
     const fileToRead = path.join(__dirname, 'user.yaml');
     const fileContents = await fs.readFile(fileToRead);
@@ -17,7 +21,7 @@ async function loadUsers() {
       console.log(`user ` + JSON.stringify(user));
       promises.push(User.create(user));
     }
-    const dothis = await Promise.all(promises);
+    await Promise.all(promises);
     console.log('Ok ');
   } catch (err) {
     console.log('error ' + err);
@@ -25,18 +29,35 @@ async function loadUsers() {
   }
 }
 
-doWork();
+startRun();
 
-async function doWork() {
-  await mongoose.connect('mongodb://localhost:27017/webph2_dev');
-  console.log('db connected');
+async function startRun() {
+  try {
+    await mongoose.connect(
+      config.mongo.uri + '/' + config.mongo.db,
+      {
+        useNewUrlParser: true
+      }
+    );
 
-  mongoose.set('debug', true);
+    if (config.db_debug_log) {
+      mongoose.set('debug', true);
+    }
 
-  const res = await loadUsers();
+    logger.info('Mongoose connected ok ');
 
-  console.log('done');
-  closeConnection();
+    try {
+      const res = await loadData();
+      logger.info('done');
+    } catch (err) {
+      // Must be reported in loadData
+    }
+
+    closeConnection();
+  } catch (err) {
+    logger.error('Process error: ', err);
+    process.exit(1);
+  }
 }
 
 const closeConnection = () => {

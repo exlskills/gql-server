@@ -34,7 +34,12 @@ export const fetchExamAttemptsByUserAndUnitJoinExam = async (
   try {
     const sortVal = opts.sort;
     if (!opts.includeExam) {
-      return await basicFind(ExamAttempt, null, { user_id, unit_id }, sortVal);
+      return await basicFind(
+        ExamAttempt,
+        null,
+        { user_id: user_id, unit_id: unit_id },
+        sortVal
+      );
     }
 
     let array = [
