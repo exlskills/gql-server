@@ -32,6 +32,7 @@ const UserOrdersSchema = new mongoose.Schema(
 export default mongoose.model('UserOrders', UserOrdersSchema, 'user_orders');
 
 UserOrdersSchema.index({
-  'order_items.item_category': 1,
-  'order_items.item_id.doc_id': 1
+  //  'order_items.item_category': 1,
+  'order_items.item_ref.course_id': 1,
+  'order_items.item_ref.cd_run_id': 1
 });

@@ -1,6 +1,5 @@
 import mongoose from 'mongoose';
 import { id_gen } from '../utils/url-id-generator';
-import EmbeddedDocRefRecord from './embedded-doc-ref-record-model';
 
 export default new mongoose.Schema(
   {
@@ -12,9 +11,18 @@ export default new mongoose.Schema(
       type: String,
       required: true
     },
-    item_id: {
-      type: [EmbeddedDocRefRecord],
+    item_options: {
+      type: Object,
+      default: {}
+    },
+    item_ref: {
+      type: Object,
       required: true
+    },
+    quantity: {
+      type: Number,
+      required: true,
+      default: 1
     },
     amount: {
       type: Number,
@@ -26,3 +34,6 @@ export default new mongoose.Schema(
     timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' }
   }
 );
+
+export const ITEM_CATEGORY_COURSE_CERTIFICATE = 'course_cert';
+export const ITEM_CATEGORY_COURSE_RUN = 'course_run';

@@ -4,7 +4,11 @@ import {
   fetchCourseDeliveryMethods,
   fetchCourseDeliverySchedule
 } from '../db-handlers/course/course-delivery-schedule-fetch';
-import { fetchByUserAndItem } from '../db-handlers/user/user-orders-handler';
+import { fetchByUserAndItemRefId } from '../db-handlers/user/user-orders-handler';
+import {
+  ITEM_CATEGORY_COURSE_CERTIFICATE,
+  ITEM_CATEGORY_COURSE_RUN
+} from '../db-models/order-item-model';
 
 export const resolveCourseDeliverySchedule = async (
   obj,
@@ -59,11 +63,10 @@ export const resolveCourseDeliveryMethods = async (obj, args, viewer, info) => {
 export const resolveUserSeatPurchased = async (obj, args, viewer, info) => {
   logger.debug(`in resolveUserSeatPurchased`);
   logger.debug(`   obj ` + JSON.stringify(obj));
-  const seatPurchased = await fetchByUserAndItem(
+  const seatPurchased = await fetchByUserAndItemRefId(
     viewer.user_id,
-    'course_run',
-    'cd_run',
+    ITEM_CATEGORY_COURSE_RUN,
     obj._id
   );
-  return seatPurchased && seatPurchased._id ? true : false;
+  return seatPurchased ? true : false;
 };
