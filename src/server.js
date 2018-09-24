@@ -20,7 +20,8 @@ let graphQLServer;
 mongoose.Promise = global.Promise;
 
 function startGraphQLServer(callback) {
-  logger.info(`connecting to ` + config.mongo.uri + '/' + config.mongo.db);
+  //logger.debug('mongo URI ' + config.mongo.uri);
+  logger.debug('mongo DB ' + config.mongo.db);
   let promiseDb = mongoose.connect(
     config.mongo.uri + '/' + config.mongo.db,
     {
