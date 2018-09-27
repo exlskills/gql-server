@@ -37,7 +37,7 @@ export const UserType = new GraphQLObjectType({
       type: GraphQLString
     },
     pwd: {
-      type: new GraphQLNonNull(GraphQLString)
+      type: GraphQLString
     },
     secondary_emails: {
       type: new GraphQLList(GraphQLString)
@@ -46,13 +46,13 @@ export const UserType = new GraphQLObjectType({
       type: GraphQLString
     },
     is_demo: {
-      type: new GraphQLNonNull(GraphQLBoolean)
+      type: GraphQLBoolean
     },
     headline: {
       type: GraphQLString
     },
     has_completed_first_tutorial: {
-      type: new GraphQLNonNull(GraphQLBoolean)
+      type: GraphQLBoolean
     },
     locales: {
       type: new GraphQLList(GraphQLString),
@@ -62,13 +62,13 @@ export const UserType = new GraphQLObjectType({
       type: new GraphQLNonNull(GraphQLString)
     },
     subscription: {
-      type: new GraphQLNonNull(UserSubscriptionConnection)
+      type: UserSubscriptionConnection
     },
     avatar_url: {
-      type: new GraphQLNonNull(GraphQLString)
+      type: GraphQLString
     },
     is_verified: {
-      type: new GraphQLNonNull(GraphQLBoolean)
+      type: GraphQLBoolean
     },
     auth_strategies: {
       type: AuthStrategyConnection,

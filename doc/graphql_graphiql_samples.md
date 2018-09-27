@@ -43,6 +43,7 @@ query CourseDeliverySched {
         instructors {
           username
           full_name
+          avatar_url
         }
       }
     }

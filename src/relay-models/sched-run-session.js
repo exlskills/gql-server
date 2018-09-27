@@ -47,7 +47,7 @@ const SessionInstructorType = new GraphQLObjectType({
     username: {
       type: GraphQLString
     },
-    primary_email: {
+    avatar_url: {
       type: GraphQLString
     }
   }),

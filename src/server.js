@@ -10,6 +10,7 @@ import config from './config';
 import { Schema } from './schema';
 import * as middleware from './http-middleware';
 import { logger } from './utils/logger';
+import User from './db-models/user-model';
 
 logger.info('Server starting ...');
 
@@ -39,6 +40,9 @@ function startGraphQLServer(callback) {
   promiseDb
     .then(db => {
       logger.info('Mongoose connected ok ');
+      logger.debug(
+        'Mongo DB ' + User.db.host + ':' + User.db.port + '/' + User.db.name
+      );
     })
     .catch(err => {
       logger.error('Mongoose connection error:', err.stack);

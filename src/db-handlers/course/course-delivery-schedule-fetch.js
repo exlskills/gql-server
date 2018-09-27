@@ -170,22 +170,25 @@ export const fetchCourseDeliverySchedule = async (
             const instrObj = {
               username: instructorId,
               full_name: '',
-              primary_email: ''
+              avatar_url: ''
             };
             const fetchedInstr = await fetchByKey(
               { username: instructorId },
-              { full_name: 1, primary_email: 1 },
+              { full_name: 1, avatar_url: 1 },
               viewer,
               info
             );
             if (fetchedInstr && fetchedInstr.full_name) {
               logger.debug(` fetchedInstr ` + fetchedInstr);
-              // instrObj.primary_email = fetchedInstr.primary_email;
               instrObj.full_name = getStringByLocale(
                 fetchedInstr.full_name,
                 viewer.locale
               ).text;
             }
+            instrObj.avatar_url =
+              fetchedInstr && fetchedInstr.avatar_url
+                ? fetchedInstr.avatar_url
+                : instrObj.avatar_url;
             logger.debug(` instrObj ` + JSON.stringify(instrObj));
             sessionInstructors.push(instrObj);
             instructorObjArray.push(instrObj);
