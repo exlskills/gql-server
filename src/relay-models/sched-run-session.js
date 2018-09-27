@@ -41,6 +41,9 @@ const SessionInstructorType = new GraphQLObjectType({
   description: 'Session Instructor',
   fields: () => ({
     id: globalIdField('SessionInstructor', obj => obj._id),
+    _id: {
+      type: GraphQLString
+    },
     full_name: {
       type: GraphQLString
     },

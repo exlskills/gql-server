@@ -1,9 +1,9 @@
 ### courseDeliverySchedule
 
-`course_id` should be base64-encoded string: concatenated word `Course` followed by semicolon and the course ID, e,g `Course:ap_java_test` is represented in the example below 
+`course_id` should be base64-encoded string: concatenated word `Course` followed by semicolon and the course ID, e,g `Course:ap_java` is represented in the example below 
 ```$xslt
 query CourseDeliverySched {
-  courseDeliverySchedule(course_id: "Q291cnNlOmFwX2phdmFfdGVzdA==", date_on_or_after: "2018-09-19T00:00:00.000Z") {
+  courseDeliverySchedule(course_id: "Q291cnNlOmFwX2phdmE=", date_on_or_after: "2018-09-19T00:00:00.000Z") {
     _id
     delivery_structure
     delivery_methods

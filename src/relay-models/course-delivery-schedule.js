@@ -8,6 +8,7 @@ import { connectionDefinitions, globalIdField } from 'graphql-relay';
 import { NodeInterface } from './node-definitions';
 import { ScheduledRunType } from './scheduled-run';
 import { EventDurationType } from './event-duration';
+import { ScheduledRunSessionInfoType } from './scheduled-run-session-info';
 
 export const CourseDeliveryScheduleType = new GraphQLObjectType({
   name: 'CourseDeliverySchedule',
@@ -44,25 +45,4 @@ export const {
 } = connectionDefinitions({
   name: 'CourseDeliverySchedule',
   nodeType: CourseDeliveryScheduleType
-});
-
-const ScheduledRunSessionInfoType = new GraphQLObjectType({
-  name: 'ScheduledRunSessionInfoType',
-  description: 'Scheduled Run Session Info',
-  fields: () => ({
-    id: globalIdField('ScheduledRunSessionInfo', obj => obj._id),
-    session_seq: {
-      type: GraphQLInt
-    },
-    headline: {
-      type: GraphQLString
-    },
-    desc: {
-      type: GraphQLString
-    },
-    session_notes: {
-      type: GraphQLString
-    }
-  }),
-  interfaces: [NodeInterface]
 });
