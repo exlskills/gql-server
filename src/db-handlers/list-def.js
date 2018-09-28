@@ -11,6 +11,7 @@ export const fetchTopic = async (obj_id, viewer, info) => {
     },
     {
       $project: {
+        _id: 1,
         value: 1
       }
     }

@@ -31,6 +31,6 @@ export const OrganizationType = new GraphQLObjectType({
   interfaces: [NodeInterface]
 });
 
-export const {
-  connectionType: OrganizationConnection
-} = connectionDefinitions({ name: 'Organization', nodeType: OrganizationType });
+export const { connectionType: OrganizationConnection } = connectionDefinitions(
+  { name: 'Organization', nodeType: OrganizationType }
+);

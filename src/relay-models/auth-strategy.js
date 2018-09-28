@@ -31,6 +31,6 @@ export const AuthStrategyType = new GraphQLObjectType({
   interfaces: [NodeInterface]
 });
 
-export const {
-  connectionType: AuthStrategyConnection
-} = connectionDefinitions({ name: 'AuthStrategy', nodeType: AuthStrategyType });
+export const { connectionType: AuthStrategyConnection } = connectionDefinitions(
+  { name: 'AuthStrategy', nodeType: AuthStrategyType }
+);

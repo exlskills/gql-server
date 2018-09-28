@@ -20,6 +20,6 @@ export const NotificationType = new GraphQLObjectType({
   interfaces: [NodeInterface]
 });
 
-export const {
-  connectionType: NotificationConnection
-} = connectionDefinitions({ name: 'Notification', nodeType: NotificationType });
+export const { connectionType: NotificationConnection } = connectionDefinitions(
+  { name: 'Notification', nodeType: NotificationType }
+);

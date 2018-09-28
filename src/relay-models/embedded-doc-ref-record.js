@@ -13,7 +13,7 @@ export const EmbeddedDocRefRecordType = new GraphQLObjectType({
   name: 'EmbeddedDocRefRecord',
   description: '',
   fields: () => ({
-    id: globalIdField('EmbeddedDocRefRecord', obj => obj._id),
+    id: globalIdField('EmbeddedDocRefRecord', obj => obj.doc_id),
     level: {
       type: new GraphQLNonNull(GraphQLInt)
     },

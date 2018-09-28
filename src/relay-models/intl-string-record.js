@@ -22,13 +22,15 @@ export const IntlStringRecordType = new GraphQLObjectType({
     content: {
       type: new GraphQLNonNull(GraphQLString)
     }
-  }),
-  interfaces: [NodeInterface]
+  })
+  //, interfaces: [NodeInterface]
 });
 
+/*
 export const {
   connectionType: IntlStringRecordConnection
 } = connectionDefinitions({
   name: 'IntlStringRecord',
   nodeType: IntlStringRecordType
 });
+*/

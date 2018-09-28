@@ -9,17 +9,10 @@ export const EmbeddedDocRefType = new GraphQLObjectType({
   name: 'EmbeddedDocRef',
   description: '',
   fields: () => ({
-    id: globalIdField('EmbeddedDocRef', obj => obj._id),
+    // id: globalIdField('EmbeddedDocRef', obj => obj._id),
     embedded_doc_refs: {
       type: new GraphQLNonNull(EmbeddedDocRefRecordConnection)
     }
-  }),
-  interfaces: [NodeInterface]
-});
-
-export const {
-  connectionType: EmbeddedDocRefConnection
-} = connectionDefinitions({
-  name: 'EmbeddedDocRef',
-  nodeType: EmbeddedDocRefType
+  })
+  //,  interfaces: [NodeInterface]
 });

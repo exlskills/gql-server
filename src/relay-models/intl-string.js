@@ -13,11 +13,13 @@ export const IntlStringType = new GraphQLObjectType({
     intlString: {
       type: new GraphQLList(IntlStringRecordType)
     }
-  }),
-  interfaces: [NodeInterface]
+  })
+  // ,  interfaces: [NodeInterface]
 });
 
+/*
 export const { connectionType: IntlStringConnection } = connectionDefinitions({
   name: 'IntlString',
   nodeType: IntlStringType
 });
+*/
