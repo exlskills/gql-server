@@ -52,6 +52,12 @@ const SessionInstructorType = new GraphQLObjectType({
     },
     avatar_url: {
       type: GraphQLString
+    },
+    headline: {
+      type: GraphQLString
+    },
+    biography: {
+      type: GraphQLString
     }
   }),
   interfaces: [NodeInterface]

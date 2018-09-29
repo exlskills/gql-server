@@ -44,6 +44,8 @@ query CourseDeliverySched {
           username
           full_name
           avatar_url
+          headline
+          biography
         }
       }
     }

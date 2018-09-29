@@ -171,11 +171,19 @@ export const fetchCourseDeliverySchedule = async (
               _id: instructorId,
               username: instructorId,
               full_name: '',
-              avatar_url: ''
+              avatar_url: '',
+              headline: '',
+              biography: ''
             };
             const fetchedInstr = await fetchByKey(
               { username: instructorId },
-              { _id: 1, full_name: 1, avatar_url: 1 },
+              {
+                _id: 1,
+                full_name: 1,
+                avatar_url: 1,
+                headline: 1,
+                biography: 1
+              },
               viewer,
               info
             );
@@ -192,6 +200,20 @@ export const fetchCourseDeliverySchedule = async (
                 : instrObj.avatar_url;
             instrObj._id =
               fetchedInstr && fetchedInstr.id ? fetchedInstr._id : instrObj._id;
+
+            if (fetchedInstr && fetchedInstr.headline) {
+              instrObj.headline = getStringByLocale(
+                fetchedInstr.headline,
+                viewer.locale
+              ).text;
+            }
+            if (fetchedInstr && fetchedInstr.biography) {
+              instrObj.biography = getStringByLocale(
+                fetchedInstr.biography,
+                viewer.locale
+              ).text;
+            }
+
             logger.debug(` instrObj ` + JSON.stringify(instrObj));
             sessionInstructors.push(instrObj);
             instructorObjArray.push(instrObj);

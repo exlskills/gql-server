@@ -564,6 +564,8 @@ type SessionInstructorType implements Node {
   full_name: String
   username: String
   avatar_url: String
+  headline: String
+  biography: String
 }
 
 input SubmitAnswerInput {
