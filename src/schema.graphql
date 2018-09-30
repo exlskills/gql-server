@@ -370,9 +370,6 @@ type Query {
   examToTake(unit_id: String, course_id: String): Exam
   examAttempt(unit_id: String): [ExamAttempt]
 
-  # Content Latest Version
-  oneVersionedContent(content_id: String!, version: String): VersionedContentRecord
-
   # Activities
   activityPaging: activityPaging
 

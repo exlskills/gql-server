@@ -2,7 +2,6 @@ import { NodeField } from '../relay-models';
 
 import queryUsers from './no-paging/user';
 import queryExam from './no-paging/exams';
-import queryVersionedContents from './no-paging/versioned-content';
 import pagingQueries from './paging';
 import courseQueries from './no-paging/course';
 import questionQueries from './no-paging/question';
@@ -21,7 +20,6 @@ export default {
   userProfile: queryUsers.userProfile,
   examToTake: queryExam.examToTake,
   examAttempt: examAttempt.examAttempt,
-  oneVersionedContent: queryVersionedContents.oneVersionedContent,
   // Paging
   activityPaging: pagingQueries.activityPaging,
   coursePaging: pagingQueries.coursePaging,
