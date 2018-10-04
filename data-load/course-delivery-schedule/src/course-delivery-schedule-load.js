@@ -1,14 +1,14 @@
-// npx babel-node data-load/course-delivery-schedule-load.js
+// npx babel-node data-load/course-delivery-schedule/src/course-delivery-schedule-load.js
 
 import mongoose from 'mongoose';
-import config from '../src/config';
-import { logger } from '../src/utils/logger';
+import config from '../../../src/config/index';
+import { logger } from '../../../src/utils/logger';
 import * as fs from 'fs-extra';
 import path from 'path';
 import * as jsyaml from 'js-yaml';
-import CourseDelivery from '../src/db-models/course-delivery-model';
+import CourseDelivery from '../../../src/db-models/course-delivery-model';
 import momentTz from 'moment-timezone';
-import { basicFind } from '../src/db-handlers/basic-query-handler';
+import { basicFind } from '../../../src/db-handlers/basic-query-handler';
 
 startRun();
 
@@ -191,6 +191,14 @@ async function startRun() {
     }
 
     logger.info('Mongoose connected ok ');
+    logger.debug(
+      'Mongo DB ' +
+        CourseDelivery.db.host +
+        ':' +
+        CourseDelivery.db.port +
+        '/' +
+        CourseDelivery.db.name
+    );
 
     try {
       const res = await loadData();
