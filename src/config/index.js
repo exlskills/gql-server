@@ -29,7 +29,8 @@ const cfg = {
     process.env.LOGGING_LEVEL ||
     (process.env.NODE_ENV === 'production' ? 'info' : 'debug'),
   db_debug_log:
-    process.env.DB_DEBUG_LOG || process.env.NODE_ENV !== 'production'
+    process.env.DB_DEBUG_LOG || process.env.NODE_ENV !== 'production',
+  github_user: process.env.GITHUB_USER || 'dummy_github_user'
 };
 
 export default cfg;

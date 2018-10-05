@@ -11,12 +11,14 @@ import { Schema } from './schema';
 import * as middleware from './http-middleware';
 import { logger } from './utils/logger';
 import User from './db-models/user-model';
+import routes from './routes';
 
 logger.info('Server starting ...');
 
 const GRAPHQL_PORT = parseInt(config.http_port);
+const LOADER_PORT = 8083;
 
-let graphQLServer;
+let graphQLServer, loaderServer;
 
 mongoose.Promise = global.Promise;
 
@@ -88,12 +90,34 @@ function startGraphQLServer(callback) {
       callback();
     }
   });
+
+  const loaderApp = express();
+
+  loaderApp.use(
+    cors()
+    //    cors({origin: config.cors_origin,credentials: true})
+  );
+  loaderApp.use(bodyParser.json());
+  loaderApp.use('/', routes);
+
+  loaderServer = loaderApp.listen(LOADER_PORT, () => {
+    logger.info(
+      `GraphQL server is now running on http://localhost:${LOADER_PORT}`
+    );
+    if (callback) {
+      callback();
+    }
+  });
 }
 
 function startServers(callback) {
   // Shut down the servers
   if (graphQLServer) {
     graphQLServer.close();
+  }
+
+  if (loaderServer) {
+    loaderServer.close();
   }
 
   let doneTasks = 0;
