@@ -30,7 +30,8 @@ const cfg = {
     (process.env.NODE_ENV === 'production' ? 'info' : 'debug'),
   db_debug_log:
     process.env.DB_DEBUG_LOG || process.env.NODE_ENV !== 'production',
-  github_user: process.env.GITHUB_USER || 'dummy_github_user'
+  github_user: process.env.GITHUB_USER || 'dummy_github_user',
+  github_token: process.env.GITHUB_TOKEN || 'create_me'
 };
 
 export default cfg;
