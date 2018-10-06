@@ -1,8 +1,12 @@
 import express from 'express';
 import { logger } from '../utils/logger';
-import { ServerError, InternalServerError } from '../helpers/server';
-import CircularJSON from 'circular-json';
-import { loadCourseDeliverySchedule } from '../../data-load/course-delivery-schedule/src/load-wrapper';
+import {
+  ServerError,
+  InternalServerError,
+  BadRequestError
+} from '../helpers/server';
+import { parse, stringify } from 'flatted/cjs';
+import { loadCourseDeliverySchedule } from '../../data-load/course-delivery-schedule/src/load-api-handler';
 
 const router = express.Router();
 
@@ -19,16 +23,26 @@ router.post('/course-delivery-schedule', async (req, res) => {
   logger.debug(`in post course-delivery-schedule`);
 
   try {
-    logger.debug(CircularJSON.stringify(req));
-    logger.debug(JSON.stringify(req.body));
-    const result = await loadCourseDeliverySchedule(req.body);
-    res.json(
-      result || {
-        status: 'OK'
-      }
+    logger.debug(stringify(req));
+    const result = await loadCourseDeliverySchedule(
+      req.body,
+      req.get('X-Hub-Signature')
     );
+    logger.error(`result ` + JSON.stringify(result));
+    if (
+      result.status &&
+      [304, 400, 403, 404, 422, 500].indexOf(result.status) > -1
+    ) {
+      return res.status(result.status).json(result);
+    } else {
+      res.json(
+        result || {
+          status: 'OK'
+        }
+      );
+    }
   } catch (error) {
-    logger.debug(`error ` + error);
+    logger.error(`uncaught error ` + error);
     return res.status(500).json({
       error: 'Internal server error'
     });

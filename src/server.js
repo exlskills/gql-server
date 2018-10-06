@@ -16,7 +16,7 @@ import routes from './routes';
 logger.info('Server starting ...');
 
 const GRAPHQL_PORT = parseInt(config.http_port);
-const LOADER_PORT = 8083;
+const LOADER_PORT = parseInt(config.loader_http_port);
 
 let graphQLServer, loaderServer;
 
@@ -102,7 +102,7 @@ function startGraphQLServer(callback) {
 
   loaderServer = loaderApp.listen(LOADER_PORT, () => {
     logger.info(
-      `GraphQL server is now running on http://localhost:${LOADER_PORT}`
+      `Loader server is now running on http://localhost:${LOADER_PORT}`
     );
     if (callback) {
       callback();

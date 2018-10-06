@@ -67,6 +67,14 @@ npm start
 
 GraphiQL: http://localhost:8080/graph
 
+## Course Delivery Schedule Loader API
+
+The API provides functionality to load Course Delivery Schedule into the system from a YAML file formatted as per `data-load/course-delivery-schedule/data/course-delivery-sample.yaml`. The content of file is pulled from the GitHub repository and then pushed back with the record IDs written into the file to facilitate updates and reloads.    
+The API port should be defined in the `LOADER_PORT` environment variable (default 8083) 
+As the process needs write access to the repository containing the YAML file, environment variable `GITHUB_USER_TOKEN` should be set according to [GitHub Personal Access Token setup](https://help.github.com/articles/creating-a-personal-access-token-for-the-command-line/). According to the [JS gihub API documentation](https://www.npmjs.com/package/@octokit/rest), only the token is used in the authentication call, the GitHub User ID is not required. 
+Additionally, environment variable `GITHUB_WH_TOKEN` should be set with the value matching the [GitHub webhook secret](https://developer.github.com/webhooks/securing/)    
+
+
 ## License
 
 This software is offered under the terms outlined in the [LICENSE.md](LICENSE.md) file provided with this notice. If you have any questions regarding the license, please contact [licensing@exlinc.com](mailto:licensing@exlinc.com)
