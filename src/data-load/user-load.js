@@ -4,9 +4,9 @@ import mongoose from 'mongoose';
 import * as fs from 'fs-extra';
 import path from 'path';
 import * as yaml from 'js-yaml';
-import User from '../src/db-models/user-model';
-import config from '../src/config';
-import { logger } from '../src/utils/logger';
+import User from '../db-models/user-model';
+import config from '../config/index';
+import { logger } from '../utils/logger';
 
 async function loadData() {
   try {

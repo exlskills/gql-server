@@ -6,7 +6,7 @@ import {
   BadRequestError
 } from '../helpers/server';
 import { parse, stringify } from 'flatted/cjs';
-import { loadCourseDeliverySchedule } from '../../data-load/course-delivery-schedule/src/load-api-handler';
+import { loadCourseDeliverySchedule } from '../data-load/course-delivery-schedule/load-api-handler';
 
 const router = express.Router();
 

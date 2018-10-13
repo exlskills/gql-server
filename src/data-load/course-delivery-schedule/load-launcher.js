@@ -1,11 +1,11 @@
 // npx babel-node data-load/course-delivery-schedule/src/load-launcher.js
 
 import mongoose from 'mongoose';
-import config from '../../../src/config/index';
-import { logger } from '../../../src/utils/logger';
+import config from '../../config/index';
+import { logger } from '../../utils/logger';
 import * as fs from 'fs-extra';
 import path from 'path';
-import CourseDelivery from '../../../src/db-models/course-delivery-model';
+import CourseDelivery from '../../db-models/course-delivery-model';
 import { loadData } from './course-delivery-schedule-load';
 
 startRun();

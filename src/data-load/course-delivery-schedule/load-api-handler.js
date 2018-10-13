@@ -1,5 +1,5 @@
-import config from '../../../src/config';
-import { logger } from '../../../src/utils/logger';
+import config from '../../config/index';
+import { logger } from '../../utils/logger';
 import { parse, stringify } from 'flatted/cjs';
 import { loadData } from './course-delivery-schedule-load';
 import verifyGithubWebhook from 'verify-github-webhook';

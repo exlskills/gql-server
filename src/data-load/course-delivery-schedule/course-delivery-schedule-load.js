@@ -1,9 +1,9 @@
-import { logger } from '../../../src/utils/logger';
+import { logger } from '../../utils/logger';
 import * as fs from 'fs-extra';
 import * as jsyaml from 'js-yaml';
-import CourseDelivery from '../../../src/db-models/course-delivery-model';
+import CourseDelivery from '../../db-models/course-delivery-model';
 import momentTz from 'moment-timezone';
-import { basicFind } from '../../../src/db-handlers/basic-query-handler';
+import { basicFind } from '../../db-handlers/basic-query-handler';
 
 export async function loadData(fileContents, yamlFile) {
   const timeInputStringFormat = 'YYYY-MM-DD HH:mm';
