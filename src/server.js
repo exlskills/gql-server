@@ -11,18 +11,22 @@ import { Schema } from './schema';
 import * as middleware from './http-middleware';
 import { logger } from './utils/logger';
 import User from './db-models/user-model';
+import routes from './routes';
 
 logger.info('Server starting ...');
 
 const GRAPHQL_PORT = parseInt(config.http_port);
+const LOADER_PORT = parseInt(config.loader_http_port);
 
-let graphQLServer;
+let graphQLServer, loaderServer;
 
 mongoose.Promise = global.Promise;
 
 function startGraphQLServer(callback) {
   //logger.debug('mongo URI ' + config.mongo.uri);
   logger.debug('mongo DB ' + config.mongo.db);
+
+  mongoose.set('useCreateIndex', true);
   let promiseDb = mongoose.connect(
     config.mongo.uri + '/' + config.mongo.db,
     {
@@ -30,8 +34,6 @@ function startGraphQLServer(callback) {
       useNewUrlParser: true
     }
   );
-
-  // mongoose.set('useCreateIndex', true);
 
   if (config.db_debug_log) {
     mongoose.set('debug', true);
@@ -88,12 +90,34 @@ function startGraphQLServer(callback) {
       callback();
     }
   });
+
+  const loaderApp = express();
+
+  loaderApp.use(
+    cors()
+    //    cors({origin: config.cors_origin,credentials: true})
+  );
+  loaderApp.use(bodyParser.json());
+  loaderApp.use('/', routes);
+
+  loaderServer = loaderApp.listen(LOADER_PORT, () => {
+    logger.info(
+      `Loader server is now running on http://localhost:${LOADER_PORT}`
+    );
+    if (callback) {
+      callback();
+    }
+  });
 }
 
 function startServers(callback) {
   // Shut down the servers
   if (graphQLServer) {
     graphQLServer.close();
+  }
+
+  if (loaderServer) {
+    loaderServer.close();
   }
 
   let doneTasks = 0;

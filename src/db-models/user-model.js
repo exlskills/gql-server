@@ -94,7 +94,8 @@ const UserSchema = new mongoose.Schema(
 );
 
 UserSchema.index({
-  'auth_strategies.auth_id': 1
+  'auth_strategies.auth_id': 1,
+  'course_roles.course_id': 1
 });
 
 export default mongoose.model('User', UserSchema, 'user');

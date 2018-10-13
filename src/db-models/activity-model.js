@@ -16,12 +16,14 @@ const ActivitySchema = new mongoose.Schema(
     user_id: {
       type: String,
       ref: 'User',
-      required: true
+      required: true,
+      index: true
     },
     def_id: {
       type: String,
       ref: 'ListDef',
-      required: true
+      required: true,
+      index: true
     },
     activity_link: {
       type: String,

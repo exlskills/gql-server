@@ -13,7 +13,7 @@ export const createExamAttempt = async examObject => {
 export const updateExamAttempt = async (condition, object, opts = {}) => {
   logger.debug(`in updateExamAttempt`);
   try {
-    const result = await ExamptAttempt.update(condition, object).exec();
+    const result = await ExamptAttempt.updateOne(condition, object).exec();
     let records;
     if (opts && opts.returnRecords === true) {
       records = await ExamptAttempt.find(condition).exec();

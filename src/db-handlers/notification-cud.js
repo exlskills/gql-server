@@ -47,7 +47,7 @@ export const markNotificationAsRead = async (user_id, notif_id) => {
         result.ok = 1;
       }
     } else {
-      result = await Notification.update(
+      result = await Notification.updateOne(
         { user_id, 'notifications._id': ObjectId(notif_id) },
         { $set: { 'notifications.$.is_read': true } }
       ).exec();

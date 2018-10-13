@@ -4,7 +4,7 @@ import { logger } from '../utils/logger';
 export const upsertQuestionInteraction = async object => {
   logger.debug(`in upsertQuestionInteraction`);
   try {
-    const result = await QuestionInteraction.update(
+    const result = await QuestionInteraction.updateOne(
       {
         user_id: object.user_id,
         question_id: object.question_id,

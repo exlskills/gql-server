@@ -10,17 +10,20 @@ const ExamAttemptSchema = new mongoose.Schema(
     exam_id: {
       type: String,
       ref: 'Exam',
-      required: true
+      required: true,
+      index: true
     },
     user_id: {
       type: String,
       ref: 'User',
-      required: true
+      required: true,
+      index: true
     },
     unit_id: {
       type: String,
       ref: 'CourseUnit',
-      required: true
+      required: true,
+      index: true
     },
     question_ids: {
       type: [String],

@@ -62,4 +62,4 @@ typings/
 .docker_run.env
 
 # Build output
-build
+build/

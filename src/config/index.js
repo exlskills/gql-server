@@ -10,6 +10,7 @@ const cfg = {
   cors_origin: process.env.CORS_REGEX
     ? [new RegExp(process.env.CORS_REGEX)]
     : [/localhost/, /exlskills.com/, /\.exlskills\.com$/],
+  loader_http_port: process.env.LOADER_PORT || 8083,
   mongo: {
     uri: process.env.DB_URI || 'mongodb://localhost:27017',
     db: process.env.DB_NAME || 'webph2_dev',
@@ -29,7 +30,9 @@ const cfg = {
     process.env.LOGGING_LEVEL ||
     (process.env.NODE_ENV === 'production' ? 'info' : 'debug'),
   db_debug_log:
-    process.env.DB_DEBUG_LOG || process.env.NODE_ENV !== 'production'
+    process.env.DB_DEBUG_LOG || process.env.NODE_ENV !== 'production',
+  github_user_token: process.env.GITHUB_USER_TOKEN || 'create_me',
+  github_wh_token: process.env.GITHUB_WH_TOKEN || null
 };
 
 export default cfg;

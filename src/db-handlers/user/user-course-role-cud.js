@@ -53,7 +53,7 @@ export const updateUserCourseRole_Object = async (
   // This is used to update last_accessed_at
   // course_id is a key field and should never be updated
   // roles are updated via a different method
-  const updateQuery = User.update(
+  const updateQuery = User.updateOne(
     { _id: user_id, 'course_roles.course_id': course_id },
     { $set: { 'course_roles.$.last_accessed_at': objContent.last_accessed_at } }
   );
@@ -66,7 +66,7 @@ export const updateUserCourseRole_Object = async (
 };
 
 export const deleteUserCourseRole_Object = async (user_id, course_id) => {
-  const updateQuery = User.update(
+  const updateQuery = User.updateOne(
     { _id: user_id, 'course_roles.course_id': course_id },
     { $pull: { course_roles: { course_id: course_id } } }
   );
@@ -103,7 +103,7 @@ export const createUserCourseRole_Object = async (
   const push_elem = {
     $push: { course_roles: { course_id: course_id, ...objContent } }
   };
-  const updateQuery = User.update({ _id: user_id }, push_elem);
+  const updateQuery = User.updateOne({ _id: user_id }, push_elem);
 
   try {
     const res = await updateQuery.exec();
