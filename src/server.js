@@ -100,7 +100,6 @@ function startGraphQLServer(callback) {
   loaderApp.use(bodyParser.json());
   loaderApp.use('/', routes);
 
-  /*
   loaderServer = loaderApp.listen(LOADER_PORT, () => {
     logger.info(
       `Loader server is now running on http://localhost:${LOADER_PORT}`
@@ -109,7 +108,6 @@ function startGraphQLServer(callback) {
       callback();
     }
   });
-  */
 }
 
 function startServers(callback) {
