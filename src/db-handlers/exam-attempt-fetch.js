@@ -2,6 +2,7 @@ import { basicFind } from '../db-handlers/basic-query-handler';
 import ExamAttempt from '../db-models/exam-attempt-model.js';
 import QuestionInteraction from '../db-models/question-interaction-model';
 import { logger } from '../utils/logger';
+import moment from 'moment';
 
 export const fetchById = async (obj_id, selectVal, viewer, info) => {
   logger.debug(`in Exam Attempt fetchById`);
@@ -20,6 +21,36 @@ export const fetchById = async (obj_id, selectVal, viewer, info) => {
     return null;
   }
   return record;
+};
+
+export const fetchExamAttemptsByUserAndUnitToday = async (user_id, unit_id) => {
+  logger.debug(`in fetchExamAttemptsByUserAndUnitToday`);
+  logger.debug(`   user_id ` + user_id);
+  logger.debug(`   unit_id ` + unit_id);
+  return await basicFind(
+    ExamAttempt,
+    null,
+    {
+      started_at: {
+        $gte: moment()
+          .startOf('day')
+          .format('YYYY-MM-DD HH:mm:ss'),
+        $lte: moment().format('YYYY-MM-DD HH:mm:ss')
+      },
+      user_id: user_id,
+      unit_id: unit_id
+    },
+    null,
+    { _id: 1 }
+  );
+
+  let arrayAttemp = await ExamAttempt.find({
+    started_at: {
+      $gte: moment().format('YYYY-MM-DD 00:00:00'),
+      $lte: moment().format('YYYY-MM-DD HH:mm:ss')
+    },
+    unit_id: { $eq: unitElem._id }
+  }).exec();
 };
 
 export const fetchExamAttemptsByUserAndUnitJoinExam = async (
@@ -120,7 +151,7 @@ export const fetchLastCancExamAttemptByUserUnit = async (user_id, unit_id) => {
     const spent_time = (record.submitted_at - record.started_at) / 1000;
     record.isContinue = spent_time < time_limit;
     if (!record.isContinue) {
-      ExamAttempt.update({ _id: record._id }, { is_active: false });
+      ExamAttempt.updateOne({ _id: record._id }, { is_active: false });
     }
   }
   logger.debug(

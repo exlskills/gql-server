@@ -11,7 +11,8 @@ const NotificationSchema = new mongoose.Schema(
     user_id: {
       type: String,
       ref: 'User',
-      required: true
+      required: true,
+      index: true
     },
     notifications: {
       type: [UserNotificationSchema],

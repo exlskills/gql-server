@@ -9,6 +9,7 @@ import { fetchLastCancExamAttemptByUserUnit } from '../exam-attempt-fetch';
 import { logger } from '../../utils/logger';
 import { checkUserViewedCard } from '../../db-handlers/card-interaction-fetch';
 import { fetchSectionCardIDsForUnit } from './section-card-fetch';
+import { fetchExamAttemptsByUserAndUnitToday } from '../../db-handlers/exam-attempt-fetch';
 
 export const fetchCourseUnitsBase = async (
   filterValues,
@@ -414,8 +415,6 @@ export const fetchCourseUnitById = async (
   viewer
 ) => {
   logger.debug(`in fetchCourseUnitById`);
-  let array = [];
-  let elem;
 
   let viewerLocale = viewer.locale;
 
@@ -433,6 +432,8 @@ export const fetchCourseUnitById = async (
   );
 
   for (let unitElem of arrayRet) {
+    // NOTE: arrayRet has 1 element only as unit_id is in the fetchParameters
+
     for (let sectionElem of unitElem.sections_list) {
       sectionElem.title = getStringByLocale(
         sectionElem.title,
@@ -445,13 +446,10 @@ export const fetchCourseUnitById = async (
     }
 
     unitElem.attempts_left = 0;
-    let arrayAttemp = await ExamAttempt.find({
-      started_at: {
-        $gte: moment().format('YYYY-MM-DD 00:00:00'),
-        $lte: moment().format('YYYY-MM-DD HH:mm:ss')
-      },
-      unit_id: { $eq: unitElem._id }
-    }).exec();
+    let arrayAttemp = await fetchExamAttemptsByUserAndUnitToday(
+      user_id,
+      unitElem._id
+    );
     if (arrayAttemp.length > 0) {
       unitElem.attempts_left =
         unitElem.attempts_allowed_per_day - arrayAttemp.length;

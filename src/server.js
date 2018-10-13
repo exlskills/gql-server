@@ -25,6 +25,8 @@ mongoose.Promise = global.Promise;
 function startGraphQLServer(callback) {
   //logger.debug('mongo URI ' + config.mongo.uri);
   logger.debug('mongo DB ' + config.mongo.db);
+
+  mongoose.set('useCreateIndex', true);
   let promiseDb = mongoose.connect(
     config.mongo.uri + '/' + config.mongo.db,
     {
@@ -32,8 +34,6 @@ function startGraphQLServer(callback) {
       useNewUrlParser: true
     }
   );
-
-  // mongoose.set('useCreateIndex', true);
 
   if (config.db_debug_log) {
     mongoose.set('debug', true);

@@ -11,11 +11,13 @@ const ListDefSchema = new mongoose.Schema(
     },
     type: {
       type: String,
-      required: true
+      required: true,
+      index: true
     },
     value: {
       type: String,
-      required: true
+      required: true,
+      index: true
     },
     latest_version: {
       type: Number,
