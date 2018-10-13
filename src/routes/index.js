@@ -10,16 +10,7 @@ import { loadCourseDeliverySchedule } from '../data-load/course-delivery-schedul
 
 const router = express.Router();
 
-router.get('/', (req, res) => {
-  logger.debug(`in root router`);
-  res.json(
-    'pong' || {
-      status: 'OK'
-    }
-  );
-});
-
-router.post('/course-delivery-schedule', async (req, res) => {
+router.post('/', async (req, res) => {
   logger.debug(`in post course-delivery-schedule`);
 
   try {
@@ -28,11 +19,12 @@ router.post('/course-delivery-schedule', async (req, res) => {
       req.body,
       req.get('X-Hub-Signature')
     );
-    logger.error(`result ` + JSON.stringify(result));
+    logger.debug(`result ` + JSON.stringify(result));
     if (
       result.status &&
-      [304, 400, 403, 404, 422, 500].indexOf(result.status) > -1
+      [304, 400, 403, 422, 500].indexOf(result.status) > -1
     ) {
+      logger.debug(`return with status `);
       return res.status(result.status).json(result);
     } else {
       res.json(

@@ -76,7 +76,8 @@ export const loadCourseDeliverySchedule = async (
           file =>
             !(
               file.toUpperCase().includes('README') ||
-              file.toUpperCase().includes('LICENSE')
+              file.toUpperCase().includes('LICENSE') ||
+              file.includes('.gitignore')
             )
         );
     }

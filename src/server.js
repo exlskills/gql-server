@@ -16,9 +16,8 @@ import routes from './routes';
 logger.info('Server starting ...');
 
 const GRAPHQL_PORT = parseInt(config.http_port);
-const LOADER_PORT = parseInt(config.loader_http_port);
 
-let graphQLServer, loaderServer;
+let graphQLServer;
 
 mongoose.Promise = global.Promise;
 
@@ -69,10 +68,9 @@ function startGraphQLServer(callback) {
   );
   graphQLApp.use(bodyParser.json());
 
-  graphQLApp.use(middleware.getViewer);
-
   graphQLApp.use(
     '/graph',
+    middleware.getViewer,
     middleware.loginRequired,
     graphQLHTTP((request, response, graphQLParams) => ({
       graphiql: true,
@@ -81,6 +79,8 @@ function startGraphQLServer(callback) {
       context: request.gqlviewer
     }))
   );
+
+  graphQLApp.use('/course-delivery-schedule', routes);
 
   graphQLServer = graphQLApp.listen(GRAPHQL_PORT, () => {
     logger.info(
@@ -91,33 +91,12 @@ function startGraphQLServer(callback) {
     }
   });
 
-  const loaderApp = express();
-
-  loaderApp.use(
-    cors()
-    //    cors({origin: config.cors_origin,credentials: true})
-  );
-  loaderApp.use(bodyParser.json());
-  loaderApp.use('/', routes);
-
-  loaderServer = loaderApp.listen(LOADER_PORT, () => {
-    logger.info(
-      `Loader server is now running on http://localhost:${LOADER_PORT}`
-    );
-    if (callback) {
-      callback();
-    }
-  });
 }
 
 function startServers(callback) {
-  // Shut down the servers
+  // Shut down the server
   if (graphQLServer) {
     graphQLServer.close();
-  }
-
-  if (loaderServer) {
-    loaderServer.close();
   }
 
   let doneTasks = 0;

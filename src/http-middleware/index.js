@@ -1,7 +1,9 @@
 import jwt from 'jsonwebtoken';
 import { jwtpublic_key } from '.././config';
+import { logger } from '../utils/logger';
 
 export const loginRequired = (req, res, next) => {
+  logger.debug(`in loginReqired`);
   if (req.gqlviewer) {
     next();
   } else {
@@ -10,6 +12,7 @@ export const loginRequired = (req, res, next) => {
 };
 
 export const getViewer = (req, res, next) => {
+  logger.debug(`in getViewer`);
   if (req.cookies.token) {
     const decoded = jwt.verify(req.cookies.token, jwtpublic_key, {
       algorithm: 'RS256'
