@@ -59,6 +59,8 @@ function startGraphQLServer(callback) {
     })
   );
 
+  graphQLApp.use('/healthcheck', require('express-healthcheck')());
+
   graphQLApp.use(cookieParser());
 
   graphQLApp.use(
@@ -66,6 +68,7 @@ function startGraphQLServer(callback) {
       extended: true
     })
   );
+
   graphQLApp.use(bodyParser.json());
 
   graphQLApp.use(
@@ -90,7 +93,6 @@ function startGraphQLServer(callback) {
       callback();
     }
   });
-
 }
 
 function startServers(callback) {

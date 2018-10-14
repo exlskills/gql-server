@@ -227,18 +227,24 @@ export const fetchCourseUnitsWithDetailedStatus = async (
     // Course Unit Exam Attempts
     unitElem.grade = 0;
     unitElem.attempts_left = unitElem.attempts_allowed_per_day;
+
     const examStatusUnitIndex = examStatusByCourseUnit.findIndex(
       x => x._id === unitElem._id
     );
-
     if (examStatusUnitIndex >= 0) {
       unitElem.grade = examStatusByCourseUnit[examStatusUnitIndex].grade;
       if (examStatusByCourseUnit[examStatusUnitIndex].passed) {
         unitElem.unit_progress_state = 1;
       }
 
+      unitElem.attempts = examStatusByCourseUnit[examStatusUnitIndex].attempts;
       unitElem.attempts_left =
         examStatusByCourseUnit[examStatusUnitIndex].attempts_left;
+      unitElem.last_attempted_at =
+        examStatusByCourseUnit[examStatusUnitIndex].last_attempted_at;
+      unitElem.final_exam_weight_pct =
+        examStatusByCourseUnit[examStatusUnitIndex].final_exam_weight_pct;
+      unitElem.passed = examStatusByCourseUnit[examStatusUnitIndex].passed;
 
       let lastCancelled = await fetchLastCancExamAttemptByUserUnit(
         userId,
