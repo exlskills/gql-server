@@ -137,7 +137,7 @@ export const fetchCourses = async (
     array.push(elem);
 
     if (fetchParameters.roles) {
-      // filter courses by user roles
+      // filter courses by specific roles
       elem = {
         $match: {
           'users.course_roles.role': {
@@ -147,8 +147,15 @@ export const fetchCourses = async (
           }
         }
       };
-      array.push(elem);
+    } else {
+      // filter courses to those where the user has any role
+      elem = {
+        $match: {
+          'users.course_roles._id': { $exists: true }
+        }
+      };
     }
+    array.push(elem);
 
     elem = {
       $addFields: {

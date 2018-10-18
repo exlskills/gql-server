@@ -246,7 +246,6 @@ export const fetchCourseDeliverySchedule = async (
 
 export const fetchCourseDeliveryMethods = async (course_id, viewer, info) => {
   logger.debug(`in fetchCourseDeliverySchedule`);
-  logger.debug(` result ` + result);
   let result = [];
   const selectVal = {
     available_delivery_methods: 1
@@ -259,6 +258,7 @@ export const fetchCourseDeliveryMethods = async (course_id, viewer, info) => {
   if (courseDeliveryRecord && courseDeliveryRecord.available_delivery_methods) {
     result = courseDeliveryRecord.available_delivery_methods;
   }
+  logger.debug(` result ` + result);
   return result;
 };
 

@@ -1,4 +1,5 @@
 import * as cud from '../db-handlers/user/user-course-role-cud';
+import { logger } from '../utils/logger';
 
 export const updateUserCourseRole = async (
   localUserId,
@@ -7,11 +8,11 @@ export const updateUserCourseRole = async (
   viewer,
   info
 ) => {
+  logger.debug(`in updateUserCourseRole`);
   let completionObj = {
     code: '0',
     msg: ''
   };
-
   // TODO discriminate between the different potentially-assigned roles and admin viewers
   if (viewer.user_id !== localUserId) {
     return Promise.reject('forbidden');
