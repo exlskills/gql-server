@@ -5,7 +5,7 @@ import Course from '../db-models/course-model';
 import { logger } from '../utils/logger';
 import * as Randomization from '../utils/randomization';
 
-export const fetchById = async (obj_id, selectVal, viewer, info) => {
+export const examFetchById = async (obj_id, selectVal, viewer, info) => {
   logger.debug(`in Exam fetchById`);
   let record;
   try {
@@ -83,8 +83,12 @@ export const searchExamIdToTake = async (unit_id, course_id, viewer, info) => {
   return idToTake;
 };
 
-async function getRandomQuestionIds(exam_id) {
-  const exam = await fetchById(exam_id, { question_ids: 1, question_count: 1 });
+export const getRandomQuestionIds = async exam_id => {
+  logger.debug(`in getRandomQuestionIds`);
+  const exam = await examFetchById(exam_id, {
+    question_ids: 1,
+    question_count: 1
+  });
   if (!exam) {
     return { quesIds: [], seed: '' };
   }
@@ -97,7 +101,7 @@ async function getRandomQuestionIds(exam_id) {
     arrayQuestion.splice(exam.question_count);
   }
   return { quesIds: arrayQuestion, seed: secret_seed };
-}
+};
 
 export const returnObjectExamAttempt = async (
   unit_id,
@@ -122,4 +126,41 @@ export const getOneExam = async (unit_id, course_id, viewer, info) => {
   logger.debug(`in getOneExam`);
   let exam_id = await searchExamIdToTake(unit_id, course_id, viewer, info);
   return exam_id;
+};
+
+export const pickExamId = async (unitObj, viewer, info) => {
+  logger.debug(`in pickExamId`);
+
+  let arrayExam = unitObj.final_exams;
+  let lengthExam = arrayExam.length;
+
+  let j = Math.floor(Math.random() * (lengthExam - 1));
+  let idToTake = arrayExam[j];
+  let examIdAssigned = false;
+  for (let i = j; i < lengthExam; i++) {
+    if (
+      !(await checkUserTookThisExam(arrayExam[i], viewer.user_id, unitObj._id))
+    ) {
+      idToTake = arrayExam[i];
+      examIdAssigned = true;
+      break;
+    }
+  }
+  if (!examIdAssigned) {
+    for (let i = j - 1; i >= 0; i--) {
+      if (
+        !(await checkUserTookThisExam(
+          arrayExam[i],
+          viewer.user_id,
+          unitObj._id
+        ))
+      ) {
+        idToTake = arrayExam[i];
+        examIdAssigned = true;
+        break;
+      }
+    }
+  }
+  logger.debug(`    exam id to take ` + idToTake);
+  return idToTake;
 };

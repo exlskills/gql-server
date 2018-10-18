@@ -30,16 +30,12 @@ export const fetchActivities = async (
   logger.debug(`in fetchActivities`);
   let user_id = fetchParameters.user_id;
   let input_date = fetchParameters.input_date;
-  let startDate = moment(input_date)
+  let startDay = moment(input_date)
     .startOf('day')
-    .format('YYYY-MM-DDT00:00:00');
-  let endDate = moment(input_date)
+    .toDate();
+  let endDay = moment(input_date)
     .add(1, 'day')
-    .format('YYYY-MM-DDTHH:mm:ss');
-  let arrayStartDate = startDate.split('T');
-  let arrayEndDate = endDate.split('T');
-  let startDay = new Date(arrayStartDate[0]);
-  let endDay = new Date(arrayEndDate[0]);
+    .toDate();
 
   let fieldToSelect = {
     activity_link: 1,

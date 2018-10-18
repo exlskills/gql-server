@@ -3,6 +3,7 @@ import { id_gen } from '../utils/url-id-generator';
 import { updateIntlStringObject } from '../parsers/intl-string-parser';
 import IntlStringSchema from './intl-string-model';
 import EmbeddedDocRefSchema from './embedded-doc-ref-model';
+import CourseItemRefSchema from './course-item-ref-model';
 import { logger } from '../utils/logger';
 
 const QuestionSchema = new mongoose.Schema(
@@ -47,6 +48,12 @@ const QuestionSchema = new mongoose.Schema(
       type: Number,
       default: 1,
       required: true
+    },
+    course_item_ref: {
+      type: CourseItemRefSchema
+    },
+    exam_only: {
+      type: Boolean
     }
   },
   {
@@ -54,108 +61,18 @@ const QuestionSchema = new mongoose.Schema(
   }
 );
 
-QuestionSchema.index({ 'doc_ref.EmbeddedDocRef.embedded_doc_refs.doc_id': 1 });
+QuestionSchema.index(
+  {
+    'doc_ref.EmbeddedDocRef.embedded_doc_refs.doc_id': 1,
+    'course_item_ref.course_id': 1,
+    'course_item_ref.unit_id': 1,
+    'course_item_ref.section_id': 1,
+    'course_item_ref.card_id': 1
+  },
+  { sparse: true }
+);
 
-QuestionSchema.methods.updateInfo = async function(data, viewerLocale) {
-  logger.debug(`in QuestionSchema.methods.updateInfo`);
-  if ('tags' in data) {
-    this.tags = data.tags;
-  }
-  if ('points' in data) {
-    this.points = data.points;
-  }
-  if ('est_time_sec' in data) {
-    this.est_time_sec = data.est_time_sec;
-  }
-  if ('compl_level' in data) {
-    this.compl_level = data.compl_level;
-  }
-  if ('hint' in data) {
-    this.hint = updateIntlStringObject(this.hint, viewerLocale, data.hint);
-  }
-  if ('question_text' in data) {
-    this.question_text = updateIntlStringObject(
-      this.question_text,
-      viewerLocale,
-      data.question_text
-    );
-  }
-
-  if ('data' in data) {
-    const answerData = data.data;
-    if (this.question_type === 'MCSA' || this.question_type === 'MCMA') {
-      if (answerData.options && answerData.options.length > 0) {
-        for (let opt of answerData.options) {
-          let quesOpt = this.data.find(item => item._id.toString() === opt.id);
-          if (!quesOpt) {
-            continue;
-          }
-          if ('is_answer' in opt) {
-            quesOpt.is_answer = opt.is_answer;
-          }
-          if ('seq' in opt) {
-            quesOpt.seq = opt.seq;
-          }
-          if ('explanation' in opt) {
-            quesOpt.explanation = updateIntlStringObject(
-              quesOpt.explanation,
-              viewerLocale,
-              opt.explanation
-            );
-          }
-          if ('text' in opt) {
-            quesOpt.text = updateIntlStringObject(
-              quesOpt.text,
-              viewerLocale,
-              opt.text
-            );
-          }
-        }
-        this.markModified('data');
-      }
-    } else if (this.question_type === 'WSCQ') {
-      if (answerData) {
-        if ('src_files' in answerData) {
-          this.data.src_files = updateIntlStringObject(
-            this.data.src_files,
-            viewerLocale,
-            answerData.src_files
-          );
-        }
-        if ('tmpl_files' in answerData) {
-          this.data.tmpl_files = updateIntlStringObject(
-            this.data.tmpl_files,
-            viewerLocale,
-            answerData.tmpl_files
-          );
-        }
-        if ('explanation' in answerData) {
-          this.data.explanation = updateIntlStringObject(
-            this.data.explanation,
-            viewerLocale,
-            answerData.explanation
-          );
-        }
-        if ('test_files' in answerData) {
-          this.data.test_files = answerData.test_files;
-        }
-        if ('grading_tests' in answerData) {
-          this.data.grading_tests = answerData.grading_tests;
-        }
-        if ('grading_strategy' in answerData) {
-          this.data.grading_strategy = answerData.grading_strategy;
-        }
-        if ('environment_key' in answerData) {
-          this.data.environment_key = answerData.environment_key;
-        }
-        if ('use_advanced_features' in answerData) {
-          this.data.use_advanced_features = answerData.use_advanced_features;
-        }
-      }
-    }
-  }
-
-  return await this.save();
-};
+// https://docs.mongodb.com/manual/core/index-sparse/#sparse-compound-indexes
+// Sparse compound indexes that only contain ascending/descending index keys will index a document as long as the document contains at least one of the keys.
 
 export default mongoose.model('Question', QuestionSchema, 'question');

@@ -106,7 +106,8 @@ const CourseSchema = new mongoose.Schema(
 
 CourseSchema.index(
   {
-    'title.intlString.content': 'text'
+    'title.intlString.content': 'text',
+    'units.Units._id': 1
   },
   {
     language_override: 'locale'

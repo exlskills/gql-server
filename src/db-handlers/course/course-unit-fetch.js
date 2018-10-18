@@ -1,15 +1,58 @@
 import Course from '../../db-models/course-model';
 import * as projectionWriter from '../../utils/projection-writer';
-import * as ExamAttemptFetch from '../../db-handlers/exam-attempt-fetch';
-import moment from 'moment';
+import { fetchExamAttemptsByUserAndUnitJoinExam } from '../../db-handlers/exam-attempt-fetch';
 import { getStringByLocale } from '../../parsers/intl-string-parser';
 import { computeQuestionsEMA } from '../question-interaction-fetch';
-import ExamAttempt from '../../db-models/exam-attempt-model';
 import { fetchLastCancExamAttemptByUserUnit } from '../exam-attempt-fetch';
 import { logger } from '../../utils/logger';
 import { checkUserViewedCard } from '../../db-handlers/card-interaction-fetch';
 import { fetchSectionCardIDsForUnit } from './section-card-fetch';
 import { fetchExamAttemptsByUserAndUnitToday } from '../../db-handlers/exam-attempt-fetch';
+import { basicFind } from '../basic-query-handler';
+
+export const fetchByCourseAndUnitId = async (
+  course_id,
+  unit_id,
+  unitFieldsProjectObj,
+  viewer,
+  info
+) => {
+  logger.debug(`in fetchByCourseAndUnitId`);
+  let array = [];
+  let elem;
+
+  elem = { $match: { _id: course_id } };
+  array.push(elem);
+
+  elem = { $addFields: { 'units.Units.currentCourseId': '$_id' } };
+  array.push(elem);
+
+  elem = { $replaceRoot: { newRoot: '$units' } };
+  array.push(elem);
+  elem = { $unwind: '$Units' };
+  array.push(elem);
+
+  elem = { $match: { 'Units._id': unit_id } };
+  array.push(elem);
+
+  let projectObj = {
+    _id: '$Units._id',
+    course_id: '$Units.currentCourseId'
+  };
+
+  projectObj = { ...projectObj, ...unitFieldsProjectObj };
+
+  elem = { $project: projectObj };
+  array.push(elem);
+
+  const result = await Course.aggregate(array).exec();
+
+  logger.debug('  result ' + JSON.stringify(result));
+  if (!result || result.length < 1) {
+    return null;
+  }
+  return result[0];
+};
 
 export const fetchCourseUnitsBase = async (
   filterValues,
@@ -317,7 +360,7 @@ export const fetchUserCourseUnitExamStatus = async (
     // Process Exam Attempts for the User - Course Unit
     let examAttempts = [];
     try {
-      examAttempts = await ExamAttemptFetch.fetchExamAttemptsByUserAndUnitJoinExam(
+      examAttempts = await fetchExamAttemptsByUserAndUnitJoinExam(
         fetchParameters.userId,
         unit._id,
         {
@@ -452,13 +495,13 @@ export const fetchCourseUnitById = async (
     }
 
     unitElem.attempts_left = 0;
-    let arrayAttemp = await fetchExamAttemptsByUserAndUnitToday(
+    const arrayAttempts = await fetchExamAttemptsByUserAndUnitToday(
       user_id,
       unitElem._id
     );
-    if (arrayAttemp.length > 0) {
+    if (arrayAttempts.length > 0) {
       unitElem.attempts_left =
-        unitElem.attempts_allowed_per_day - arrayAttemp.length;
+        unitElem.attempts_allowed_per_day - arrayAttempts.length;
     } else {
       unitElem.attempts_left = unitElem.attempts_allowed_per_day;
     }

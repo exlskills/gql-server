@@ -1,5 +1,5 @@
 import { createExamAttempt } from '../db-handlers/exam-attempt-cud';
-import * as ExamFetch from '../db-handlers/exam-fetch';
+import { examFetchById } from '../db-handlers/exam-fetch';
 import * as CourseFetch from '../db-handlers/course/course-fetch';
 import * as ExamAttemptFetch from '../db-handlers/exam-attempt-fetch';
 import { createActivity } from '../db-handlers/activities-cud';
@@ -55,7 +55,7 @@ export const takeExam = async (courseId, unitId, viewer, info) => {
         }
       }
     });
-    const exam = await ExamFetch.fetchById(attempt.exam_id, { time_limit: 1 });
+    const exam = await examFetchById(attempt.exam_id, { time_limit: 1 });
     const time_limit = exam.time_limit;
 
     return {
@@ -83,7 +83,7 @@ export const leaveExam = async (exam_attempt_id, cancel, viewer, info) => {
     examattempt.submitted_at = new Date();
     examattempt.is_cancelled = cancel !== false;
 
-    const exam = await ExamFetch.fetchById(examattempt.exam_id, {
+    const exam = await examFetchById(examattempt.exam_id, {
       time_limit: 1
     });
     if (exam) {

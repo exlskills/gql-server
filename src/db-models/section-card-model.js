@@ -2,6 +2,7 @@ import mongoose from 'mongoose';
 import IntlString from './intl-string-model.js';
 import EmbeddedDocRef from './embedded-doc-ref-model.js';
 import { id_gen } from '../utils/url-id-generator';
+import CourseItemRefSchema from './course-item-ref-model';
 
 export default new mongoose.Schema(
   {
@@ -36,6 +37,9 @@ export default new mongoose.Schema(
     card_ref: {
       type: EmbeddedDocRef,
       required: true
+    },
+    course_item_ref: {
+      type: CourseItemRefSchema
     }
   },
   {

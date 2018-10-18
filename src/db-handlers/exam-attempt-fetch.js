@@ -6,11 +6,9 @@ import moment from 'moment';
 
 export const fetchById = async (obj_id, selectVal, viewer, info) => {
   logger.debug(`in Exam Attempt fetchById`);
-  logger.debug(`  obj_id ` + obj_id);
-  let record;
   try {
     //model, runParams, queryVal, sortVal, selectVal
-    record = await basicFind(
+    return await basicFind(
       ExamAttempt,
       { isById: true },
       obj_id,
@@ -20,37 +18,30 @@ export const fetchById = async (obj_id, selectVal, viewer, info) => {
   } catch (errInternalAlreadyReported) {
     return null;
   }
-  return record;
 };
 
 export const fetchExamAttemptsByUserAndUnitToday = async (user_id, unit_id) => {
   logger.debug(`in fetchExamAttemptsByUserAndUnitToday`);
-  logger.debug(`   user_id ` + user_id);
-  logger.debug(`   unit_id ` + unit_id);
-  return await basicFind(
-    ExamAttempt,
-    null,
-    {
-      started_at: {
-        $gte: moment()
-          .startOf('day')
-          .format('YYYY-MM-DD HH:mm:ss'),
-        $lte: moment().format('YYYY-MM-DD HH:mm:ss')
+  try {
+    return await basicFind(
+      ExamAttempt,
+      null,
+      {
+        started_at: {
+          $gte: moment()
+            .startOf('day')
+            .toDate(),
+          $lte: moment().toDate()
+        },
+        user_id: user_id,
+        unit_id: unit_id
       },
-      user_id: user_id,
-      unit_id: unit_id
-    },
-    null,
-    { _id: 1 }
-  );
-
-  let arrayAttemp = await ExamAttempt.find({
-    started_at: {
-      $gte: moment().format('YYYY-MM-DD 00:00:00'),
-      $lte: moment().format('YYYY-MM-DD HH:mm:ss')
-    },
-    unit_id: { $eq: unitElem._id }
-  }).exec();
+      { started_at: -1 },
+      { _id: 1 }
+    );
+  } catch (errInternalAlreadyReported) {
+    return null;
+  }
 };
 
 export const fetchExamAttemptsByUserAndUnitJoinExam = async (
@@ -169,6 +160,8 @@ export const checkUserTookThisExam = async (exam_id, user_id, unit_id) => {
   } else {
     elem = { $match: { unit_id: unit_id, user_id: user_id } };
   }
+  array.push(elem);
+  elem = { $project: { exam_id: 1 } };
   array.push(elem);
   const response = await ExamAttempt.aggregate(array).exec();
   return response.length > 0;
