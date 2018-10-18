@@ -66,7 +66,7 @@ export const fetchCourses = async (
     delivery_methods: 1,
     delivery_structures: 1
   };
-  let intlStringFields = {
+  let courseIntlStringFields = {
     title: 1,
     headline: 1,
     description: 1
@@ -83,49 +83,46 @@ export const fetchCourses = async (
   let limit = aggregateArray.find(item => !!item.$limit);
 
   let array = [];
+  let elem;
 
   if (fetchParameters.courseIds) {
-    array.push({
+    elem = {
       $match: {
         _id: {
           $in: fetchParameters.courseIds
         }
       }
-    });
+    };
+    array.push(elem);
   }
 
   if (fetchParameters.userId) {
-    array.push({
+    // Pull this User's record
+    elem = { $addFields: { userid: fetchParameters.userId } };
+    array.push(elem);
+
+    elem = {
       $lookup: {
         from: 'user',
-        localField: '_id',
-        foreignField: 'course_roles.course_id',
+        localField: 'userid',
+        foreignField: '_id',
         as: 'users'
       }
-    });
-    array.push({
-      $project: {
-        ...intlStringFields,
-        ...courseFields,
-        users: {
-          $filter: {
-            input: '$users',
-            cond: {
-              $eq: ['$$this._id', fetchParameters.userId]
-            }
-          }
-        }
-      }
-    });
+    };
+    array.push(elem);
   }
 
-  if (fetchParameters.mine) {
-    array.push({
+  if (fetchParameters.mine && fetchParameters.userId) {
+    // Note, we only merge Courses with Users if the userId is provided
+    // Otherwise, the query performance is unacceptable
+    elem = {
       $unwind: '$users'
-    });
-    array.push({
+    };
+    array.push(elem);
+
+    elem = {
       $project: {
-        ...intlStringFields,
+        ...courseIntlStringFields,
         ...courseFields,
         'users.course_roles': {
           $filter: {
@@ -136,11 +133,12 @@ export const fetchCourses = async (
           }
         }
       }
-    });
+    };
+    array.push(elem);
 
-    // filter courses by user roles
     if (fetchParameters.roles) {
-      array.push({
+      // filter courses by user roles
+      elem = {
         $match: {
           'users.course_roles.role': {
             $elemMatch: {
@@ -148,14 +146,17 @@ export const fetchCourses = async (
             }
           }
         }
-      });
+      };
+      array.push(elem);
     }
 
-    array.push({
+    elem = {
       $addFields: {
         last_accessed_at: '$users.course_roles.last_accessed_at'
       }
-    });
+    };
+    array.push(elem);
+
     courseFields.last_accessed_at = 1;
 
     sort = {
@@ -166,32 +167,35 @@ export const fetchCourses = async (
   }
 
   if (fetchParameters.relevant) {
-    array.push({
+    elem = {
       $project: {
-        ...intlStringFields,
-        ...courseFields,
-        my_course: {
-          $size: '$users'
-        }
+        ...courseIntlStringFields,
+        ...courseFields
       }
-    });
-    courseFields.my_course = 1;
+    };
+    array.push(elem);
 
+    // TODO add relevancy logic based on Course counter fields
+    /*
     sort = {
       $sort: {
-        my_course: -1,
+        TBD
         title: 1
       }
     };
+    */
   }
 
   if (fetchParameters.trending) {
-    array.push({
+    elem = {
       $project: {
-        ...intlStringFields,
+        ...courseIntlStringFields,
         ...courseFields
       }
-    });
+    };
+    array.push(elem);
+
+    // TODO - enrolled_count is not maintained, review the logic
     sort = {
       $sort: {
         enrolled_count: -1,
@@ -201,14 +205,15 @@ export const fetchCourses = async (
   }
 
   if (fetchParameters.topic) {
-    array.push({
+    elem = {
       $match: {
         topics: fetchParameters.topic
       }
-    });
+    };
+    array.push(elem);
   }
 
-  array.push({
+  elem = {
     $project: {
       ...courseFields,
       'title.intlString': projectionWriter.writeIntlStringFilter(
@@ -224,8 +229,10 @@ export const fetchCourses = async (
         viewerLocale
       )
     }
-  });
-  array.push({
+  };
+  array.push(elem);
+
+  elem = {
     $project: {
       ...courseFields,
       title: projectionWriter.writeIntlStringEval('title', viewerLocale),
@@ -235,14 +242,17 @@ export const fetchCourses = async (
         viewerLocale
       )
     }
-  });
+  };
+  array.push(elem);
 
   if (filterValues) {
     try {
       const objectFilter = JSON.parse(filterValues.filterValuesString);
-      array.push({
+      elem = {
         $match: objectFilter
-      });
+      };
+      array.push(elem);
+
       sort = {
         $sort: {
           title: 1
