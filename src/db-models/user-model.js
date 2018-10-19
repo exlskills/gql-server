@@ -107,9 +107,7 @@ const UserSchema = new mongoose.Schema(
 
 UserSchema.index(
   {
- //   'auth_strategies.auth_id': 1,
- //   'course_roles.course_id': 1,
-//    'full_name.intlString.content': 1,
+ //    'full_name.intlString.content': 1,
     'headline.intlString.content': 'text',
     'biography.intlString.content': 'text'
   },
