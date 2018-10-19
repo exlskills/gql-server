@@ -1,4 +1,4 @@
-// npx babel-node data-load/user-load.js
+// npx babel-node src/data-load/user-load.js
 
 import mongoose from 'mongoose';
 import * as fs from 'fs-extra';
@@ -10,7 +10,8 @@ import { logger } from '../utils/logger';
 
 async function loadData() {
   try {
-    const fileToRead = path.join(__dirname, 'user.yaml');
+    logger.debug(`path __dirname ` + __dirname);
+    const fileToRead = path.join(__dirname, './sample-data/user.yaml');
     const fileContents = await fs.readFile(fileToRead);
     const parsed = yaml.safeLoad(fileContents);
     logger.info(`parsed ` + JSON.stringify(parsed));

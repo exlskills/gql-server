@@ -1,0 +1,72 @@
+- username: 'testjavaguru1'
+  primary_email: 'testjavaguru1@mail.me'
+  is_demo: false
+  full_name:
+    intlString:
+      - locale: 'en'
+        is_default: true
+        content: 'Test JavaGuru1'
+  is_instructor: true
+  headline:
+    intlString:
+    - locale: 'en'
+      is_default: true
+      content: 'Java Super Guru'
+  biography:
+    intlString:
+    - locale: 'en'
+      is_default: true
+      content: |
+        Very experienced in Java 8 and JavaScript
+  avatar_url: 'https://www.gravatar.com/avatar/00000000000000000000000000000000?d=robohash'
+  instructor_topics:
+    - Java
+    - JavaScript
+
+- username: 'testjavasolid1'
+  primary_email: 'testjavasolid1@mail.me'
+  is_demo: false
+  full_name:
+    intlString:
+    - locale: 'en'
+      is_default: true
+      content: 'Test JavaSolid1'
+  is_instructor: true
+  headline:
+    intlString:
+    - locale: 'en'
+      is_default: true
+      content: 'Java Solid Instructor'
+  biography:
+    intlString:
+    - locale: 'en'
+      is_default: true
+      content: |
+        Experienced in Java 8
+  avatar_url: 'https://www.gravatar.com/avatar/00000000000000000000000000000000?d=robohash'
+  instructor_topics:
+  - Java
+
+- username: 'testjavajunior1'
+  primary_email: 'testjavajunior1@mail.me'
+  is_demo: false
+  full_name:
+    intlString:
+    - locale: 'en'
+      is_default: true
+      content: 'Test JavaJunior1'
+  is_instructor: true
+  headline:
+    intlString:
+    - locale: 'en'
+      is_default: true
+      content: 'Java Junior Instructor'
+  biography:
+    intlString:
+    - locale: 'en'
+      is_default: true
+      content: |
+        Beginner in JavaScript
+  avatar_url: 'https://www.gravatar.com/avatar/00000000000000000000000000000000?d=robohash'
+  instructor_topics:
+  - JavaScript

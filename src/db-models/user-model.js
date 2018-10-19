@@ -16,8 +16,7 @@ const UserSchema = new mongoose.Schema(
       default: id_gen
     },
     full_name: {
-      type: IntlStringSchema,
-      index: true
+      type: IntlStringSchema
     },
     headline: {
       type: IntlStringSchema
@@ -39,7 +38,14 @@ const UserSchema = new mongoose.Schema(
     is_demo: {
       type: Boolean,
       required: true,
-      default: true
+      default: true,
+      index: true
+    },
+    is_instructor: {
+      type: Boolean,
+      required: true,
+      default: false,
+      index: true
     },
     has_completed_first_tutorial: {
       type: Boolean,
@@ -86,6 +92,12 @@ const UserSchema = new mongoose.Schema(
     },
     zoho_ccy_code: {
       type: String
+    },
+    instructor_topics: {
+      // "en" values. Each must match list_def.value where list_def.type='instructor_topic'
+      // list_def.desc contains non-"en" values by locale
+      type: [String],
+      index: true
     }
   },
   {
@@ -93,9 +105,18 @@ const UserSchema = new mongoose.Schema(
   }
 );
 
-UserSchema.index({
-  'auth_strategies.auth_id': 1,
-  'course_roles.course_id': 1
-});
+UserSchema.index(
+  {
+ //   'auth_strategies.auth_id': 1,
+ //   'course_roles.course_id': 1,
+//    'full_name.intlString.content': 1,
+    'headline.intlString.content': 'text',
+    'biography.intlString.content': 'text'
+  },
+  { language_override: 'locale' },
+  {
+    default_language: 'none'
+  }
+);
 
 export default mongoose.model('User', UserSchema, 'user');
