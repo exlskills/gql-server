@@ -288,6 +288,10 @@ type LeaveExamPayload {
   clientMutationId: String
 }
 
+input ListArg {
+  values: [String]
+}
+
 type ListDef implements Node {
   # The ID of an object
   id: ID!
@@ -373,34 +377,37 @@ type Query {
   # Activities
   activityPaging: activityPaging
 
-  # all Courses in the database
-  coursePaging(orderBy: [OrderBy], filterValues: FilterValues, resolverArgs: [QueryResolverArgs], after: String, first: Int, before: String, last: Int): CourseConnection
-
-  # all Units in the course
-  unitPaging(orderBy: [OrderBy], filterValues: FilterValues, resolverArgs: [QueryResolverArgs], after: String, first: Int, before: String, last: Int): CourseUnitConnection
-
-  # User exam status for Course
-  userCourseUnitExamStatusPaging(orderBy: [OrderBy], filterValues: FilterValues, resolverArgs: [QueryResolverArgs], after: String, first: Int, before: String, last: Int): CourseUnitConnection
-
-  # all Sections in the Unit
-  sectionPaging(orderBy: [OrderBy], filterValues: FilterValues, resolverArgs: [QueryResolverArgs], after: String, first: Int, before: String, last: Int): UnitSectionConnection
-
   # all Cards in the Section
   cardPaging(orderBy: [OrderBy], filterValues: FilterValues, resolverArgs: [QueryResolverArgs], after: String, first: Int, before: String, last: Int): SectionCardConnection
+
+  # all Courses in the database
+  coursePaging(orderBy: [OrderBy], filterValues: FilterValues, resolverArgs: [QueryResolverArgs], after: String, first: Int, before: String, last: Int): CourseConnection
+  langType: [Lang]
+
+  # Instructors
+  listInstructors(orderBy: [OrderBy], filterValues: FilterValues, resolverArgs: [QueryResolverArgs], instructorTopics: ListArg, after: String, first: Int, before: String, last: Int): UserConnection
 
   # Notifications for the logged in user
   notificationPaging: notificationPaging
 
   # Question Entry
   questionHint(orderBy: [OrderBy], filterValues: FilterValues, resolverArgs: [QueryResolverArgs], after: String, first: Int, before: String, last: Int): Question
-  langType: [Lang]
 
   # get Question by Unit
   questionPaging(orderBy: [OrderBy], filterValues: FilterValues, resolverArgs: [QueryResolverArgs], after: String, first: Int, before: String, last: Int): QuestionConnection
 
   # get Questions For Exam
   questionPagingExam(orderBy: [OrderBy], filterValues: FilterValues, resolverArgs: [QueryResolverArgs], after: String, first: Int, before: String, last: Int): QuestionConnection
+
+  # all Sections in the Unit
+  sectionPaging(orderBy: [OrderBy], filterValues: FilterValues, resolverArgs: [QueryResolverArgs], after: String, first: Int, before: String, last: Int): UnitSectionConnection
   topicFilter: [ListDef]
+
+  # all Units in the course
+  unitPaging(orderBy: [OrderBy], filterValues: FilterValues, resolverArgs: [QueryResolverArgs], after: String, first: Int, before: String, last: Int): CourseUnitConnection
+
+  # User exam status for Course
+  userCourseUnitExamStatusPaging(orderBy: [OrderBy], filterValues: FilterValues, resolverArgs: [QueryResolverArgs], after: String, first: Int, before: String, last: Int): CourseUnitConnection
 }
 
 input QueryResolverArgs {
@@ -689,8 +696,11 @@ type User implements Node {
   secondary_emails: [String]
   biography: String
   is_demo: Boolean
+  is_instructor: Boolean
   headline: String
   has_completed_first_tutorial: Boolean
+  instructor_topics_en: [String]
+  instructor_topics_locale: [String]
   locales: [String]
   primary_locale: String!
   subscription: UserSubscriptionConnection
@@ -707,6 +717,15 @@ type UserActivity {
   id: ID!
   date: String!
   count: Int!
+}
+
+# A connection to a list of items.
+type UserConnection {
+  # Information to aid in pagination.
+  pageInfo: PageInfo!
+
+  # A list of edges.
+  edges: [UserEdge]
 }
 
 # Defines a users role in a course
@@ -731,6 +750,15 @@ type UserCourseRoleConnection {
 type UserCourseRoleEdge {
   # The item at the end of the edge
   node: UserCourseRole
+
+  # A cursor for use in pagination
+  cursor: String!
+}
+
+# An edge in a connection.
+type UserEdge {
+  # The item at the end of the edge
+  node: User
 
   # A cursor for use in pagination
   cursor: String!
