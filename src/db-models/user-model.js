@@ -107,7 +107,6 @@ const UserSchema = new mongoose.Schema(
 
 UserSchema.index(
   {
- //    'full_name.intlString.content': 1,
     'headline.intlString.content': 'text',
     'biography.intlString.content': 'text'
   },
