@@ -1,12 +1,19 @@
 import ExamptAttempt from '../db-models/exam-attempt-model';
 import { logger } from '../utils/logger';
+import { stringify } from 'flatted/cjs';
 
 export const createExamAttempt = async examObject => {
   logger.debug(`in createExamAttempt`);
   try {
     return await ExamptAttempt.create(examObject);
   } catch (err) {
-    return Promise.reject('Error adding to DB' + err);
+    logger.error(
+      `failed inserting ExamAttempt ` +
+        err +
+        ` for doc ` +
+        stringify(examObject)
+    );
+    return null;
   }
 };
 

@@ -10,6 +10,9 @@ export const CompletionObjType = new GraphQLObjectType({
     msg: {
       type: GraphQLString
     },
+    msg_id: {
+      type: GraphQLString
+    },
     processed: {
       type: GraphQLInt
     },

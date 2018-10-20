@@ -21,7 +21,7 @@ export const ActivityType = new GraphQLObjectType({
       type: new GraphQLNonNull(GraphQLString),
       resolve: obj => obj.date.toISOString()
     },
-    def_id: {
+    def_value: {
       type: new GraphQLNonNull(GraphQLString)
     },
     activity_link: {

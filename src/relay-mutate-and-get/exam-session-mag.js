@@ -23,7 +23,11 @@ export const startExam = async (courseId, unitId, viewer, info) => {
 
     if (!unitObj || !unitObj.final_exams || unitObj.final_exams.length < 1) {
       return {
-        completionObj: { code: '1', msg: 'No Exams Found for Course-Unit' }
+        completionObj: {
+          code: '1',
+          msg: 'This Unit does not have exams',
+          msg_id: 'noexam'
+        }
       };
     }
 
@@ -36,13 +40,24 @@ export const startExam = async (courseId, unitId, viewer, info) => {
       const lastAttempt = arrayAttempts[0];
       // TODO check if current attempt still valid
       if (arrayAttempts.length >= unitObj.attempts_allowed_per_day) {
+        return {
+          completionObj: {
+            code: '1',
+            msg: 'No more attempts allowed today for this Unit',
+            msg_id: 'over_max_attempts'
+          }
+        };
       }
     }
 
     let exam_id = await pickExamId(unitObj, viewer, info);
     if (!exam_id) {
       return {
-        completionObj: { code: '1', msg: 'No Exams Found for Course-Unit' }
+        completionObj: {
+          code: '1',
+          msg: 'No Exams found for this Unit',
+          msg_id: 'no_exams_found'
+        }
       };
     }
 
@@ -58,7 +73,8 @@ export const startExam = async (courseId, unitId, viewer, info) => {
       return {
         completionObj: {
           code: '1',
-          msg: 'Failed to build Question ID Array for the exam'
+          msg: 'Failed to build Exam Question set',
+          msg_id: 'fail_build_q_set'
         }
       };
     }
@@ -76,7 +92,8 @@ export const startExam = async (courseId, unitId, viewer, info) => {
       return {
         completionObj: {
           code: '1',
-          msg: 'Failed to insert Exam Attempt doc'
+          msg: 'Failed initiate Exam Session',
+          msg_id: 'fail_exam_sess_doc'
         }
       };
     }
@@ -85,35 +102,31 @@ export const startExam = async (courseId, unitId, viewer, info) => {
     const courseTitle = getStringByLocale(course.title, viewer.locale).text;
     const courseUrlId = toClientUrlId(courseTitle, course._id);
 
-    const activityInsert = await createActivity(viewer.user_id, {
-      listDef_value: 'attempted_exam',
-      activity_link: `/courses/${courseUrlId}/grades`,
-      doc_ref: {
-        EmbeddedDocRef: {
-          embedded_doc_refs: [
-            {
-              level: 'course',
-              doc_id: courseId
-            },
-            {
-              level: 'unit',
-              doc_id: unitId
-            },
-            {
-              level: 'exam',
-              doc_id: exam_id
-            }
-          ]
+    try {
+      const activityInsert = await createActivity(viewer.user_id, {
+        listDef_value: 'attempted_exam',
+        activity_link: `/courses/${courseUrlId}/grades`,
+        doc_ref: {
+          EmbeddedDocRef: {
+            embedded_doc_refs: [
+              {
+                level: 'course',
+                doc_id: courseId
+              },
+              {
+                level: 'unit',
+                doc_id: unitId
+              },
+              {
+                level: 'exam',
+                doc_id: exam_id
+              }
+            ]
+          }
         }
-      }
-    });
-    if (!activityInsert) {
-      return {
-        completionObj: {
-          code: '1',
-          msg: 'Failed to insert Activity doc'
-        }
-      };
+      });
+    } catch (errAlreadyRecorded) {
+      // Still proceed with the exam
     }
 
     const exam = await examFetchById(exam_id, { time_limit: 1 });
@@ -125,11 +138,18 @@ export const startExam = async (courseId, unitId, viewer, info) => {
       exam_id: exam_id,
       completionObj: {
         code: '0',
-        msg: ''
+        msg: '',
+        msg_id: ''
       }
     };
   } catch (error) {
-    return { completionObj: { code: '1', msg: error.message } };
+    return {
+      completionObj: {
+        code: '1',
+        msg: error.message,
+        msg_id: 'srv_uncaught_error'
+      }
+    };
   }
 };
 

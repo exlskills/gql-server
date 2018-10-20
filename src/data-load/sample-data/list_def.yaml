@@ -1,0 +1,322 @@
+---
+- type: notif
+  value: added_to_class
+  latest_version: 1
+  desc:
+    intlString:
+    - locale: en
+      content: You have been added to a Class
+      is_default: true
+  contents:
+  - version: 1
+    content:
+      intlString:
+      - locale: en
+        content: You have been added to a Class
+        is_default: true
+- type: notif
+  value: comment_discussion
+  latest_version: 1
+  contents:
+  - version: 1
+    content:
+      intlString:
+      - locale: en
+        content: A user commented on your discussion
+        is_default: true
+- type: notif
+  value: commented_discussion
+  latest_version: 2
+  desc:
+    intlString:
+    - locale: en
+      content: Comment on course discussion
+      is_default: true
+  contents:
+  - version: 1
+    content:
+      intlString:
+      - locale: en
+        content: Comment on course discussion
+        is_default: true
+  - version: 2
+    content:
+      intlString:
+      - locale: en
+        content: Comment on course discussion
+        is_default: true
+- type: activity
+  value: enrolled_class
+  latest_version: 1
+  desc:
+    intlString:
+    - locale: en
+      content: enrolled in class
+      is_default: true
+  contents:
+  - version: 1
+    content:
+      intlString:
+      - locale: en
+        content: enrolled in class
+        is_default: true
+- type: activity
+  value: enrolled a course
+  latest_version: 2
+  desc:
+    intlString:
+    - locale: en
+      content: enrolled a course
+      is_default: true
+  contents:
+  - version: 1
+    content:
+      intlString:
+      - locale: en
+        content: added a course
+        is_default: true
+  - version: 2
+    content:
+      intlString:
+      - locale: en
+        content: enrolled a course
+        is_default: true
+- type: activity
+  value: created_workspace
+  latest_version: 1
+  desc:
+    intlString:
+    - locale: en
+      content: created a new workspace
+      is_default: true
+  contents:
+  - version: 1
+    content:
+      intlString:
+      - locale: en
+        content: created a new workspace
+        is_default: true
+- type: activity
+  value: discussion
+  latest_version: 1
+  desc:
+    intlString:
+    - locale: en
+      content: discussion
+      is_default: true
+  contents:
+  - version: 1
+    content:
+      intlString:
+      - locale: en
+        content: discuss about
+        is_default: true
+- type: activity
+  value: attempted_exam
+  latest_version: 1
+  desc:
+    intlString:
+    - locale: en
+      content: attempted an exam for a course unit
+      is_default: true
+  contents:
+  - version: 1
+    content:
+      intlString:
+      - locale: en
+        content: attempted an exam for a course unit
+        is_default: true
+- type: activity
+  value: attempted_quiz
+  latest_version: 1
+  desc:
+    intlString:
+    - locale: en
+      content: attempted a quiz
+      is_default: true
+  contents:
+  - version: 1
+    content:
+      intlString:
+      - locale: en
+        content: attempted a quiz
+        is_default: true
+- type: activity
+  value: take exam
+  latest_version: 1
+  desc:
+    intlString:
+    - locale: en
+      content: take exam
+      is_default: true
+  contents:
+  - version: 1
+    content:
+      intlString:
+      - locale: en
+        content: take course
+        is_default: true
+- type: activity
+  value: entered_comment
+  latest_version: 1
+  desc:
+    intlString:
+    - locale: en
+      content: entered comment
+      is_default: true
+  contents:
+  - version: 1
+    content:
+      intlString:
+      - locale: en
+        content: entered comment
+        is_default: true
+- type: activity
+  value: created_class
+  latest_version: 1
+  desc:
+    intlString:
+    - locale: en
+      content: created a new class
+      is_default: true
+  contents:
+  - version: 1
+    content:
+      intlString:
+      - locale: en
+        content: created a new class
+        is_default: true
+- type: instructor_topic
+  value: Golang
+  latest_version: 1
+  desc:
+    intlString:
+    - locale: fr
+      content: Golang
+      is_default: false
+- type: instructor_topic
+  value: Java
+  latest_version: 1
+  desc:
+    intlString:
+    - locale: fr
+      content: Java
+      is_default: false
+    - is_default: true
+      content: JavaEn
+      locale: en
+- type: instructor_topic
+  value: Python
+  latest_version: 1
+  desc:
+    intlString:
+    - locale: fr
+      content: Python
+      is_default: false
+- type: instructor_topic
+  value: JavaScript
+  latest_version: 1
+  desc:
+    intlString:
+    - locale: fr
+      content: JavaScript
+      is_default: false
+    - is_default: true
+      content: JS
+      locale: en
+- type: topic
+  value: Golang
+  latest_version: 2
+  desc:
+    intlString:
+    - locale: en
+      content: Golang course
+      is_default: true
+  contents:
+  - version: 1
+    content:
+      intlString:
+      - locale: en
+        content: Golang
+        is_default: true
+      - locale: fr
+        content: Golang
+        is_default: false
+  - version: 2
+    content:
+      intlString:
+      - locale: en
+        content: Golang
+        is_default: true
+- type: topic
+  value: java
+  latest_version: 2
+  desc:
+    intlString:
+    - locale: en
+      content: java course
+      is_default: true
+  contents:
+  - version: 1
+    content:
+      intlString:
+      - locale: en
+        content: java
+        is_default: true
+      - locale: fr
+        content: java
+        is_default: false
+  - version: 2
+    content:
+      intlString:
+      - locale: en
+        content: java
+        is_default: true
+- type: topic
+  value: python
+  latest_version: 2
+  desc:
+    intlString:
+    - locale: en
+      content: java course
+      is_default: true
+  contents:
+  - version: 1
+    content:
+      intlString:
+      - locale: en
+        content: python
+        is_default: true
+      - locale: fr
+        content: python
+        is_default: false
+  - version: 2
+    content:
+      intlString:
+      - locale: en
+        content: python
+        is_default: true
+- type: topic
+  value: programming
+  latest_version: 2
+  desc:
+    intlString:
+    - locale: en
+      content: programming
+      is_default: true
+  contents:
+  - version: 1
+    content:
+      intlString:
+      - locale: en
+        content: programming
+        is_default: true
+      - locale: fr
+        content: programmer
+        is_default: false
+  - version: 2
+    content:
+      intlString:
+      - locale: en
+        content: coding
+        is_default: true

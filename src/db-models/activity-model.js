@@ -19,7 +19,7 @@ const ActivitySchema = new mongoose.Schema(
       required: true,
       index: true
     },
-    def_id: {
+    def_value: {
       type: String,
       ref: 'ListDef',
       required: true,

@@ -2,6 +2,20 @@ import { logger } from '../utils/logger';
 import ListDef from '../db-models/list-def-model';
 import * as projectionWriter from '../utils/projection-writer';
 
+export const fetchByTypeAndValue = async (
+  defType,
+  defValue,
+  locale,
+  fetchDescYN,
+  fetchContentYN,
+  contentVersion,
+  viewer,
+  info
+) => {
+  logger.debug(`in fetchByTypeAndValue`);
+  // TODO
+};
+
 export const fetchTopic = async (obj_id, viewer, info) => {
   logger.debug(`in fetchTopic`);
   let array = [

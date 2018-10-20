@@ -61,18 +61,8 @@ const QuestionSchema = new mongoose.Schema(
   }
 );
 
-QuestionSchema.index(
-  {
-    'doc_ref.EmbeddedDocRef.embedded_doc_refs.doc_id': 1,
-    'course_item_ref.course_id': 1,
-    'course_item_ref.unit_id': 1,
-    'course_item_ref.section_id': 1,
-    'course_item_ref.card_id': 1
-  },
-  { sparse: true }
-);
-
-// https://docs.mongodb.com/manual/core/index-sparse/#sparse-compound-indexes
-// Sparse compound indexes that only contain ascending/descending index keys will index a document as long as the document contains at least one of the keys.
+QuestionSchema.index({
+  'doc_ref.EmbeddedDocRef.embedded_doc_refs.doc_id': 1
+});
 
 export default mongoose.model('Question', QuestionSchema, 'question');

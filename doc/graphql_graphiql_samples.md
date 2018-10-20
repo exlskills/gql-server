@@ -53,6 +53,23 @@ query CourseDeliverySched {
 }
 ```
 
+## List Instructors
+query listInstructors {
+  listInstructors(instructorTopics: {values: ["Java"]}, resolverArgs: [{param: "text", value: "Java"}, {param: "full_name", value: "Java"}, {param: "primary_locale", value: "en"}]) {
+    edges {
+      node {
+        full_name
+        instructor_topics_en
+        biography
+        username
+        headline
+        avatar_url
+        instructor_topics_locale
+      }
+    }
+  }
+}
+
 ## startExam
 
 mutation startExam($courseUnit: StartExamInput!){
