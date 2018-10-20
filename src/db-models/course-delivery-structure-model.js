@@ -8,7 +8,8 @@ export default new mongoose.Schema(
   {
     _id: {
       type: String,
-      default: id_gen
+      default: id_gen,
+      index: true
     },
     delivery_methods: {
       type: [String],

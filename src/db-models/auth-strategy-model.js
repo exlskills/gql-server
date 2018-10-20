@@ -9,7 +9,8 @@ export default new mongoose.Schema(
     },
     auth_id: {
       type: String,
-      required: true
+      required: true,
+      index: true
     },
     email: {
       type: String

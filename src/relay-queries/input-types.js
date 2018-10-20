@@ -63,3 +63,10 @@ export const FieldCudType = new GraphQLList(
     }
   })
 );
+
+export const ListArgType = new GraphQLInputObjectType({
+  name: 'ListArg',
+  fields: {
+    values: { type: new GraphQLList(GraphQLString) }
+  }
+});

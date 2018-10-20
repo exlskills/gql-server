@@ -11,7 +11,8 @@ export default new mongoose.Schema(
     course_id: {
       type: String,
       ref: 'Course',
-      required: true
+      required: true,
+      index: true
     },
     role: {
       type: [String],

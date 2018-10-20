@@ -8,6 +8,8 @@ import { mdbUserToGqlUser } from '../parsers/user-parser';
 import { fromGlobalId } from 'graphql-relay';
 import moment from 'moment';
 import { logger } from '../utils/logger';
+import { connectionFromDataSource } from '../../build/paging-processor/connection-from-datasource';
+import { fetchUserList } from '../db-handlers/user/user-list-fetch';
 
 export const findUserById = async (user_id, viewer, info) => {
   logger.debug(`in findUserById`);
@@ -67,4 +69,35 @@ export const resolveUserActivities = async (obj, args, viewer, info) => {
   } catch (error) {
     return Promise.reject(error);
   }
+};
+
+export const resolveListInstructors = async (obj, args, viewer, info) => {
+  logger.debug(`in resolveListInstructors`);
+  logger.debug(` args ` + JSON.stringify(args));
+
+  const businessKey = '_id';
+  args.filterValues = { is_instructor: true };
+
+  const resolverArgs = { instructorTopics: args.instructorTopics };
+
+  try {
+    for (let arg of args.resolverArgs) {
+      resolverArgs[arg.param] = arg.value;
+    }
+  } catch (err) {
+    return Promise.reject('Malformed parameters. Error ' + err);
+  }
+
+  const fetchParameters = {
+    list_type: 'instructors',
+    resolverArgs: resolverArgs
+  };
+
+  const execDetails = {
+    queryFunction: fetchUserList,
+    businessKey: businessKey,
+    fetchParameters: fetchParameters
+  };
+
+  return connectionFromDataSource(execDetails, obj, args, viewer, info);
 };

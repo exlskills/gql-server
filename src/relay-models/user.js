@@ -48,11 +48,20 @@ export const UserType = new GraphQLObjectType({
     is_demo: {
       type: GraphQLBoolean
     },
+    is_instructor: {
+      type: GraphQLBoolean
+    },
     headline: {
       type: GraphQLString
     },
     has_completed_first_tutorial: {
       type: GraphQLBoolean
+    },
+    instructor_topics_en: {
+      type: new GraphQLList(GraphQLString)
+    },
+    instructor_topics_locale: {
+      type: new GraphQLList(GraphQLString)
     },
     locales: {
       type: new GraphQLList(GraphQLString),

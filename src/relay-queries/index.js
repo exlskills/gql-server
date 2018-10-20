@@ -22,15 +22,16 @@ export default {
   examAttempt: examAttempt.examAttempt,
   // Paging
   activityPaging: pagingQueries.activityPaging,
-  coursePaging: pagingQueries.coursePaging,
-  unitPaging: pagingQueries.unitPaging,
-  userCourseUnitExamStatusPaging: pagingQueries.userCourseUnitExamStatusPaging,
-  sectionPaging: pagingQueries.sectionPaging,
   cardPaging: pagingQueries.cardPaging,
+  coursePaging: pagingQueries.coursePaging,
+  langType: langQueries.langType,
+  listInstructors: pagingQueries.listInstructors,
   notificationPaging: pagingQueries.notificationPaging,
   questionHint: questionQueries.questionHint,
-  langType: langQueries.langType,
   questionPaging: pagingQueries.questionPaging,
   questionPagingExam: pagingQueries.questionPagingExam,
-  topicFilter: courseQueries.topicFilter
+  sectionPaging: pagingQueries.sectionPaging,
+  topicFilter: courseQueries.topicFilter,
+  unitPaging: pagingQueries.unitPaging,
+  userCourseUnitExamStatusPaging: pagingQueries.userCourseUnitExamStatusPaging
 };

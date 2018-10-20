@@ -36,7 +36,10 @@ const ListDefSchema = new mongoose.Schema(
 );
 
 ListDefSchema.index(
-  { 'contents.content.intlString.content': 'text' },
+  {
+    'contents.content.intlString.content': 'text',
+    'desc.intlString.content': 'text'
+  },
   { language_override: 'locale' },
   { default_language: 'none' }
 );
