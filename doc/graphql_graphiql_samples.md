@@ -54,8 +54,9 @@ query CourseDeliverySched {
 ```
 
 ## List Instructors
+```
 query listInstructors {
-  listInstructors(instructorTopics: {values: ["Java"]}, resolverArgs: [{param: "text", value: "Java"}, {param: "full_name", value: "Java"}, {param: "primary_locale", value: "en"}]) {
+  listInstructors(instructorTopics: ["Java"], resolverArgs: [{param: "text", value: "Java"}, {param: "full_name", value: "Java"}, {param: "primary_locale", value: "en"}]) {
     edges {
       node {
         full_name
@@ -69,11 +70,46 @@ query listInstructors {
     }
   }
 }
+```
 
 ## List Activities
+```
+query listActivities {
+  listActivities(activityTypes:["attempted_exam"], dateRange:{date_from:"2018-09-10T00:00:00.000Z",date_to:"2019-01-10T00:00:00.000Z"}){
+    edges{
+      node {
+        id
+        date
+        user_id
+        type
+        type_desc
+        content
+        activity_link
+      }
+    }
+  }
+}
+```
+### Date format
+See [graphql-iso-date](https://www.npmjs.com/package/graphql-iso-date) for the `GraphQLDateTime` type:
+```
+resolver can take Date, date-time string or Unix timestamp (number)
+new Date(Date.UTC(2017, 0, 10, 21, 33, 15, 233))
+
+```
+
+## User Activity Count by Date
+```
+query listActivities {
+  userActivityCountByDate(activityTypes:["attempted_exam"],dateRange:{date_from:"2018-09-10T00:00:00.000Z",date_to:"2019-01-10T00:00:00.000Z"}){
+    count
+    date
+  }
+}
+```
 
 ## startExam
-
+```
 mutation startExam($courseUnit: StartExamInput!){
   startExam(input: $courseUnit) {
     exam_session_id
@@ -86,11 +122,13 @@ mutation startExam($courseUnit: StartExamInput!){
     }
   }
 }
-
+```
 ### Variables
+```
 {
   "courseUnit": {
     "courseId": "YXBfamF2YQ==",
     "unitId": "MjJiMDg3Yzc0ZTk0NGUxMzk5ODlmNTFkNmY0MTMyNDc="
   }
 }
+```

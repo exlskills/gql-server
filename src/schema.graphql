@@ -3,7 +3,6 @@ type Activity implements Node {
   id: ID!
   user_id: ID!
   date: String!
-  def_id: String!
   activity_link: String!
   type: String!
   type_desc: String
@@ -26,10 +25,6 @@ type ActivityEdge {
 
   # A cursor for use in pagination
   cursor: String!
-}
-
-type activityPaging {
-  activities(orderBy: [OrderBy], filterValues: FilterValues, resolverArgs: [QueryResolverArgs], after: String, first: Int, before: String, last: Int): ActivityConnection
 }
 
 # Authentication strategy object, provides a flexible structure for various auth methods
@@ -64,6 +59,7 @@ type AuthStrategyEdge {
 type CompletionObj {
   code: String
   msg: String
+  msg_id: String
   processed: Int
   modified: Int
 }
@@ -183,6 +179,11 @@ enum CudAction {
   DELETE
 }
 
+input DateRange {
+  date_from: DateTime
+  date_to: DateTime
+}
+
 # A date-time string at UTC, such as 2007-12-03T10:15:30Z, compliant with the
 # `date-time` format outlined in section 5.6 of the RFC 3339 profile of the ISO
 # 8601 standard for representation of dates and times using the Gregorian calendar.
@@ -288,10 +289,6 @@ type LeaveExamPayload {
   clientMutationId: String
 }
 
-input ListArg {
-  values: [String]
-}
-
 type ListDef implements Node {
   # The ID of an object
   id: ID!
@@ -303,6 +300,7 @@ type Mutation {
   readNotification(input: ReadNotificationInput!): ReadNotificationPayload
   submitAnswer(input: SubmitAnswerInput!): SubmitAnswerPayload
   takeExam(input: TakeExamInput!): TakeExamPayload
+  startExam(input: StartExamInput!): StartExamPayload
   leaveExam(input: LeaveExamInput!): LeaveExamPayload
   updateUserProfile(input: UpdateUserProfileInput!): UpdateUserProfilePayload
   updateUserUnitStatus(input: UpdateUserUnitStatusInput!): UpdateUserUnitStatusPayload
@@ -369,13 +367,13 @@ type Query {
 
   # Card Entry by question ID
   cardByQuestion(question_id: String!): SectionCard
-  userActivity(start_date: String, end_date: String): [UserActivity]
+  userActivityCountByDate(dateRange: DateRange, activityTypes: [String]): [UserActivity]
   userProfile(user_id: String): User
   examToTake(unit_id: String, course_id: String): Exam
   examAttempt(unit_id: String): [ExamAttempt]
 
   # Activities
-  activityPaging: activityPaging
+  listActivities(orderBy: [OrderBy], filterValues: FilterValues, resolverArgs: [QueryResolverArgs], activityTypes: [String], dateRange: DateRange, listDefVersion: Int, after: String, first: Int, before: String, last: Int): ActivityConnection
 
   # all Cards in the Section
   cardPaging(orderBy: [OrderBy], filterValues: FilterValues, resolverArgs: [QueryResolverArgs], after: String, first: Int, before: String, last: Int): SectionCardConnection
@@ -385,7 +383,7 @@ type Query {
   langType: [Lang]
 
   # Instructors
-  listInstructors(orderBy: [OrderBy], filterValues: FilterValues, resolverArgs: [QueryResolverArgs], instructorTopics: ListArg, after: String, first: Int, before: String, last: Int): UserConnection
+  listInstructors(orderBy: [OrderBy], filterValues: FilterValues, resolverArgs: [QueryResolverArgs], instructorTopics: [String], after: String, first: Int, before: String, last: Int): UserConnection
 
   # Notifications for the logged in user
   notificationPaging: notificationPaging
@@ -570,6 +568,20 @@ type SessionInstructorType implements Node {
   avatar_url: String
   headline: String
   biography: String
+}
+
+input StartExamInput {
+  courseId: ID!
+  unitId: ID!
+  clientMutationId: String
+}
+
+type StartExamPayload {
+  exam_session_id: String
+  exam_time_limit: Float
+  exam_id: String
+  completionObj: CompletionObj
+  clientMutationId: String
 }
 
 input SubmitAnswerInput {

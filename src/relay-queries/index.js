@@ -16,7 +16,7 @@ export default {
   courseDeliverySchedule: courseQueries.courseDeliveryScheduleByMethod,
   cardEntry: courseQueries.sectionCardEntry,
   cardByQuestion: courseQueries.cardByQuestion,
-  userActivity: queryUsers.userActivity,
+  userActivityCountByDate: queryUsers.userActivityCountByDate,
   userProfile: queryUsers.userProfile,
   examToTake: queryExam.examToTake,
   examAttempt: examAttempt.examAttempt,

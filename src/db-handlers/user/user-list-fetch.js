@@ -64,13 +64,13 @@ export const fetchUserList = async (
     };
   }
 
-  if (filters.instructorTopics.values) {
-    let instrTopicsEnArray = filters.instructorTopics.values;
+  if (fetchParameters.instructorTopics) {
+    let instrTopicsEnArray = fetchParameters.instructorTopics;
     if (locale !== 'en') {
       instrTopicsEnArray = [];
       const listDefValues = findValuesByTypeAndDesc(
         'instructor_topic',
-        filters.instructorTopics.values,
+        fetchParameters.instructorTopics,
         locale
       );
       if (listDefValues && listDefValues.length > 0) {

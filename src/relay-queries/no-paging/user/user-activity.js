@@ -1,17 +1,18 @@
 import { GraphQLList, GraphQLString } from 'graphql';
 
 import { UserActivityType } from '../../../relay-models/user-activity';
-import { resolveUserActivities } from '../../../relay-resolvers/user-resolvers';
+import { resolveUserActivityCountByDate } from '../../../relay-resolvers/user-resolvers';
+import * as inputTypes from '../../input-types';
 
 export default {
   type: new GraphQLList(UserActivityType),
   args: {
-    start_date: {
-      type: GraphQLString
+    dateRange: {
+      type: inputTypes.DateRangeType
     },
-    end_date: {
-      type: GraphQLString
+    activityTypes: {
+      type: new GraphQLList(GraphQLString)
     }
   },
-  resolve: resolveUserActivities
+  resolve: resolveUserActivityCountByDate
 };

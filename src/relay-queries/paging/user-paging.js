@@ -2,6 +2,7 @@ import { UserConnection } from '../../relay-models';
 import * as inputTypes from '../input-types';
 import { connectionArgs } from 'graphql-relay';
 import { resolveListInstructors } from '../../relay-resolvers/user-resolvers';
+import { GraphQLList, GraphQLString } from 'graphql';
 
 export const listInstructors = {
   type: UserConnection,
@@ -17,7 +18,7 @@ export const listInstructors = {
       type: inputTypes.QueryResolverArgsType
     },
     instructorTopics: {
-      type: inputTypes.ListArgType
+      type: new GraphQLList(GraphQLString)
     },
     ...connectionArgs
   },

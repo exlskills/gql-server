@@ -29,9 +29,12 @@ export const fetchExamAttemptsByUserAndUnitToday = async (user_id, unit_id) => {
       {
         started_at: {
           $gte: moment()
+            .utc()
             .startOf('day')
             .toDate(),
-          $lte: moment().toDate()
+          $lte: moment()
+            .utc()
+            .toDate()
         },
         user_id: user_id,
         unit_id: unit_id

@@ -151,54 +151,6 @@ export const fetchUserProfileById = async (obj_id, viewer, info) => {
   return record;
 };
 
-export const fetchUserActivities = async (
-  userId,
-  startDate,
-  endDate,
-  viewer,
-  info
-) => {
-  logger.debug(`in fetchUserActivities`);
-  let record;
-
-  const array = [
-    {
-      $match: {
-        user_id: userId,
-        date: {
-          $gte: startDate,
-          $lte: endDate
-        }
-      }
-    },
-    {
-      $group: {
-        _id: {
-          $dateToString: {
-            format: '%Y-%m-%d',
-            date: '$date'
-          }
-        },
-        count: {
-          $sum: 1
-        }
-      }
-    },
-    {
-      $project: {
-        date: '$_id',
-        count: 1
-      }
-    }
-  ];
-
-  try {
-    return await Activity.aggregate(array).exec();
-  } catch (err) {
-    return Promise.reject('Find failed', err);
-  }
-};
-
 export const suggestedUser = async (text, stringOrganization, viewer, info) => {
   logger.debug(`in suggestedUser`);
   let records;

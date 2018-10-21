@@ -24,8 +24,6 @@ export default function aggregateBuilder(sortVal, skipVal, limitVal) {
     if (skipVal > 0) {
       returnArray.push({ $skip: skipVal });
     }
-  } else {
-    logger.error('invalid limitVal in aggregateBuilder:', limitVal);
   }
 
   return returnArray;

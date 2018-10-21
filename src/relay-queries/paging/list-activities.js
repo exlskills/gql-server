@@ -1,4 +1,9 @@
-import { GraphQLList, GraphQLObjectType, GraphQLString } from "graphql";
+import {
+  GraphQLList,
+  GraphQLInt,
+  GraphQLString,
+  GraphQLNonNull
+} from 'graphql';
 
 import { connectionArgs } from 'graphql-relay';
 
@@ -22,17 +27,16 @@ export const listActivities = {
       type: inputTypes.QueryResolverArgsType
     },
     activityTypes: {
-      type: inputTypes.ListArgType
-    },
-    listTypes: {
       type: new GraphQLList(GraphQLString)
     },
     dateRange: {
       type: inputTypes.DateRangeType
     },
+    listDefVersion: {
+      type: GraphQLInt
+    },
     ...connectionArgs
   },
-
   resolve: (obj, args, viewer, info) =>
     resolveActivities(obj, args, viewer, info)
 };

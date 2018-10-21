@@ -13,13 +13,13 @@ export const resolveActivities = async (obj, args, viewer, info) => {
 
   const businessKey = '_id';
   const fetchParameters = {
-    user_id: viewer.user_id
+    user_id: viewer.user_id,
+    activityTypes: args.activityTypes,
+    dateRange: args.dateRange,
+    listDefVersion: args.listDefVersion ? args.listDefVersion : 0
   };
 
-  const resolverArgs = {
-    activityTypes: args.activityTypes,
-    dateRange: args.dateRange
-  };
+  const resolverArgs = {};
   if (args.resolverArgs) {
     try {
       for (let arg of args.resolverArgs) {
@@ -29,10 +29,6 @@ export const resolveActivities = async (obj, args, viewer, info) => {
       return Promise.reject('Malformed parameters. Error ' + err);
     }
   }
-  // By default, use the latest version in list_def
-  resolverArgs.listdef_version = resolverArgs.listdef_version
-    ? resolverArgs.listdef_version
-    : 0;
 
   fetchParameters.resolverArgs = resolverArgs;
 

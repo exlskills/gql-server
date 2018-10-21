@@ -25,7 +25,6 @@ export const ActivityType = new GraphQLObjectType({
       type: new GraphQLNonNull(GraphQLString)
     },
     type: {
-      // This is list_def.value
       type: new GraphQLNonNull(GraphQLString)
     },
     type_desc: {

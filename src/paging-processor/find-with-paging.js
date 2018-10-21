@@ -25,9 +25,9 @@ import { logger } from '../utils/logger';
 export async function findWithPaging(execDetails, args, viewerLocale) {
   logger.debug(`in (.....) findWithPaging`);
   let sortVal;
-  let skipVal;
+  let skipVal = 0;
   let limitVal;
-  let array;
+  let array = [];
   let hasPreviousPage = false;
   let hasNextPage = false;
   let anchor = 0;
@@ -80,7 +80,6 @@ export async function findWithPaging(execDetails, args, viewerLocale) {
     }
   }
 
-  skipVal = 0;
   if (upperLim) {
     skipVal = upperLim.index;
   }
@@ -98,6 +97,8 @@ export async function findWithPaging(execDetails, args, viewerLocale) {
   } else {
     limitVal = -1;
   }
+
+  limitVal = limitVal ? limitVal : -1;
 
   array = await findOptimisticArray(
     execDetails,
