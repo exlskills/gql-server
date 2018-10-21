@@ -70,6 +70,8 @@ query listInstructors {
   }
 }
 
+## List Activities
+
 ## startExam
 
 mutation startExam($courseUnit: StartExamInput!){

@@ -28,6 +28,9 @@ export const fetchActivities = async (
   fetchParameters
 ) => {
   logger.debug(`in fetchActivities`);
+  logger.debug(` fetchParameters ` + JSON.stringify(fetchParameters));
+
+  /*
   let user_id = fetchParameters.user_id;
   let input_date = fetchParameters.input_date;
   let startDay = moment(input_date)
@@ -47,16 +50,56 @@ export const fetchActivities = async (
   }
   let skip = aggregateArray.find(item => !!item.$skip);
   let limit = aggregateArray.find(item => !!item.$limit);
-  const array = [
-    { $match: { user_id, date: { $gte: startDay, $lte: endDay } } },
+
+  let array = [];
+  let elem;
+
+  elem = { $match: { user_id, date: { $gte: startDay, $lte: endDay } } };
+  array.push(elem);
+
+  let array_ld = [];
+  elem = {
+    $match: {
+      $expr: {
+        $and: [
+          { $eq: ['$type', 'activity'] },
+          { $eq: ['$value', '$$listdef_value'] }
+        ]
+      }
+    }
+  };
+  array_ld.push(elem);
+
+  elem = {
+    $lookup: {
+      from: 'list_def',
+      let: { listdef_value: '$listdef_value' },
+      pipeline: array_ld,
+      as: 'list_def'
+    }
+  };
+  array.push(elem);
+
+  */
+  /*
+  let: { order_item: "$item", order_qty: "$ordered" },
+  pipeline: [
+
+    { $project: { stock_item: 0, _id: 0 } }
+  ],
+    as: "stockdata"
+}
+
+
     {
       $lookup: {
-        from: 'list_def',
+        from: '',
         localField: 'def_id',
         foreignField: '_id',
         as: 'list_def'
       }
     },
+
     { $unwind: '$list_def' },
     {
       $project: {
@@ -98,8 +141,13 @@ export const fetchActivities = async (
       }
     }
   ];
+  */
+
+  /*
   if (sort) array.push(sort);
   if (skip) array.push(skip);
   if (limit) array.push(limit);
   return await Activity.aggregate(array).exec();
+  */
+  return [];
 };

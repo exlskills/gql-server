@@ -17,7 +17,7 @@ export default new mongoose.Schema(
       type: String,
       required: true
     },
-    def_value: {
+    listdef_value: {
       type: String,
       required: true,
       ref: 'ListDef'

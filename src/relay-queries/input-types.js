@@ -4,6 +4,7 @@ import {
   GraphQLList,
   GraphQLString
 } from 'graphql';
+import { GraphQLDateTime } from 'graphql-iso-date';
 
 export const OrderByDirectionType = new GraphQLEnumType({
   name: 'OrderByDirection',
@@ -68,5 +69,17 @@ export const ListArgType = new GraphQLInputObjectType({
   name: 'ListArg',
   fields: {
     values: { type: new GraphQLList(GraphQLString) }
+  }
+});
+
+export const DateRangeType = new GraphQLInputObjectType({
+  name: 'DateRange',
+  fields: {
+    date_from: {
+      type: GraphQLDateTime
+    },
+    date_to: {
+      type: GraphQLDateTime
+    }
   }
 });

@@ -1,29 +1,19 @@
 import Activity from '../db-models/activity-model';
-import ListDef from '../db-models/list-def-model';
 import { logger } from '../utils/logger';
+import { stringify } from 'flatted/cjs';
 
-export const createActivity = async (user_id, newActivityObj) => {
+export const createActivity = async newActivityObj => {
   logger.debug(`in createActivity`);
-
-  // TODO - code to use list-def handler fetchByTypeAndValue
   try {
-    let def = await ListDef.findOne({
-      type: 'activity',
-      value: newActivityObj.listDef_value
-    }).exec();
-    if (!def) {
-      return Promise.reject('No listDef found', null);
-    }
-
-    let userActivity = new Activity({
-      user_id,
-      date: new Date(),
-      def_id: def._id,
-      activity_link: newActivityObj.activity_link,
-      doc_ref: newActivityObj.doc_ref
-    });
-    return await userActivity.save();
+    const activityRecord = await Activity.create(newActivityObj);
+    return activityRecord._id;
   } catch (err) {
-    return Promise.reject('Error adding to DB', err);
+    logger.error(
+      `Create Activity failed with error ` +
+        err +
+        ` ; Doc object: ` +
+        stringify(newActivityObj)
+    );
+    return null;
   }
 };

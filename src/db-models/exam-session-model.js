@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 
-const ExamAttemptSchema = new mongoose.Schema(
+const ExamSessionSchema = new mongoose.Schema(
   {
     _id: {
       type: mongoose.Schema.Types.ObjectId,
@@ -57,4 +57,4 @@ const ExamAttemptSchema = new mongoose.Schema(
   }
 );
 
-export default mongoose.model('ExamAttempt', ExamAttemptSchema, 'exam_attempt');
+export default mongoose.model('ExamSession', ExamSessionSchema, 'exam_session');

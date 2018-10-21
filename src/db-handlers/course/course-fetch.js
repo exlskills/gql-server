@@ -5,6 +5,7 @@ import { basicFind } from '../../db-handlers/basic-query-handler';
 import { getStringByLocale } from '../../parsers/intl-string-parser';
 import CardInteraction from '../../db-models/card-interaction-model';
 import { logger } from '../../utils/logger';
+import { toClientUrlId } from '../../utils/client-url';
 
 export const fetchById = async (obj_id, selectVal, viewer, info) => {
   logger.debug(`in Course fetchById`);
@@ -341,4 +342,11 @@ export const fetchCourseAndCardInteraction = async (
     courseRecord.last_accessed_card = '';
   }
   return courseRecord;
+};
+
+export const getCourseUrl = async (course_id, viewer, info) => {
+  logger.debug(`in getCourseUrl`);
+  const course = await fetchById(course_id, { title: 1 });
+  const courseTitle = getStringByLocale(course.title, 'en').text;
+  return toClientUrlId(courseTitle, course_id);
 };

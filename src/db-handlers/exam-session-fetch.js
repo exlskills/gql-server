@@ -1,5 +1,5 @@
 import { basicFind } from '../db-handlers/basic-query-handler';
-import ExamAttempt from '../db-models/exam-attempt-model.js';
+import ExamAttempt from '../db-models/exam-session-model.js';
 import QuestionInteraction from '../db-models/question-interaction-model';
 import { logger } from '../utils/logger';
 import moment from 'moment';

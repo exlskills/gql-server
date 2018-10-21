@@ -1,6 +1,5 @@
 import mongoose from 'mongoose';
-import IntlStringSchema from './intl-string-model';
-import EmbeddedDocRefSchema from './embedded-doc-ref-model';
+import ActivityLinkRefSchema from './activity-link-ref-model';
 
 const ActivitySchema = new mongoose.Schema(
   {
@@ -19,7 +18,7 @@ const ActivitySchema = new mongoose.Schema(
       required: true,
       index: true
     },
-    def_value: {
+    listdef_value: {
       type: String,
       ref: 'ListDef',
       required: true,
@@ -29,17 +28,13 @@ const ActivitySchema = new mongoose.Schema(
       type: String,
       required: true
     },
-    doc_ref: {
-      type: EmbeddedDocRefSchema
+    activity_link_ref: {
+      type: ActivityLinkRefSchema
     }
   },
   {
     timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' }
   }
 );
-
-ActivitySchema.index({
-  'doc_ref.EmbeddedDocRef.embedded_doc_refs.doc_id': 1
-});
 
 export default mongoose.model('Activity', ActivitySchema, 'activity');

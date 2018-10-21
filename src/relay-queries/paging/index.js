@@ -6,12 +6,12 @@ import {
   userCourseUnitExamStatusPaging
 } from './course-paging';
 import { questionPaging, questionPagingExam } from './question';
-import { activityPaging } from './activity-paging';
+import { listActivities } from './list-activities';
 import { notificationPaging } from './notification-paging';
 import { listInstructors } from './user-paging';
 
 export default {
-  activityPaging,
+  listActivities,
   cardPaging,
   coursePaging,
   listInstructors,

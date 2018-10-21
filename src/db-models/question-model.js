@@ -1,10 +1,8 @@
 import mongoose from 'mongoose';
 import { id_gen } from '../utils/url-id-generator';
-import { updateIntlStringObject } from '../parsers/intl-string-parser';
 import IntlStringSchema from './intl-string-model';
 import EmbeddedDocRefSchema from './embedded-doc-ref-model';
 import CourseItemRefSchema from './course-item-ref-model';
-import { logger } from '../utils/logger';
 
 const QuestionSchema = new mongoose.Schema(
   {

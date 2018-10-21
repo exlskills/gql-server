@@ -1,6 +1,6 @@
 import { basicFind } from '../db-handlers/basic-query-handler';
 import Exam from '../db-models/exam-model.js';
-import { checkUserTookThisExam } from './exam-attempt-fetch';
+import { checkUserTookThisExam } from './exam-session-fetch';
 import Course from '../db-models/course-model';
 import { logger } from '../utils/logger';
 import * as Randomization from '../utils/randomization';

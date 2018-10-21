@@ -1,17 +1,15 @@
-import { createExamAttempt } from '../db-handlers/exam-attempt-cud';
+import { createExamSessionDoc } from '../db-handlers/exam-session-cud';
 import {
   pickExamId,
   examFetchById,
   getRandomQuestionIds
 } from '../db-handlers/exam-fetch';
-import { fetchById } from '../db-handlers/course/course-fetch';
-import * as ExamAttemptFetch from '../db-handlers/exam-attempt-fetch';
+import { getCourseUrl } from '../db-handlers/course/course-fetch';
+import * as ExamAttemptFetch from '../db-handlers/exam-session-fetch';
 import { createActivity } from '../db-handlers/activities-cud';
-import { getStringByLocale } from '../parsers/intl-string-parser';
-import { toClientUrlId } from '../utils/client-url';
 import { logger } from '../utils/logger';
 import { fetchByCourseAndUnitId } from '../db-handlers/course/course-unit-fetch';
-import { fetchExamAttemptsByUserAndUnitToday } from '../db-handlers/exam-attempt-fetch';
+import { fetchExamAttemptsByUserAndUnitToday } from '../db-handlers/exam-session-fetch';
 
 export const startExam = async (courseId, unitId, viewer, info) => {
   logger.debug(`in startExam`);
@@ -74,12 +72,12 @@ export const startExam = async (courseId, unitId, viewer, info) => {
         completionObj: {
           code: '1',
           msg: 'Failed to build Exam Question set',
-          msg_id: 'fail_build_q_set'
+          msg_id: 'fail_build_qs_set'
         }
       };
     }
 
-    const attemptInsert = await createExamAttempt({
+    const sessionDocId = await createExamSessionDoc({
       exam_id: exam_id,
       user_id: viewer.user_id,
       unit_id: unitId,
@@ -88,52 +86,36 @@ export const startExam = async (courseId, unitId, viewer, info) => {
       is_active: true,
       question_ids: questIdsObj.quesIds
     });
-    if (!attemptInsert) {
+    if (!sessionDocId) {
       return {
         completionObj: {
           code: '1',
           msg: 'Failed initiate Exam Session',
-          msg_id: 'fail_exam_sess_doc'
+          msg_id: 'fail_exam_session_doc'
         }
       };
     }
 
-    const course = await fetchById(courseId, { _id: 1, title: 1 });
-    const courseTitle = getStringByLocale(course.title, viewer.locale).text;
-    const courseUrlId = toClientUrlId(courseTitle, course._id);
+    const courseUrlId = await getCourseUrl(courseId);
 
-    try {
-      const activityInsert = await createActivity(viewer.user_id, {
-        listDef_value: 'attempted_exam',
-        activity_link: `/courses/${courseUrlId}/grades`,
-        doc_ref: {
-          EmbeddedDocRef: {
-            embedded_doc_refs: [
-              {
-                level: 'course',
-                doc_id: courseId
-              },
-              {
-                level: 'unit',
-                doc_id: unitId
-              },
-              {
-                level: 'exam',
-                doc_id: exam_id
-              }
-            ]
-          }
-        }
-      });
-    } catch (errAlreadyRecorded) {
-      // Still proceed with the exam
-    }
+    await createActivity({
+      date: new Date(),
+      user_id: viewer.user_id,
+      listdef_value: 'attempted_exam',
+      activity_link: `/courses/${courseUrlId}/grades`,
+      activity_link_ref: {
+        course_id: courseId,
+        unit_id: unitId,
+        exam_session_id: sessionDocId
+      }
+    });
+    // Still proceed with the exam if Activity insert failed
 
     const exam = await examFetchById(exam_id, { time_limit: 1 });
     const time_limit = exam.time_limit;
 
     return {
-      exam_session_id: attemptInsert._id,
+      exam_session_id: sessionDocId,
       exam_time_limit: time_limit,
       exam_id: exam_id,
       completionObj: {

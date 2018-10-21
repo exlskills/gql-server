@@ -21,7 +21,7 @@ export default {
   examToTake: queryExam.examToTake,
   examAttempt: examAttempt.examAttempt,
   // Paging
-  activityPaging: pagingQueries.activityPaging,
+  listActivities: pagingQueries.listActivities,
   cardPaging: pagingQueries.cardPaging,
   coursePaging: pagingQueries.coursePaging,
   langType: langQueries.langType,

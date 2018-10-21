@@ -1,15 +1,9 @@
 import { fromGlobalId, nodeDefinitions } from 'graphql-relay';
 
 import * as Course from '../db-handlers/course/course-fetch.js';
-import * as CardInteraction from '../db-handlers/card-interaction-fetch.js';
-import * as User from '../db-handlers/user/user-fetch.js';
-import * as ExamAttempt from '../db-handlers/exam-attempt-fetch.js';
-import * as Exam from '../db-handlers/exam-fetch.js';
 import * as Organization from '../db-handlers/organization-fetch.js';
-import * as OrganizationInvite from '../db-handlers/organization-invite-fetch.js';
 import * as Path from '../db-handlers/path-fetch.js';
 import * as Question from '../db-handlers/question-fetch.js';
-import * as QuestionInteraction from '../db-handlers/question-interaction-fetch.js';
 import * as VersionedContent from '../db-handlers/versioned-content/versioned-content-fetch.js';
 
 /**

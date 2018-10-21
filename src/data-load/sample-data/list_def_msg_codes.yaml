@@ -20,14 +20,14 @@
       content: No Exams found for this Unit
       is_default: true
 - type: msg_exam
-  value: fail_build_q_set
+  value: fail_build_qs_set
   desc:
     intlString:
     - locale: en
       content: Failed to build Exam Question set
       is_default: true
 - type: msg_exam
-  value: fail_exam_sess_doc
+  value: fail_exam_session_doc
   desc:
     intlString:
     - locale: en

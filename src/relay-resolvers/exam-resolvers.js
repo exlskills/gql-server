@@ -1,5 +1,5 @@
 import { examFetchById, searchExamIdToTake } from '../db-handlers/exam-fetch';
-import { fetchExamAttemptsByUserAndUnitJoinExam } from '../db-handlers/exam-attempt-fetch';
+import { fetchExamAttemptsByUserAndUnitJoinExam } from '../db-handlers/exam-session-fetch';
 import { fromGlobalId } from 'graphql-relay';
 import { logger } from '../utils/logger';
 

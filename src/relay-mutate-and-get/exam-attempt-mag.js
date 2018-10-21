@@ -1,7 +1,7 @@
-import { createExamAttempt } from '../db-handlers/exam-attempt-cud';
+import { createExamSessionDoc } from '../db-handlers/exam-session-cud';
 import { examFetchById } from '../db-handlers/exam-fetch';
 import * as CourseFetch from '../db-handlers/course/course-fetch';
-import * as ExamAttemptFetch from '../db-handlers/exam-attempt-fetch';
+import * as ExamAttemptFetch from '../db-handlers/exam-session-fetch';
 import { createActivity } from '../db-handlers/activities-cud';
 import { getStringByLocale } from '../parsers/intl-string-parser';
 import { toClientUrlId } from '../utils/client-url';
@@ -16,7 +16,7 @@ export const takeExam = async (courseId, unitId, viewer, info) => {
       viewer,
       info
     );
-    let attempt = await createExamAttempt({
+    let attempt = await createExamSessionDoc({
       exam_id: arrayReturn.exam_id,
       user_id: viewer.user_id,
       unit_id: unitId,

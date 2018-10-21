@@ -1,7 +1,7 @@
 import { upsertQuestionInteraction } from '../db-handlers/question-interaction-cud';
 import * as QuestionFetch from '../db-handlers/question-fetch';
 import { getStringByLocale } from '../parsers/intl-string-parser';
-import * as ExamAttemptFetch from '../db-handlers/exam-attempt-fetch';
+import * as ExamAttemptFetch from '../db-handlers/exam-session-fetch';
 import { fetchById } from '../db-handlers/course/course-fetch';
 import { fetchUnitSections } from '../db-handlers/course/unit-section-fetch';
 import { toClientUrlId } from '../utils/client-url';
