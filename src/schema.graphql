@@ -288,10 +288,6 @@ type LeaveExamPayload {
   clientMutationId: String
 }
 
-input ListArg {
-  values: [String]
-}
-
 type ListDef implements Node {
   # The ID of an object
   id: ID!
@@ -385,7 +381,7 @@ type Query {
   langType: [Lang]
 
   # Instructors
-  listInstructors(orderBy: [OrderBy], filterValues: FilterValues, resolverArgs: [QueryResolverArgs], instructorTopics: ListArg, after: String, first: Int, before: String, last: Int): UserConnection
+  listInstructors(orderBy: [OrderBy], filterValues: FilterValues, resolverArgs: [QueryResolverArgs], instructorTopics: [String], after: String, first: Int, before: String, last: Int): UserConnection
 
   # Notifications for the logged in user
   notificationPaging: notificationPaging

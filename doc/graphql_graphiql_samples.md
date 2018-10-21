@@ -1,4 +1,4 @@
-### courseDeliverySchedule
+## courseDeliverySchedule
 
 `course_id` should be base64-encoded string: concatenated word `Course` followed by semicolon and the course ID, e,g `Course:ap_java` is represented in the example below 
 ```$xslt
@@ -49,6 +49,52 @@ query CourseDeliverySched {
         }
       }
     }
+  }
+}
+```
+
+## List Instructors
+```
+query listInstructors {
+  listInstructors(instructorTopics: ["Java"], resolverArgs: [{param: "text", value: "Java"}, {param: "full_name", value: "Java"}, {param: "primary_locale", value: "en"}]) {
+    edges {
+      node {
+        full_name
+        instructor_topics_en
+        biography
+        username
+        headline
+        avatar_url
+        instructor_topics_locale
+      }
+    }
+  }
+}
+```
+
+## List Activities
+
+## startExam
+```
+mutation startExam($courseUnit: StartExamInput!){
+  startExam(input: $courseUnit) {
+    exam_session_id
+    exam_id
+    exam_time_limit
+    completionObj{
+      code
+      processed
+      msg
+    }
+  }
+}
+```
+### Variables
+```
+{
+  "courseUnit": {
+    "courseId": "YXBfamF2YQ==",
+    "unitId": "MjJiMDg3Yzc0ZTk0NGUxMzk5ODlmNTFkNmY0MTMyNDc="
   }
 }
 ```

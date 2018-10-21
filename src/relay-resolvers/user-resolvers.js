@@ -80,12 +80,14 @@ export const resolveListInstructors = async (obj, args, viewer, info) => {
 
   const resolverArgs = { instructorTopics: args.instructorTopics };
 
-  try {
-    for (let arg of args.resolverArgs) {
-      resolverArgs[arg.param] = arg.value;
+  if (args.resolverArgs) {
+    try {
+      for (let arg of args.resolverArgs) {
+        resolverArgs[arg.param] = arg.value;
+      }
+    } catch (err) {
+      return Promise.reject('Malformed parameters. Error ' + err);
     }
-  } catch (err) {
-    return Promise.reject('Malformed parameters. Error ' + err);
   }
 
   const fetchParameters = {
