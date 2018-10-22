@@ -26,7 +26,7 @@ export default mutationWithClientMutationId({
     );
     logger.debug(`response_data raw ` + response_data);
     const localQuestionId = fromGlobalId(question_id).id;
-    const localExamSessionId = fromGlobalId(exam_attempt_id).id;
+    const localExamSessionId = fromGlobalId(exam_session_id).id;
     return processExamQuestionAnswer(
       localQuestionId,
       localExamSessionId,

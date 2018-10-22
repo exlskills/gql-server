@@ -77,7 +77,7 @@ export const resolveGetQuestionsForExam = (obj, args, viewer, info) => {
   };
   if (args.resolverArgs.find(e => e.param === 'exam_session_id')) {
     const attempt = args.resolverArgs.find(e => e.param === 'exam_session_id');
-    fetchParameters.exam_attempt_id = fromGlobalId(attempt.value).id;
+    fetchParameters.exam_session_id = fromGlobalId(attempt.value).id;
   }
   const execDetails = {
     queryFunction: getQuestionsInExamAttempt,

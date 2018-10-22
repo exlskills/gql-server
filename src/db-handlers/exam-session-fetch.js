@@ -1,15 +1,14 @@
 import { basicFind } from '../db-handlers/basic-query-handler';
-import ExamAttempt from '../db-models/exam-session-model.js';
-import QuestionInteraction from '../db-models/question-interaction-model';
+import ExamSession from '../db-models/exam-session-model.js';
 import { logger } from '../utils/logger';
 import moment from 'moment';
 
 export const fetchById = async (obj_id, selectVal, viewer, info) => {
-  logger.debug(`in Exam Attempt fetchById`);
+  logger.debug(`in Exam Session fetchById`);
   try {
     //model, runParams, queryVal, sortVal, selectVal
     return await basicFind(
-      ExamAttempt,
+      ExamSession,
       { isById: true },
       obj_id,
       null,
@@ -20,11 +19,11 @@ export const fetchById = async (obj_id, selectVal, viewer, info) => {
   }
 };
 
-export const fetchExamAttemptsByUserAndUnitToday = async (user_id, unit_id) => {
-  logger.debug(`in fetchExamAttemptsByUserAndUnitToday`);
+export const fetchExamSessionsByUserAndUnitToday = async (user_id, unit_id) => {
+  logger.debug(`in fetchExamSessionsByUserAndUnitToday`);
   try {
     return await basicFind(
-      ExamAttempt,
+      ExamSession,
       null,
       {
         started_at: {
@@ -47,12 +46,12 @@ export const fetchExamAttemptsByUserAndUnitToday = async (user_id, unit_id) => {
   }
 };
 
-export const fetchExamAttemptsByUserAndUnitJoinExam = async (
+export const fetchExamSessionsByUserAndUnitJoinExam = async (
   user_id,
   unit_id,
   opts = {}
 ) => {
-  logger.debug(`in fetchExamAttemptsByUserAndUnitJoinExam`);
+  logger.debug(`in fetchExamSessionsByUserAndUnitJoinExam`);
   logger.debug(`   user_id ` + user_id);
   logger.debug(`   unit_id ` + unit_id);
   logger.debug(`   opts ` + JSON.stringify(opts));
@@ -60,7 +59,7 @@ export const fetchExamAttemptsByUserAndUnitJoinExam = async (
     const sortVal = opts.sort;
     if (!opts.includeExam) {
       return await basicFind(
-        ExamAttempt,
+        ExamSession,
         null,
         { user_id: user_id, unit_id: unit_id },
         sortVal
@@ -80,29 +79,14 @@ export const fetchExamAttemptsByUserAndUnitJoinExam = async (
       { $unwind: '$exam' },
       { $sort: sortVal || {} }
     ];
-    return await ExamAttempt.aggregate(array).exec();
+    return await ExamSession.aggregate(array).exec();
   } catch (error) {
     return [];
   }
 };
 
-export const computeFinalGrade = async quesInteIds => {
-  logger.debug(`in computeFinalGrade`);
-  const result = await QuestionInteraction.aggregate([
-    { $match: { _id: { $in: quesInteIds } } }
-  ]).exec();
-  let sumOfSoc = 0;
-  for (let res of result) {
-    if (res.pct_score == null || res.pct_score === '' || isNaN(res.pct_score)) {
-      res.pct_score = 0;
-    }
-    sumOfSoc += res.pct_score;
-  }
-  return sumOfSoc;
-};
-
-export const fetchLastCancExamAttemptByUserUnit = async (user_id, unit_id) => {
-  logger.debug(`in fetchLastCancExamAttemptByUserUnit`);
+export const fetchLastCancExamSessionByUserUnit = async (user_id, unit_id) => {
+  logger.debug(`in fetchLastCancExamSessionByUserUnit`);
   logger.debug(`user_id ` + user_id);
   logger.debug(`unit_id ` + unit_id);
   let array = [];
@@ -137,7 +121,7 @@ export const fetchLastCancExamAttemptByUserUnit = async (user_id, unit_id) => {
     { $sort: { started_at: -1 } },
     { $limit: 1 }
   );
-  const arrayRet = await ExamAttempt.aggregate(array).exec();
+  const arrayRet = await ExamSession.aggregate(array).exec();
   const record = arrayRet && arrayRet[0] ? arrayRet[0] : null;
 
   if (record) {
@@ -145,11 +129,11 @@ export const fetchLastCancExamAttemptByUserUnit = async (user_id, unit_id) => {
     const spent_time = (record.submitted_at - record.started_at) / 1000;
     record.isContinue = spent_time < time_limit;
     if (!record.isContinue) {
-      ExamAttempt.updateOne({ _id: record._id }, { is_active: false });
+      ExamSession.updateOne({ _id: record._id }, { is_active: false });
     }
   }
   logger.debug(
-    `fetchLastCancelledExamAttempt result ` + JSON.stringify(record)
+    `  fetchLastCancExamSessionByUserUnit result ` + JSON.stringify(record)
   );
   return record;
 };
@@ -166,6 +150,24 @@ export const checkUserTookThisExam = async (exam_id, user_id, unit_id) => {
   array.push(elem);
   elem = { $project: { exam_id: 1 } };
   array.push(elem);
-  const response = await ExamAttempt.aggregate(array).exec();
+  const response = await ExamSession.aggregate(array).exec();
   return response.length > 0;
+};
+
+export const findActiveExamSessionsForUser = async (user_id, selectVal) => {
+  logger.debug(`in findActiveExamSessionsForUser`);
+  logger.debug(`user_id ` + user_id);
+
+  try {
+    //model, runParams, queryVal, sortVal, selectVal
+    return await basicFind(
+      ExamSession,
+      null,
+      { user_id: user_id, is_active: true },
+      null,
+      selectVal
+    );
+  } catch (errInternalAlreadyReported) {
+    return null;
+  }
 };

@@ -78,7 +78,11 @@ export const CourseUnitType = new GraphQLObjectType({
     is_continue_exam: {
       type: GraphQLBoolean
     },
-    exam_session_id: globalIdField('ExamAttempt', obj => obj.exam_session_id),
+    // TODO this is not mapped anymore as being renamed to exam_session_id
+    exam_attempt_id: {
+      type: GraphQLString
+    },
+    exam_session_id: globalIdField('ExamSession', obj => obj.exam_session_id),
     last_attempted_at: {
       type: GraphQLString
     },

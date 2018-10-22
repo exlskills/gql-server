@@ -1,5 +1,6 @@
 import { basicFind } from '../db-handlers/basic-query-handler';
 import Question from '../db-models/question-model.js';
+import { QUESTION_TYPES } from '../db-models/question-model.js';
 import * as projectionWriter from '../utils/projection-writer';
 import { getStringByLocale } from '../parsers/intl-string-parser';
 import { returnObjectExamAttempt } from '../db-handlers/exam-fetch';
@@ -155,7 +156,7 @@ export const getQuestionsInExamAttempt = async (
   // Load latest user answer
   for (let question of result) {
     let userAnswer;
-    if (fetchParameters.exam_session_id != null) {
+    if (fetchParameters.exam_session_id) {
       userAnswer = await getUserAnswer(
         fetchParameters.exam_session_id,
         question._id,
@@ -262,8 +263,8 @@ export const fetchQuestionsGeneric = async (
 
   for (let question of result) {
     if (
-      question.question_type === 'MCSA' ||
-      question.question_type === 'MCMA'
+      question.question_type === QUESTION_TYPES.MULT_CHOICE_SINGLE_ANSWER ||
+      question.question_type === QUESTION_TYPES.MULT_CHOICE_MULT_ANSWERS
     ) {
       question.data = {
         _id: question._id,
@@ -273,7 +274,9 @@ export const fetchQuestionsGeneric = async (
           text: getStringByLocale(item.text, viewerLocale).text
         }))
       };
-    } else if (question.question_type === 'WSCQ') {
+    } else if (
+      question.question_type === QUESTION_TYPES.WRITE_SOFTWARE_CODE_QUESTION
+    ) {
       question.data.tmpl_files = question.tmpl_files;
     }
     delete question.tmpl_files;

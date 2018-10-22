@@ -17,8 +17,8 @@ export default mutationWithClientMutationId({
       resolve: ({ returnObj }, viewer, info) => returnObj.completionObj
     }
   },
-  mutateAndGetPayload: ({ exam_attempt_id }, viewer, info) => {
-    const localId = fromGlobalId(exam_attempt_id).id;
+  mutateAndGetPayload: ({ exam_session_id }, viewer, info) => {
+    const localId = fromGlobalId(exam_session_id).id;
     return leaveExam(localId, false, viewer, info).then(returnObj => ({
       returnObj
     }));

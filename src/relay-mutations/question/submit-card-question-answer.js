@@ -13,10 +13,11 @@ import { CompletionObjType } from '../../relay-models/completion-obj';
 import { processCardQuestionAction } from '../../relay-mutate-and-get/exam-question-mag';
 import { logger } from '../../utils/logger';
 
+// TODO - remove exam_attempt_id everywhere in this file after SPF is updated
 export default mutationWithClientMutationId({
   name: 'SubmitAnswer',
   inputFields: {
-    exam_attempt_id: { type: new GraphQLNonNull(GraphQLID) },
+    exam_attempt_id: { type: GraphQLID },
     question_id: { type: new GraphQLNonNull(GraphQLID) },
     response_data: { type: GraphQLString },
     checkAnswer: { type: GraphQLBoolean },
@@ -70,11 +71,10 @@ export default mutationWithClientMutationId({
   ) => {
     logger.debug(`in relay-mutation SubmitAnswer mutateAndGetPayload`);
     logger.debug(`response_data raw ` + response_data);
+    logger.debug(`question_id raw ` + question_id);
     const localQuestionId = fromGlobalId(question_id).id;
-    const localExamAttemptId = fromGlobalId(exam_attempt_id).id;
     return processCardQuestionAction(
       localQuestionId,
-      localExamAttemptId,
       response_data,
       checkAnswer,
       quiz,

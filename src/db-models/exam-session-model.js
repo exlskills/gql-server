@@ -33,10 +33,16 @@ const ExamSessionSchema = new mongoose.Schema(
       type: [mongoose.Schema.Types.ObjectId],
       ref: 'QuestionInteraction'
     },
+    // Need index to quickly find active sessions
     is_active: {
-      type: Boolean
+      type: Boolean,
+      index: true
     },
     started_at: {
+      type: Date,
+      index: true
+    },
+    active_till: {
       type: Date
     },
     submitted_at: {

@@ -147,9 +147,10 @@ type CourseUnit implements Node {
   ema: Float
   grade: Float
   is_continue_exam: Boolean
+  exam_attempt_id: String
 
   # The ID of an object
-  exam_attempt_id: ID!
+  exam_session_id: ID!
   last_attempted_at: String
   attempts: Int
   passed: Boolean
@@ -240,8 +241,8 @@ type Exam implements Node {
   est_time: Int
 }
 
-# ExamAttempt
-type ExamAttempt implements Node {
+# ExamSession
+type ExamSession implements Node {
   # The ID of an object
   id: ID!
   exam_id: ID!
@@ -280,7 +281,7 @@ type Lang implements Node {
 }
 
 input LeaveExamInput {
-  exam_attempt_id: ID!
+  exam_session_id: ID!
   clientMutationId: String
 }
 
@@ -298,14 +299,13 @@ type ListDef implements Node {
 
 type Mutation {
   readNotification(input: ReadNotificationInput!): ReadNotificationPayload
-  submitAnswer(input: SubmitAnswerInput!): SubmitAnswerPayload
-  takeExam(input: TakeExamInput!): TakeExamPayload
-  startExam(input: StartExamInput!): StartExamPayload
   leaveExam(input: LeaveExamInput!): LeaveExamPayload
+  startExam(input: StartExamInput!): StartExamPayload
+  submitAnswer(input: SubmitAnswerInput!): SubmitAnswerPayload
+  submitExamQuestionAnswer(input: SubmitExamQuestionAnswerInput!): SubmitExamQuestionAnswerPayload
   updateUserProfile(input: UpdateUserProfileInput!): UpdateUserProfilePayload
   updateUserUnitStatus(input: UpdateUserUnitStatusInput!): UpdateUserUnitStatusPayload
   updateUserCourseRole(input: UpdateUserCourseRoleInput!): UpdateUserCourseRolePayload
-  takeQuiz(input: TakeQuizInput!): TakeQuizPayload
 }
 
 # NextQuestion
@@ -370,7 +370,7 @@ type Query {
   userActivityCountByDate(dateRange: DateRange, activityTypes: [String]): [UserActivity]
   userProfile(user_id: String): User
   examToTake(unit_id: String, course_id: String): Exam
-  examAttempt(unit_id: String): [ExamAttempt]
+  examAttempt(unit_id: String): [ExamSession]
 
   # Activities
   listActivities(orderBy: [OrderBy], filterValues: FilterValues, resolverArgs: [QueryResolverArgs], activityTypes: [String], dateRange: DateRange, listDefVersion: Int, after: String, first: Int, before: String, last: Int): ActivityConnection
@@ -585,7 +585,7 @@ type StartExamPayload {
 }
 
 input SubmitAnswerInput {
-  exam_attempt_id: ID!
+  exam_attempt_id: ID
   question_id: ID!
   response_data: String
   checkAnswer: Boolean
@@ -604,30 +604,15 @@ type SubmitAnswerPayload {
   clientMutationId: String
 }
 
-input TakeExamInput {
-  courseId: ID!
-  unitId: ID!
+input SubmitExamQuestionAnswerInput {
+  exam_session_id: ID!
+  question_id: ID!
+  response_data: String
   clientMutationId: String
 }
 
-type TakeExamPayload {
-  exam_attempt_id: String
-  exam_time_limit: Float
-  exam_id: String
+type SubmitExamQuestionAnswerPayload {
   completionObj: CompletionObj
-  clientMutationId: String
-}
-
-input TakeQuizInput {
-  card: Boolean
-  courseId: ID!
-  unitId: ID!
-  sectionId: ID
-  clientMutationId: String
-}
-
-type TakeQuizPayload {
-  quiz_id: String
   clientMutationId: String
 }
 

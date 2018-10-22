@@ -1,13 +1,13 @@
 import Course from '../../db-models/course-model';
 import * as projectionWriter from '../../utils/projection-writer';
-import { fetchExamAttemptsByUserAndUnitJoinExam } from '../exam-session-fetch';
+import { fetchExamSessionsByUserAndUnitJoinExam } from '../exam-session-fetch';
 import { getStringByLocale } from '../../parsers/intl-string-parser';
 import { computeQuestionsEMA } from '../question-interaction-fetch';
-import { fetchLastCancExamAttemptByUserUnit } from '../exam-session-fetch';
+import { fetchLastCancExamSessionByUserUnit } from '../exam-session-fetch';
 import { logger } from '../../utils/logger';
 import { checkUserViewedCard } from '../../db-handlers/card-interaction-fetch';
 import { fetchSectionCardIDsForUnit } from './section-card-fetch';
-import { fetchExamAttemptsByUserAndUnitToday } from '../exam-session-fetch';
+import { fetchExamSessionsByUserAndUnitToday } from '../exam-session-fetch';
 import { basicFind } from '../basic-query-handler';
 
 export const fetchByCourseAndUnitId = async (
@@ -289,7 +289,7 @@ export const fetchCourseUnitsWithDetailedStatus = async (
         examStatusByCourseUnit[examStatusUnitIndex].final_exam_weight_pct;
       unitElem.passed = examStatusByCourseUnit[examStatusUnitIndex].passed;
 
-      let lastCancelled = await fetchLastCancExamAttemptByUserUnit(
+      let lastCancelled = await fetchLastCancExamSessionByUserUnit(
         userId,
         unitElem._id
       );
@@ -360,7 +360,7 @@ export const fetchUserCourseUnitExamStatus = async (
     // Process Exam Attempts for the User - Course Unit
     let examAttempts = [];
     try {
-      examAttempts = await fetchExamAttemptsByUserAndUnitJoinExam(
+      examAttempts = await fetchExamSessionsByUserAndUnitJoinExam(
         fetchParameters.userId,
         unit._id,
         {
@@ -495,7 +495,7 @@ export const fetchCourseUnitById = async (
     }
 
     unitElem.attempts_left = 0;
-    const arrayAttempts = await fetchExamAttemptsByUserAndUnitToday(
+    const arrayAttempts = await fetchExamSessionsByUserAndUnitToday(
       user_id,
       unitElem._id
     );

@@ -8,7 +8,6 @@ import {
 } from '../db-handlers/course/course-fetch';
 import { fromGlobalId, toGlobalId } from 'graphql-relay';
 import { logger } from '../utils/logger';
-import { fetchCourseDeliverySchedule } from '../db-handlers/course/course-delivery-schedule-fetch';
 
 /**
  * Resolve function for CoursePaging query
@@ -79,6 +78,7 @@ export const resolveCourseById = async (obj, args, viewer, info) => {
   try {
     let course_id = fromGlobalId(args.course_id).id;
     let result = await fetchCourseAndCardInteraction(course_id, viewer, info);
+
     if (result && result.last_accessed_unit) {
       result.last_accessed_unit = toGlobalId(
         'CourseUnit',
@@ -97,6 +97,7 @@ export const resolveCourseById = async (obj, args, viewer, info) => {
         result.last_accessed_card
       );
     }
+    logger.debug(`   result ` + JSON.stringify(result));
     return result;
   } catch (err) {
     return Promise.reject(err);

@@ -17,13 +17,13 @@ export const getStringByLocale = (intlString, locale) => {
 export const updateIntlStringObject = (field, locale, newVal) => {
   const index = field.intlString.findIndex(item => item.locale == locale);
 
-  if (index != -1) {
+  if (index !== -1) {
     field.intlString[index].content = newVal;
   } else {
     field.intlString.push({
       locale: locale,
       content: newVal,
-      is_default: field.intlString.length == 0
+      is_default: field.intlString.length === 0
     });
   }
 

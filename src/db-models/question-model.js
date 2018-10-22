@@ -64,3 +64,9 @@ QuestionSchema.index({
 });
 
 export default mongoose.model('Question', QuestionSchema, 'question');
+
+export const QUESTION_TYPES = {
+  MULT_CHOICE_SINGLE_ANSWER: 'MCSA',
+  MULT_CHOICE_MULT_ANSWERS: 'MCMA',
+  WRITE_SOFTWARE_CODE_QUESTION: 'WSCQ'
+};

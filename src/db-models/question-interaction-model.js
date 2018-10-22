@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import AnswerSubmission from './question-answer-submission-model';
 
 const QuestionInteractionSchema = new mongoose.Schema(
   {
@@ -33,8 +34,7 @@ const QuestionInteractionSchema = new mongoose.Schema(
       required: true
     },
     entered_at: {
-      type: [Date],
-      required: true
+      type: [Date]
     },
     duration_sec: {
       type: Number
@@ -45,16 +45,22 @@ const QuestionInteractionSchema = new mongoose.Schema(
     trace: {
       type: [String]
     },
+    // TODO - deprecate, use answer_submissions
     response_data: {
       type: mongoose.Schema.Types.Mixed // QuestionFreeResponseInput | []QuestionMultipleResponse
     },
+    answer_submissions: {
+      type: [AnswerSubmission]
+    },
     points: {
       type: Number,
-      required: true
+      required: true,
+      default: 0
     },
     pct_score: {
       type: Number,
-      required: true
+      required: true,
+      default: 0
     }
   },
   {

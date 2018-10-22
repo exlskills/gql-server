@@ -5,15 +5,35 @@ import {
   getRandomQuestionIds
 } from '../db-handlers/exam-fetch';
 import { getCourseUrl } from '../db-handlers/course/course-fetch';
-import * as ExamAttemptFetch from '../db-handlers/exam-session-fetch';
+import * as ExamSessionFetch from '../db-handlers/exam-session-fetch';
 import { createActivity } from '../db-handlers/activities-cud';
 import { logger } from '../utils/logger';
 import { fetchByCourseAndUnitId } from '../db-handlers/course/course-unit-fetch';
-import { fetchExamAttemptsByUserAndUnitToday } from '../db-handlers/exam-session-fetch';
+import { fetchExamSessionsByUserAndUnitToday } from '../db-handlers/exam-session-fetch';
+import { findActiveExamSessionsForUser } from '../db-handlers/exam-session-fetch';
+import moment from 'moment';
 
 export const startExam = async (courseId, unitId, viewer, info) => {
   logger.debug(`in startExam`);
   try {
+    const activeSessions = await findActiveExamSessionsForUser(viewer.user_id, {
+      _id: 1,
+      exam_id: 1,
+      unit_id: 1,
+      started_at: 1
+    });
+    if (activeSessions && activeSessions.length > 0) {
+      return {
+        exam_session_id: activeSessions._id,
+        exam_id: activeSessions.exam_id,
+        completionObj: {
+          code: '1',
+          msg: 'Another exam session is already active',
+          msg_id: 'active_session'
+        }
+      };
+    }
+
     let unitObj = await fetchByCourseAndUnitId(courseId, unitId, {
       final_exams: '$Units.final_exams',
       attempts_allowed_per_day: '$Units.attempts_allowed_per_day'
@@ -29,7 +49,7 @@ export const startExam = async (courseId, unitId, viewer, info) => {
       };
     }
 
-    const arrayAttempts = await fetchExamAttemptsByUserAndUnitToday(
+    const arrayAttempts = await fetchExamSessionsByUserAndUnitToday(
       viewer.user_id,
       unitId
     );
@@ -77,11 +97,24 @@ export const startExam = async (courseId, unitId, viewer, info) => {
       };
     }
 
+    const courseUrlId = await getCourseUrl(courseId);
+    const exam = await examFetchById(exam_id, { time_limit: 1 });
+    // Everything is validated and ready at this point
+
+    const started_at = moment()
+      .utc()
+      .toDate();
+    // TODO - add a "grace period" based on the user connection speed
+    const active_till = new Date(
+      started_at.getTime() + exam.time_limit * 60000
+    );
+
     const sessionDocId = await createExamSessionDoc({
       exam_id: exam_id,
       user_id: viewer.user_id,
       unit_id: unitId,
-      started_at: Date(),
+      started_at: started_at,
+      active_till: active_till,
       is_cancelled: false,
       is_active: true,
       question_ids: questIdsObj.quesIds
@@ -96,9 +129,8 @@ export const startExam = async (courseId, unitId, viewer, info) => {
       };
     }
 
-    const courseUrlId = await getCourseUrl(courseId);
-
-    await createActivity({
+    // do not wait for this to finish
+    createActivity({
       date: new Date(),
       user_id: viewer.user_id,
       listdef_value: 'attempted_exam',
@@ -109,14 +141,10 @@ export const startExam = async (courseId, unitId, viewer, info) => {
         exam_session_id: sessionDocId
       }
     });
-    // Still proceed with the exam if Activity insert failed
-
-    const exam = await examFetchById(exam_id, { time_limit: 1 });
-    const time_limit = exam.time_limit;
 
     return {
       exam_session_id: sessionDocId,
-      exam_time_limit: time_limit,
+      exam_time_limit: exam.time_limit,
       exam_id: exam_id,
       completionObj: {
         code: '0',
@@ -135,26 +163,26 @@ export const startExam = async (courseId, unitId, viewer, info) => {
   }
 };
 
-export const leaveExam = async (exam_attempt_id, cancel, viewer, info) => {
+export const leaveExam = async (exam_session_id, cancel, viewer, info) => {
   logger.debug(`in leaveExam`);
   try {
-    const examattempt = await ExamAttemptFetch.fetchById(exam_attempt_id, {
+    const examSession = await ExamSessionFetch.fetchById(exam_session_id, {
       _id: 1,
       exam_id: 1,
       started_at: 1
     });
-    examattempt.submitted_at = new Date();
-    examattempt.is_cancelled = cancel !== false;
+    examSession.submitted_at = new Date();
+    examSession.is_cancelled = cancel !== false;
 
-    const exam = await ExamFetch.fetchById(examattempt.exam_id, {
+    const exam = await ExamFetch.fetchById(examSession.exam_id, {
       time_limit: 1
     });
     if (exam) {
       const timeDiff =
-        (examattempt.submitted_at - examattempt.started_at) / 1000 / 60;
-      examattempt.time_limit_exceeded = timeDiff > exam.time_limit;
-      examattempt.is_active = false;
-      await examattempt.save();
+        (examSession.submitted_at - examSession.started_at) / 1000 / 60;
+      examSession.time_limit_exceeded = timeDiff > exam.time_limit;
+      examSession.is_active = false;
+      await examSession.save();
     }
     return {
       completionObj: {

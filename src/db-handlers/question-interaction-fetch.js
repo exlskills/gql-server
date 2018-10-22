@@ -5,10 +5,9 @@ import Config from '../config';
 
 export const fetchById = async (obj_id, selectVal, viewer, info) => {
   logger.debug(`in Quest Interact fetchById`);
-  let record;
   try {
     //model, runParams, queryVal, sortVal, selectVal
-    record = await basicFind(
+    return await basicFind(
       QuestionInteraction,
       { isById: true },
       obj_id,
@@ -18,7 +17,22 @@ export const fetchById = async (obj_id, selectVal, viewer, info) => {
   } catch (errInternalAlreadyReported) {
     return null;
   }
-  return record;
+};
+
+export const fetchOneByIds = async (queryVal, selectVal, viewer, info) => {
+  logger.debug(`in Quest Interact fetchById`);
+  try {
+    //model, runParams, queryVal, sortVal, selectVal
+    return await basicFind(
+      QuestionInteraction,
+      { isOne: true },
+      queryVal,
+      null,
+      selectVal
+    );
+  } catch (errInternalAlreadyReported) {
+    return null;
+  }
 };
 
 export const findByQuestionIds = async (
@@ -53,7 +67,7 @@ export const findByQuestionIds = async (
   }
 };
 
-export const getUserAnswer = async (exam_attempt_id, question_id, user_id) => {
+export const getUserAnswer = async (exam_session_id, question_id, user_id) => {
   logger.debug(`in Quest Interact getUserAnswer`);
   const record = await basicFind(
     QuestionInteraction,
@@ -61,7 +75,7 @@ export const getUserAnswer = async (exam_attempt_id, question_id, user_id) => {
     {
       user_id: user_id,
       question_id: question_id,
-      exam_session_id: exam_attempt_id
+      exam_session_id: exam_session_id
     }
   );
   return record && record.response_data ? record.response_data : null;

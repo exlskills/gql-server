@@ -1,27 +1,29 @@
-import { upsertQuestionInteraction } from '../db-handlers/question-interaction-cud';
+import {
+  processExamQuestionInteraction,
+  upsertQuestionInteraction
+} from '../db-handlers/question-interaction-cud';
 import * as QuestionFetch from '../db-handlers/question-fetch';
 import { getStringByLocale } from '../parsers/intl-string-parser';
-import * as ExamAttemptFetch from '../db-handlers/exam-session-fetch';
 import { fetchById } from '../db-handlers/course/course-fetch';
 import { fetchUnitSections } from '../db-handlers/course/unit-section-fetch';
 import { toClientUrlId } from '../utils/client-url';
 import { logger } from '../utils/logger';
-import mongoose from 'mongoose';
 import { singleToDoubleQuotes } from '../utils/string-utils';
 import { fromGlobalId } from 'graphql-relay';
-
+import { QUESTION_TYPES } from '../db-models/question-model';
 import {
   getWsenvGradingClient,
   callWsenvGrading,
   editGradingResponse
 } from '../utils/wsenv-connect';
 import { fetchCourseUnitsBase } from '../db-handlers/course/course-unit-fetch';
-
-const ObjectId = mongoose.Types.ObjectId;
+import * as ExamSessionFetch from '../db-handlers/exam-session-fetch';
+import moment from 'moment';
+import { recordIncident } from '../db-handlers/incidents-cud';
+import { recordQuestionInteractionId } from '../db-handlers/exam-session-cud';
 
 export const processCardQuestionAction = async (
   question_id,
-  exam_attempt_id,
   response_data,
   check_answer,
   quiz,
@@ -30,6 +32,8 @@ export const processCardQuestionAction = async (
   viewer
 ) => {
   logger.debug(`in processCardQuestionAction`);
+  logger.debug(`   question_id ` + question_id);
+  logger.debug(`   response_data ` + response_data);
   logger.debug(`   check_answer ` + check_answer);
   logger.debug(`   quiz ` + quiz);
   logger.debug(`   is_quiz_start ` + is_quiz_start);
@@ -65,7 +69,6 @@ export const processCardQuestionAction = async (
     let questionInteractionInfo = {
       user_id: viewer.user_id,
       question_id: question_id,
-      exam_session_id: quiz ? exam_attempt_id : ObjectId(exam_attempt_id),
       is_complete: !quiz, // quiz false by default
       exam_type: quiz ? 'quiz' : 'unit_exam',
       points: 0,
@@ -77,7 +80,7 @@ export const processCardQuestionAction = async (
       questionInteractionInfo.$push = { entered_at: new Date() };
     } else {
       questionInteractionInfo.result = response_data
-        ? 'question_submitted'
+        ? 'answer_submitted'
         : 'skipped';
     }
 
@@ -102,8 +105,8 @@ export const processCardQuestionAction = async (
       };
 
       if (
-        question.question_type === 'MCSA' ||
-        question.question_type === 'MCMA'
+        question.question_type === QUESTION_TYPES.MULT_CHOICE_SINGLE_ANSWER ||
+        question.question_type === QUESTION_TYPES.MULT_CHOICE_MULT_ANSWERS
       ) {
         gradingObj = await gradeMCQuestionAnswer(
           question,
@@ -111,7 +114,9 @@ export const processCardQuestionAction = async (
           viewer
         );
         gradingObj.grading_response = '';
-      } else if (question.question_type === 'WSCQ') {
+      } else if (
+        question.question_type === QUESTION_TYPES.WRITE_SOFTWARE_CODE_QUESTION
+      ) {
         gradingObj = await gradeWSCQQuestionAnswer(
           question,
           response_data,
@@ -139,7 +144,9 @@ export const processCardQuestionAction = async (
     const uqi_output = await upsertQuestionInteraction(questionInteractionInfo);
 
     if (!quiz) {
-      let examattempt = await ExamAttemptFetch.fetchById(
+      logger.debug(`****************** in !quiz --------------------`);
+      /*
+      let examattempt = await ExamSessionFetch.fetchById(
         questionInteractionInfo.exam_session_id,
         { _id: 1, question_ids: 1, question_interaction_ids: 1 }
       );
@@ -150,7 +157,7 @@ export const processCardQuestionAction = async (
         if (quesInterIdx === -1) {
           examattempt.question_interaction_ids.push(uqi_output.record._id);
         }
-        examattempt.final_grade_pct = await ExamAttemptFetch.computeFinalGrade(
+        examattempt.final_grade_pct = await ExamSessionFetch.computeFinalGrade(
           examattempt.question_interaction_ids
         );
         if (isNaN(examattempt.final_grade_pct)) {
@@ -160,6 +167,7 @@ export const processCardQuestionAction = async (
           examattempt.final_grade_pct / examattempt.question_ids.length;
         await examattempt.save();
       }
+      */
     }
 
     if (is_last_question) {
@@ -282,11 +290,16 @@ const gradeMCQuestionAnswer = async (question, response_data, viewer) => {
     }
   }
 
-  // TODO use global static constants
-  if (question.question_type === 'MCSA' && is_correct) {
+  if (
+    question.question_type === QUESTION_TYPES.MULT_CHOICE_SINGLE_ANSWER &&
+    is_correct
+  ) {
     points = question.points;
     pct_score = 100;
-  } else if (question.question_type === 'MCMA' && response_data_adj) {
+  } else if (
+    question.question_type === QUESTION_TYPES.MULT_CHOICE_MULT_ANSWERS &&
+    response_data_adj
+  ) {
     let correctAnswersArray = [];
     let correctAnswersCount = 0;
     let incorrectAnswersCount = 0;
@@ -338,13 +351,6 @@ const gradeWSCQQuestionAnswer = async (question, response_data, viewer) => {
   const wsenvGradingUrl = await getWsenvGradingClient();
   logger.debug(`grading url ` + wsenvGradingUrl);
 
-  //logger.debug(`p1_raw ` + question.data.grading_tests);
-  //logger.debug(`p2_raw ` + question.data.test_files);
-  logger.debug(`p3_raw ` + rd_object.user_files);
-  //logger.debug(`p1 ` + JSON.parse(question.data.grading_tests));
-  //logger.debug(`p2 ` + JSON.parse(question.data.test_files));
-  logger.debug(`p3 ` + JSON.parse(rd_object.user_files));
-
   let gradingCallObject = {
     apiVersion: question.data.api_version,
     gradingStrategy: question.data.grading_strategy,
@@ -394,16 +400,24 @@ const gradeWSCQQuestionAnswer = async (question, response_data, viewer) => {
 
 export const processExamQuestionAnswer = async (
   question_id,
-  exam_attempt_id,
+  exam_session_id,
   response_data,
   viewer
 ) => {
   logger.debug(`in processExamQuestionAnswer`);
+  logger.debug(`   question_id ` + question_id);
+  logger.debug(`   exam_session_id ` + exam_session_id);
+  logger.debug(`   response_data ` + response_data);
+
+  const received_at = moment()
+    .utc()
+    .toDate();
 
   try {
     const question = await QuestionFetch.fetchById(question_id, {
       _id: 1,
-      exam_only: 1
+      exam_only: 1,
+      course_item_ref: 1
     });
     if (!question || !question.exam_only) {
       return {
@@ -416,8 +430,90 @@ export const processExamQuestionAnswer = async (
     }
     logger.debug(`question ` + JSON.stringify(question));
 
+    const examSession = await ExamSessionFetch.fetchById(exam_session_id, {
+      unit_id: 1,
+      exam_id: 1,
+      user_id: 1,
+      question_ids: 1,
+      active_till: 1
+    });
+
+    if (!examSession) {
+      return {
+        completionObj: {
+          code: '1',
+          msg: 'Invalid exam session',
+          msg_id: 'invalid_session'
+        }
+      };
+    }
+
+    if (examSession.active_till < received_at) {
+      return {
+        completionObj: {
+          code: '1',
+          msg: 'Exam session expired',
+          msg_id: 'session_expired'
+        }
+      };
+    }
+
+    if (
+      examSession.unit_id !== question.course_item_ref.unit_id ||
+      examSession.question_ids.filter(qid => qid === question_id).length < 1
+    ) {
+      //  Do not wait for this
+      recordIncident(
+        viewer.user_id,
+        'exam_quest',
+        'session or question details mismatch'
+      );
+      return {
+        completionObj: {
+          code: '1',
+          msg: 'Invalid exam session',
+          msg_id: 'invalid_session'
+        }
+      };
+    }
+
+    const questionInteraction_id = await processExamQuestionInteraction(
+      viewer.user_id,
+      question_id,
+      exam_session_id,
+      received_at,
+      response_data,
+      { result: 'answer_submitted' }
+    );
+
+    if (!questionInteraction_id) {
+      return {
+        completionObj: {
+          code: '1',
+          msg: 'Processing failed',
+          msg_id: 'process_failed'
+        }
+      };
+    }
+
+    // do not wait
+    recordQuestionInteractionId(exam_session_id, questionInteraction_id);
+
+    return {
+      completionObj: {
+        code: '0',
+        msg: 'Answer recorded',
+        msg_id: 'answer_recorded'
+      }
+    };
   } catch (error) {
     logger.error(`Error ` + error);
-    return { completionObj: { code: '1', msg: error.message } };
+    return {
+      completionObj: {
+        code: '1',
+        msg: 'Processing failed',
+        msg_id: 'process_failed'
+      }
+    };
   }
 };

@@ -29,7 +29,7 @@ VersionedContentSchema.methods.updateContent = async function(newText, locale) {
   const lastContent = this.contents.sort((a, b) => b.version - a.version)[0];
   const oldText = getStringByLocale(lastContent.content, locale).text;
 
-  if (oldText != newText) {
+  if (oldText !== newText) {
     const newContent = {
       version: lastContent.version + 1,
       content: { intlString: [{ content: newText, locale, is_default: true }] }

@@ -117,8 +117,8 @@ mutation startExam($courseUnit: StartExamInput!){
     exam_time_limit
     completionObj{
       code
-      processed
       msg
+      msg_id
     }
   }
 }
@@ -132,3 +132,33 @@ mutation startExam($courseUnit: StartExamInput!){
   }
 }
 ```
+
+## Submit Exam Question Answer
+```
+mutation submitExamQA($submitEQA: SubmitExamQuestionAnswerInput!){
+  submitExamQuestionAnswer(input: $submitEQA) {
+    completionObj{
+      code
+      msg
+      msg_id
+    }
+  }
+}
+```
+### Variables
+```
+{
+  "submitEQA": {
+    "exam_session_id": "RXhhbVNlc3Npb246NWJjZGMwODY2NDcwZGUwYjkxNDY5MDg0",
+    "question_id": "UXVlc3Rpb246OGIzMTZkNjQ3M2I1NDBhOGI2NTg4YzgxNGY2ZDdiNGI=",
+    "response_data": "'selected_ids':['UXVlc3Rpb25NdWx0aXBsZURhdGE6NWJjZDM2MjVkNzlmOGYxYTUyMmVjMDVh']"
+  }
+}
+```
+Prefixes: 
+`ExamSession` 
+`Question` 
+`QuestionMultipleData` 
+
+
+

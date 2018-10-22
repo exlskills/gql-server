@@ -3,6 +3,7 @@ import * as QuestionFetch from '../../db-handlers/question-fetch';
 import * as projectionWriter from '../../utils/projection-writer';
 import { logger } from '../../utils/logger';
 import { fetchQuestionsGeneric } from '../question-fetch';
+import { QUESTION_TYPES } from '../../db-models/question-model';
 
 export const fetchCardDetailsById = async (
   courseId,
@@ -383,8 +384,8 @@ export const fetchSectionCards = async (
     // add question ID into `data` for MC questions
     for (let question of cardQuestions) {
       if (
-        question.question_type === 'MCSA' ||
-        question.question_type === 'MCMA'
+        question.question_type === QUESTION_TYPES.MULT_CHOICE_SINGLE_ANSWER ||
+        question.question_type === QUESTION_TYPES.MULT_CHOICE_MULT_ANSWERS
       ) {
         question.data._id = question._id;
       }

@@ -15,7 +15,7 @@ export const mdbUserToGqlUser = (user, viewer) => {
     ).text;
     gqlUser.headline = getStringByLocale(gqlUser.headline, viewer.locale).text;
     // apply security
-    if (gqlUser._id != viewer._id) {
+    if (gqlUser._id !== viewer._id) {
       gqlUser.auth_strategies = [];
     }
     return gqlUser;

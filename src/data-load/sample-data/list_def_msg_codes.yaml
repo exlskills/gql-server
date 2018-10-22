@@ -6,6 +6,13 @@
       content: This Unit does not have exams
       is_default: true
 - type: msg_exam
+  value: active_session
+  desc:
+    intlString:
+    - locale: en
+      content: Another exam session is already active
+      is_default: true
+- type: msg_exam
   value: over_max_attempts
   desc:
     intlString:
@@ -42,10 +49,31 @@
       content: Invalid Question
       is_default: true
 
-- type: msg_card_qa
-  value: void_exam_qa
+- type: msg_exam_qa
+  value: invalid_q
   desc:
     intlString:
     - locale: en
       content: Invalid Question
+      is_default: true
+- type: msg_exam_qa
+  value: invalid_session
+  desc:
+    intlString:
+    - locale: en
+      content: Invalid exam sessions
+      is_default: true
+- type: msg_exam_qa
+  value: session_expired
+  desc:
+    intlString:
+    - locale: en
+      content: Exam sessions expired
+      is_default: true
+- type: msg_exam_qa
+  value: answer_recorded
+  desc:
+    intlString:
+    - locale: en
+      content: Answer recorded
       is_default: true

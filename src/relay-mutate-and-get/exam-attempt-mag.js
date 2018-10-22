@@ -72,10 +72,10 @@ export const takeExam = async (courseId, unitId, viewer, info) => {
   }
 };
 
-export const leaveExam = async (exam_attempt_id, cancel, viewer, info) => {
+export const leaveExam = async (exam_session_id, cancel, viewer, info) => {
   logger.debug(`in leaveExam`);
   try {
-    const examattempt = await ExamAttemptFetch.fetchById(exam_attempt_id, {
+    const examattempt = await ExamAttemptFetch.fetchById(exam_session_id, {
       _id: 1,
       exam_id: 1,
       started_at: 1

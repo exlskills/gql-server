@@ -12,10 +12,10 @@ import { connectionDefinitions, globalIdField } from 'graphql-relay';
 import { NodeInterface } from './node-definitions';
 
 export const ExamAttemptType = new GraphQLObjectType({
-  name: 'ExamAttempt',
-  description: 'ExamAttempt',
+  name: 'ExamSession',
+  description: 'ExamSession',
   fields: () => ({
-    id: globalIdField('ExamAttempt', obj => obj._id),
+    id: globalIdField('ExamSession', obj => obj._id),
     exam_id: {
       type: new GraphQLNonNull(GraphQLID)
     },
@@ -48,6 +48,6 @@ export const ExamAttemptType = new GraphQLObjectType({
 });
 
 export const { connectionType: ExamAttemptConnection } = connectionDefinitions({
-  name: 'ExamAttempt',
+  name: 'ExamSession',
   nodeType: ExamAttemptType
 });
