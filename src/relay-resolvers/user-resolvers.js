@@ -8,7 +8,7 @@ import { mdbUserToGqlUser } from '../parsers/user-parser';
 import { fromGlobalId } from 'graphql-relay';
 import moment from 'moment';
 import { logger } from '../utils/logger';
-import { connectionFromDataSource } from '../../build/paging-processor/connection-from-datasource';
+import { connectionFromDataSource } from '../paging-processor/connection-from-datasource';
 import { fetchUserList } from '../db-handlers/user/user-list-fetch';
 
 export const findUserById = async (user_id, viewer, info) => {
