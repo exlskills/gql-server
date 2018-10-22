@@ -9,7 +9,7 @@ import { leaveExam } from '../../relay-mutate-and-get/exam-attempt-mag';
 export default mutationWithClientMutationId({
   name: 'LeaveExam',
   inputFields: {
-    exam_attempt_id: { type: new GraphQLNonNull(GraphQLID) }
+    exam_session_id: { type: new GraphQLNonNull(GraphQLID) }
   },
   outputFields: {
     completionObj: {

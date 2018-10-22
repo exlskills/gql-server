@@ -59,7 +59,7 @@ export const takeExam = async (courseId, unitId, viewer, info) => {
     const time_limit = exam.time_limit;
 
     return {
-      exam_attempt_id: attempt._id,
+      exam_session_id: attempt._id,
       exam_time_limit: time_limit,
       exam_id: attempt.exam_id,
       completionObj: {

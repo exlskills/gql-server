@@ -19,7 +19,7 @@ import { fetchCourseUnitsBase } from '../db-handlers/course/course-unit-fetch';
 
 const ObjectId = mongoose.Types.ObjectId;
 
-export const processQuestionAction = async (
+export const processCardQuestionAction = async (
   question_id,
   exam_attempt_id,
   response_data,
@@ -29,13 +29,27 @@ export const processQuestionAction = async (
   is_last_question,
   viewer
 ) => {
-  logger.debug(`in processQuestionAction`);
+  logger.debug(`in processCardQuestionAction`);
   logger.debug(`   check_answer ` + check_answer);
   logger.debug(`   quiz ` + quiz);
   logger.debug(`   is_quiz_start ` + is_quiz_start);
   logger.debug(`   is_last_question ` + is_last_question);
 
   try {
+    const question = await QuestionFetch.fetchById(question_id, {
+      question_text: 0
+    });
+    if (!question || question.exam_only) {
+      return {
+        completionObj: {
+          code: '1',
+          msg: 'Invalid question',
+          msg_id: 'invalid_q'
+        }
+      };
+    }
+
+    logger.debug(`question ` + JSON.stringify(question));
     let returnData = {
       // question: question,
       is_correct: false,
@@ -43,14 +57,15 @@ export const processQuestionAction = async (
       grading_response: '',
       completionObj: {
         code: '0',
-        msg: ''
+        msg: '',
+        msg_id: ''
       }
     };
 
     let questionInteractionInfo = {
       user_id: viewer.user_id,
       question_id: question_id,
-      exam_attempt_id: quiz ? exam_attempt_id : ObjectId(exam_attempt_id),
+      exam_session_id: quiz ? exam_attempt_id : ObjectId(exam_attempt_id),
       is_complete: !quiz, // quiz false by default
       exam_type: quiz ? 'quiz' : 'unit_exam',
       points: 0,
@@ -72,17 +87,6 @@ export const processQuestionAction = async (
       }
       questionInteractionInfo.$push.response_data = response_data;
     }
-
-    const question = await QuestionFetch.fetchById(question_id, {
-      question_text: 0
-    });
-    if (!question) {
-      return {
-        completionObj: { code: '1', msg: 'ERROR cannot find question' }
-      };
-    }
-
-    logger.debug(`question ` + JSON.stringify(question));
 
     const docRefs = question.doc_ref.EmbeddedDocRef.embedded_doc_refs;
     const courseId = docRefs.find(item => item.level === 'course');
@@ -136,7 +140,7 @@ export const processQuestionAction = async (
 
     if (!quiz) {
       let examattempt = await ExamAttemptFetch.fetchById(
-        questionInteractionInfo.exam_attempt_id,
+        questionInteractionInfo.exam_session_id,
         { _id: 1, question_ids: 1, question_interaction_ids: 1 }
       );
       if (examattempt) {
@@ -386,4 +390,34 @@ const gradeWSCQQuestionAnswer = async (question, response_data, viewer) => {
 
   logger.debug(`response ` + JSON.stringify(response));
   return response;
+};
+
+export const processExamQuestionAnswer = async (
+  question_id,
+  exam_attempt_id,
+  response_data,
+  viewer
+) => {
+  logger.debug(`in processExamQuestionAnswer`);
+
+  try {
+    const question = await QuestionFetch.fetchById(question_id, {
+      _id: 1,
+      exam_only: 1
+    });
+    if (!question || !question.exam_only) {
+      return {
+        completionObj: {
+          code: '1',
+          msg: 'Invalid question',
+          msg_id: 'invalid_q'
+        }
+      };
+    }
+    logger.debug(`question ` + JSON.stringify(question));
+
+  } catch (error) {
+    logger.error(`Error ` + error);
+    return { completionObj: { code: '1', msg: error.message } };
+  }
 };

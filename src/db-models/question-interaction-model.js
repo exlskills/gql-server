@@ -1,5 +1,4 @@
 import mongoose from 'mongoose';
-import IntlString from './intl-string-model.js';
 
 const QuestionInteractionSchema = new mongoose.Schema(
   {
@@ -20,7 +19,7 @@ const QuestionInteractionSchema = new mongoose.Schema(
       required: true,
       index: true
     },
-    exam_attempt_id: {
+    exam_session_id: {
       type: String,
       index: true
     },

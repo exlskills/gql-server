@@ -10,7 +10,7 @@ import { fromGlobalId, mutationWithClientMutationId } from 'graphql-relay';
 
 import { CompletionObjType } from '../../relay-models/completion-obj';
 
-import { processQuestionAction } from '../../relay-mutate-and-get/exam-question-mag';
+import { processCardQuestionAction } from '../../relay-mutate-and-get/exam-question-mag';
 import { logger } from '../../utils/logger';
 
 export default mutationWithClientMutationId({
@@ -72,7 +72,7 @@ export default mutationWithClientMutationId({
     logger.debug(`response_data raw ` + response_data);
     const localQuestionId = fromGlobalId(question_id).id;
     const localExamAttemptId = fromGlobalId(exam_attempt_id).id;
-    return processQuestionAction(
+    return processCardQuestionAction(
       localQuestionId,
       localExamAttemptId,
       response_data,

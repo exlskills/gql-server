@@ -22,10 +22,10 @@ export default mutationWithClientMutationId({
     unitId: { type: new GraphQLNonNull(GraphQLID) }
   },
   outputFields: {
-    exam_attempt_id: {
+    exam_session_id: {
       type: GraphQLString,
       resolve: ({ returnObj }, viewer, info) =>
-        toGlobalId('ExamAttempt', returnObj.exam_attempt_id)
+        toGlobalId('ExamAttempt', returnObj.exam_session_id)
     },
     exam_time_limit: {
       type: GraphQLFloat,

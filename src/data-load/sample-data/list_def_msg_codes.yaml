@@ -33,3 +33,19 @@
     - locale: en
       content: Failed initiate Exam Session
       is_default: true
+
+- type: msg_card_qa
+  value: invalid_q
+  desc:
+    intlString:
+    - locale: en
+      content: Invalid Question
+      is_default: true
+
+- type: msg_card_qa
+  value: void_exam_qa
+  desc:
+    intlString:
+    - locale: en
+      content: Invalid Question
+      is_default: true

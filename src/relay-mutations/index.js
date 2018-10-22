@@ -1,16 +1,17 @@
 import notification from './notification';
-import examAttempt from './exam-attempt';
+import examSession from './exam-session';
 import userMutations from './user';
 import userCourseRoleMutations from './user-course-role';
-import examMutations from './exam';
+import question from './question';
 import quizAttempt from './quiz';
 
 export default {
   readNotification: notification.readNotification,
-  submitAnswer: examMutations.submitAnswer,
-  takeExam: examAttempt.takeExam,
-  startExam: examMutations.startExam,
-  leaveExam: examAttempt.leaveExam,
+  leaveExam: examSession.leaveExam,
+  startExam: examSession.startExam,
+  submitAnswer: question.submitCardQuestionAnswer,
+  submitExamQuestionAnswer: question.submitExamQuestionAnswer,
+  takeExam: examSession.takeExam,
   updateUserProfile: userMutations.updateUserProfile,
   updateUserUnitStatus: userMutations.updateUserUnitStatus,
   updateUserCourseRole: userCourseRoleMutations.updateUserCourseRole,

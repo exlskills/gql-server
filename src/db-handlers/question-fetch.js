@@ -155,9 +155,9 @@ export const getQuestionsInExamAttempt = async (
   // Load latest user answer
   for (let question of result) {
     let userAnswer;
-    if (fetchParameters.exam_attempt_id != null) {
+    if (fetchParameters.exam_session_id != null) {
       userAnswer = await getUserAnswer(
-        fetchParameters.exam_attempt_id,
+        fetchParameters.exam_session_id,
         question._id,
         fetchParameters.userId
       );
