@@ -6,8 +6,9 @@ import question from './question';
 
 export default {
   readNotification: notification.readNotification,
-  leaveExam: examSession.leaveExam,
+
   startExam: examSession.startExam,
+  submitExam: examSession.submitExam,
 
   // TODO remove after SPF update
   submitAnswer: question.setCardQuestionAnswer,

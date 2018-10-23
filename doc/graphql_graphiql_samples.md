@@ -151,7 +151,7 @@ mutation setExamQA($submitEQA: SetExamQuestionAnswerInput!){
   "submitEQA": {
     "exam_session_id": "RXhhbVNlc3Npb246NWJjZGMwODY2NDcwZGUwYjkxNDY5MDg0",
     "question_id": "UXVlc3Rpb246OGIzMTZkNjQ3M2I1NDBhOGI2NTg4YzgxNGY2ZDdiNGI=",
-    "response_data": "'selected_ids':['UXVlc3Rpb25NdWx0aXBsZURhdGE6NWJjZDM2MjVkNzlmOGYxYTUyMmVjMDVh']"
+    "response_data": "{'selected_ids':['UXVlc3Rpb25NdWx0aXBsZURhdGE6NWJjZDM2MjVkNzlmOGYxYTUyMmVjMDVh']}"
   }
 }
 ```
@@ -181,6 +181,29 @@ mutation getExamQA($getEQA: GetCurrentExamQuestionAnswerInput!){
   "getEQA": {
     "exam_session_id": "RXhhbVNlc3Npb246NWJjZGMwODY2NDcwZGUwYjkxNDY5MDg0",
     "question_id": "UXVlc3Rpb246OGIzMTZkNjQ3M2I1NDBhOGI2NTg4YzgxNGY2ZDdiNGI="
+  }
+}
+```
+
+## Submit Exam
+```
+mutation submitExam($submitExam: SubmitExamInput!){
+  submitExam(input: $submitExam) {
+    final_grade_pct
+    pass_mark_pct
+    completionObj{
+      code
+      msg
+      msg_id
+    }
+  }
+}
+```
+### Variables
+```
+{
+  "submitExam": {
+    "exam_session_id": "RXhhbVNlc3Npb246NWJjZGMwODY2NDcwZGUwYjkxNDY5MDg0"
   }
 }
 ```

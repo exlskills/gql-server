@@ -293,16 +293,6 @@ type Lang implements Node {
   value: String
 }
 
-input LeaveExamInput {
-  exam_session_id: ID!
-  clientMutationId: String
-}
-
-type LeaveExamPayload {
-  completionObj: CompletionObj
-  clientMutationId: String
-}
-
 type ListDef implements Node {
   # The ID of an object
   id: ID!
@@ -312,8 +302,8 @@ type ListDef implements Node {
 
 type Mutation {
   readNotification(input: ReadNotificationInput!): ReadNotificationPayload
-  leaveExam(input: LeaveExamInput!): LeaveExamPayload
   startExam(input: StartExamInput!): StartExamPayload
+  submitExam(input: SubmitExamInput!): SubmitExamPayload
   submitAnswer(input: SubmitAnswerInput!): SubmitAnswerPayload
   getCurrentExamQuestionAnswer(input: GetCurrentExamQuestionAnswerInput!): GetCurrentExamQuestionAnswerPayload
   setCardQuestionAnswer(input: SubmitAnswerInput!): SubmitAnswerPayload
@@ -628,6 +618,18 @@ type SubmitAnswerPayload {
   grading_response: String
   completionObj: CompletionObj
   next_question: NextQuestion
+  clientMutationId: String
+}
+
+input SubmitExamInput {
+  exam_session_id: ID!
+  clientMutationId: String
+}
+
+type SubmitExamPayload {
+  final_grade_pct: Float
+  pass_mark_pct: Int
+  completionObj: CompletionObj
   clientMutationId: String
 }
 

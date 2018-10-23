@@ -29,7 +29,7 @@ const ExamSessionSchema = new mongoose.Schema(
       type: [String],
       ref: 'Question'
     },
-    // Need index to quickly find active sessions
+    // Need this low-cardinality index to quickly find active sessions
     is_active: {
       type: Boolean,
       index: true
@@ -43,9 +43,6 @@ const ExamSessionSchema = new mongoose.Schema(
     },
     submitted_at: {
       type: Date
-    },
-    is_cancelled: {
-      type: Boolean
     },
     time_limit_exceeded: {
       type: Boolean

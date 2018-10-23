@@ -85,6 +85,7 @@ export const fetchExamSessionsByUserAndUnitJoinExam = async (
   }
 };
 
+// TODO - deprecate this
 export const fetchLastCancExamSessionByUserUnit = async (user_id, unit_id) => {
   logger.debug(`in fetchLastCancExamSessionByUserUnit`);
   logger.debug(`user_id ` + user_id);

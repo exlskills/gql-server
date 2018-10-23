@@ -40,6 +40,13 @@
     - locale: en
       content: Failed initiate Exam Session
       is_default: true
+- type: msg_exam
+  value: grading_issue
+  desc:
+    intlString:
+    - locale: en
+      content: Exam grading failed
+      is_default: true
 
 - type: msg_card_qa
   value: invalid_q
@@ -47,6 +54,13 @@
     intlString:
     - locale: en
       content: Invalid Question
+      is_default: true
+- type: msg_card_qa
+  value: grading_issue
+  desc:
+    intlString:
+    - locale: en
+      content: Grading failed
       is_default: true
 
 - type: msg_exam_qa
@@ -69,6 +83,13 @@
     intlString:
     - locale: en
       content: Exam sessions expired
+      is_default: true
+- type: msg_exam_qa
+  value: session_completed
+  desc:
+    intlString:
+    - locale: en
+      content: Exam sessions completed
       is_default: true
 - type: msg_exam_qa
   value: answer_recorded

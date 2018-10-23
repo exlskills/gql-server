@@ -10,7 +10,7 @@ import { fromGlobalId, mutationWithClientMutationId } from 'graphql-relay';
 
 import { CompletionObjType } from '../../relay-models/completion-obj';
 
-import { processCardQuestionAction } from '../../relay-mutate-and-get/exam-question-mag';
+import { processCardQuestionAction } from '../../relay-mutate-and-get/card-question-mag';
 import { logger } from '../../utils/logger';
 
 // TODO - remove exam_attempt_id everywhere in this file after SPF is updated

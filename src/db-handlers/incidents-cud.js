@@ -4,15 +4,14 @@ import { stringify } from 'flatted/cjs';
 
 export const recordIncident = async (user_id, incident_type, incident_desc) => {
   logger.debug(`in recordIncident`);
+  const newIncidentObj = {
+    user_id: user_id,
+    incident_type: incident_type,
+    incident_desc: incident_desc
+  };
+  // Timestamp is auto-added
   try {
-    const newIncidentObj = {
-      user_id: user_id,
-      incident_type: incident_type,
-      incident_desc: incident_desc
-    };
-    // Timestamp is auto-added
     const incidentRecord = await Incident.create(newIncidentObj);
-    return incidentRecord._id;
   } catch (err) {
     logger.error(
       `Record Incident failed with error ` +
@@ -22,4 +21,5 @@ export const recordIncident = async (user_id, incident_type, incident_desc) => {
     );
     return null;
   }
+  return incidentRecord._id;
 };

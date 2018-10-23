@@ -42,34 +42,3 @@ export const updateExamSession = async (condition, object, opts = {}) => {
   }
 };
 
-export const recordQuestionInteractionId = async (
-  exam_session_id,
-  questionInteraction_id
-) => {
-  logger.debug(`in recordQuestionInteractionId`);
-  try {
-    let array = [
-      { $match: { _id: ObjectId(exam_session_id) } },
-      {
-        $project: {
-          qi_id_found: {
-            $in: [ObjectId(questionInteraction_id), '$question_interaction_ids']
-          }
-        }
-      }
-    ];
-    const checkExamSession = await ExamSession.aggregate(array).exec();
-    logger.debug(`checkExamSession ` + JSON.stringify(checkExamSession));
-    if (checkExamSession[0].qi_id_found) {
-      return { already_recorded: 1 };
-    } else {
-      return updateExamSession(
-        { _id: exam_session_id },
-        { $push: { question_interaction_ids: questionInteraction_id } }
-      );
-    }
-  } catch (err) {
-    logger.error(`recordQuestionInteractionId failed with error: ` + err);
-    return null;
-  }
-};

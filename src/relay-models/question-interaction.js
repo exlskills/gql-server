@@ -22,9 +22,6 @@ export const QuestionInteractionType = new GraphQLObjectType({
     user_id: {
       type: new GraphQLNonNull(GraphQLID)
     },
-    is_complete: {
-      type: new GraphQLNonNull(GraphQLBoolean)
-    },
     result: {
       type: new GraphQLNonNull(GraphQLString)
     },

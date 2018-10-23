@@ -44,6 +44,7 @@ export default mutationWithClientMutationId({
   mutateAndGetPayload: ({ courseId, unitId }, viewer, info) => {
     const localUnitId = fromGlobalId(unitId).id;
     const localCourseId = fromGlobalId(courseId).id;
+    // NOTE: using { returnObj } to enable individual resolvers above
     return startExam(localCourseId, localUnitId, viewer).then(returnObj => ({
       returnObj
     }));

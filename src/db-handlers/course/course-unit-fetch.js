@@ -289,6 +289,7 @@ export const fetchCourseUnitsWithDetailedStatus = async (
         examStatusByCourseUnit[examStatusUnitIndex].final_exam_weight_pct;
       unitElem.passed = examStatusByCourseUnit[examStatusUnitIndex].passed;
 
+      // TODO - deprecate this
       let lastCancelled = await fetchLastCancExamSessionByUserUnit(
         userId,
         unitElem._id

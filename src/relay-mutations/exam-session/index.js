@@ -1,7 +1,7 @@
-import leaveExam from './leave-exam';
+import submitExam from './submit-exam';
 import startExam from './start-exam-session';
 
 export default {
-  leaveExam,
+  submitExam,
   startExam
 };

@@ -163,3 +163,93 @@ export const fetchCurrentAnswer = async (
     return null;
   }
 };
+
+export const fetchFinalAnswerJoinQuestion = async (
+  exam_session_id,
+  question_id,
+  user_id
+) => {
+  logger.debug(`in Question Interact fetchFinalAnswerJoinQuestion`);
+  try {
+    let elem;
+    let array = [];
+    elem = {
+      $match: {
+        exam_session_id: mongoose.Types.ObjectId(exam_session_id),
+        user_id: user_id,
+        question_id: question_id
+      }
+    };
+    array.push(elem);
+
+    elem = {
+      $project: {
+        _id: 0,
+        question_id: 1,
+        answer_submissions: 1
+      }
+    };
+    array.push(elem);
+    elem = {
+      $unwind: '$answer_submissions'
+    };
+    array.push(elem);
+    elem = {
+      $project: {
+        submitted_at: '$answer_submissions.submitted_at',
+        response_data: '$answer_submissions.response_data',
+        question_id: 1
+      }
+    };
+    array.push(elem);
+    elem = {
+      $sort: {
+        submitted_at: -1
+      }
+    };
+    array.push(elem);
+    elem = { $limit: 1 };
+    array.push(elem);
+
+    let array_lookup = [];
+    elem = {
+      $match: {
+        $expr: {
+          $eq: ['$_id', '$$question_id']
+        }
+      }
+    };
+    array_lookup.push(elem);
+
+    elem = {
+      $project: {
+        data: 1,
+        points: 1,
+        question_type: 1
+      }
+    };
+    array_lookup.push(elem);
+
+    elem = {
+      $lookup: {
+        from: 'question',
+        let: { question_id: '$question_id' },
+        pipeline: array_lookup,
+        as: 'question'
+      }
+    };
+    array.push(elem);
+    elem = {
+      $unwind: '$question'
+    };
+    array.push(elem);
+
+    const qiRecord = await QuestionInteraction.aggregate(array).exec();
+    logger.debug(`   qiRecord ` + JSON.stringify(qiRecord));
+
+    return qiRecord ? qiRecord[0] : null;
+  } catch (err) {
+    logger.error(`Aggregation failed in fetchCurrentAnswer: ` + err);
+    return null;
+  }
+};

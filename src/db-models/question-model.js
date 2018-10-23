@@ -10,6 +10,7 @@ const QuestionSchema = new mongoose.Schema(
       type: String,
       default: id_gen
     },
+    // TODO - deprecate and remove
     doc_ref: {
       type: EmbeddedDocRefSchema
     },

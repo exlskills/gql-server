@@ -1,4 +1,7 @@
-import { createExamSessionDoc } from '../db-handlers/exam-session-cud';
+import {
+  createExamSessionDoc,
+  updateExamSession
+} from '../db-handlers/exam-session-cud';
 import {
   pickExamId,
   examFetchById,
@@ -12,6 +15,14 @@ import { fetchByCourseAndUnitId } from '../db-handlers/course/course-unit-fetch'
 import { fetchExamSessionsByUserAndUnitToday } from '../db-handlers/exam-session-fetch';
 import { findActiveExamSessionsForUser } from '../db-handlers/exam-session-fetch';
 import moment from 'moment';
+import { recordIncident } from '../db-handlers/incidents-cud';
+import {
+  gradeMCQuestionAnswer,
+  gradeWSCQQuestionAnswer
+} from '../utils/question-answer-grading';
+import { fetchFinalAnswerJoinQuestion } from '../db-handlers/question-interaction-fetch';
+import { QUESTION_TYPES } from '../db-models/question-model';
+import { processExamQuestionInteraction } from '../db-handlers/question-interaction-cud';
 
 export const startExam = async (courseId, unitId, viewer, info) => {
   logger.debug(`in startExam`);
@@ -115,7 +126,6 @@ export const startExam = async (courseId, unitId, viewer, info) => {
       unit_id: unitId,
       started_at: started_at,
       active_till: active_till,
-      is_cancelled: false,
       is_active: true,
       question_ids: questIdsObj.quesIds
     });
@@ -163,34 +173,176 @@ export const startExam = async (courseId, unitId, viewer, info) => {
   }
 };
 
-export const leaveExam = async (exam_session_id, cancel, viewer, info) => {
-  logger.debug(`in leaveExam`);
-  try {
-    const examSession = await ExamSessionFetch.fetchById(exam_session_id, {
-      _id: 1,
-      exam_id: 1,
-      started_at: 1
-    });
-    examSession.submitted_at = new Date();
-    examSession.is_cancelled = cancel !== false;
+export const processExamSubmission = async (exam_session_id, viewer, info) => {
+  logger.debug(`in processExamSubmission`);
 
-    const exam = await ExamFetch.fetchById(examSession.exam_id, {
-      time_limit: 1
-    });
-    if (exam) {
-      const timeDiff =
-        (examSession.submitted_at - examSession.started_at) / 1000 / 60;
-      examSession.time_limit_exceeded = timeDiff > exam.time_limit;
-      examSession.is_active = false;
-      await examSession.save();
-    }
+  const received_at = moment()
+    .utc()
+    .toDate();
+
+  const examSession = await ExamSessionFetch.fetchById(exam_session_id, {
+    user_id: 1,
+    exam_id: 1,
+    question_ids: 1,
+    active_till: 1,
+    final_grade_pct: 1
+  });
+
+  if (
+    !examSession &&
+    !examSession.question_ids &&
+    examSession.question_ids.length < 1
+  ) {
     return {
       completionObj: {
-        code: '0',
-        msg: ''
+        code: '1',
+        msg: 'Invalid exam session',
+        msg_id: 'invalid_session'
       }
     };
-  } catch (error) {
-    return { completionObj: { code: '1', msg: error.message } };
   }
+
+  if (examSession.user_id !== viewer.user_id) {
+    //  Do not wait for this
+    recordIncident(viewer.user_id, 'exam_session', 'session details mismatch');
+    return {
+      completionObj: {
+        code: '1',
+        msg: 'Invalid exam session',
+        msg_id: 'invalid_session'
+      }
+    };
+  }
+
+  if (
+    examSession.time_limit_exceeded ||
+    (received_at && examSession.active_till < received_at)
+  ) {
+    return {
+      completionObj: {
+        code: '1',
+        msg: 'Exam session expired',
+        msg_id: 'session_expired'
+      }
+    };
+  }
+
+  const examRec = await examFetchById(examSession.exam_id, {
+    _id: 0,
+    pass_mark_pct: 1
+  });
+  logger.debug(`  examRec ` + JSON.stringify(examRec));
+
+  if (!examSession.is_active) {
+    return {
+      final_grade_pct: examSession.final_grade_pct,
+      pass_mark_pct: examRec.pass_mark_pct,
+      completionObj: {
+        code: '2',
+        msg: 'Exam session comleted',
+        msg_id: 'session_completed'
+      }
+    };
+  }
+
+  let sum_pct_score = 0;
+  for (let question_id of examSession.question_ids) {
+    let gradingObj = { pct_score: 0 };
+
+    const qiRecord = await fetchFinalAnswerJoinQuestion(
+      exam_session_id,
+      question_id,
+      viewer.user_id
+    );
+    try {
+      if (qiRecord && qiRecord.response_data) {
+        if (
+          qiRecord.question.question_type ===
+            QUESTION_TYPES.MULT_CHOICE_SINGLE_ANSWER ||
+          qiRecord.question.question_type ===
+            QUESTION_TYPES.MULT_CHOICE_MULT_ANSWERS
+        ) {
+          gradingObj = await gradeMCQuestionAnswer(
+            qiRecord.question,
+            qiRecord.response_data,
+            viewer
+          );
+        } else if (
+          qiRecord.question.question_type ===
+          QUESTION_TYPES.WRITE_SOFTWARE_CODE_QUESTION
+        ) {
+          gradingObj = await gradeWSCQQuestionAnswer(
+            qiRecord.question,
+            qiRecord.response_data,
+            viewer
+          );
+        } else {
+          logger.error(
+            'Grading logic not implemented for question type ' +
+              qiRecord.question.question_type
+          );
+          return {
+            completionObj: {
+              code: '1',
+              msg: 'Exam grading failed',
+              msg_id: 'grading_issue'
+            }
+          };
+        }
+      }
+    } catch (err) {
+      logger.error(
+        `Grade question failed exam_session_id: ` +
+          exam_session_id +
+          ` question_id ` +
+          question_id
+      );
+      return {
+        completionObj: {
+          code: '1',
+          msg: 'Exam grading failed',
+          msg_id: 'grading_issue'
+        }
+      };
+    }
+
+    // Do not wait for this
+    processExamQuestionInteraction(
+      viewer.user_id,
+      question_id,
+      exam_session_id,
+      received_at,
+      null,
+      {
+        points: gradingObj.points,
+        pct_score: gradingObj.pct_score
+      }
+    );
+
+    sum_pct_score += gradingObj.pct_score;
+  }
+
+  const final_grade_pct = sum_pct_score / examSession.question_ids.length;
+  logger.debug(`  final_grade_pct ` + final_grade_pct);
+
+  // do not wait
+  updateExamSession(
+    { _id: exam_session_id },
+    {
+      is_active: false,
+      submitted_at: received_at,
+      time_limit_exceeded: false,
+      final_grade_pct: final_grade_pct
+    }
+  );
+
+  return {
+    final_grade_pct: final_grade_pct,
+    pass_mark_pct: examRec.pass_mark_pct,
+    completionObj: {
+      code: '0',
+      msg: '',
+      msg_id: ''
+    }
+  };
 };

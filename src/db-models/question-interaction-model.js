@@ -25,11 +25,6 @@ const QuestionInteractionSchema = new mongoose.Schema(
       ref: 'ExamSession',
       index: true
     },
-    is_complete: {
-      type: Boolean,
-      required: true,
-      default: false
-    },
     result: {
       type: String,
       required: true
@@ -41,7 +36,8 @@ const QuestionInteractionSchema = new mongoose.Schema(
       type: Number
     },
     exam_type: {
-      type: String
+      type: String,
+      default: ''
     },
     trace: {
       type: [String]

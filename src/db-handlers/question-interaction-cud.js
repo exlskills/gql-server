@@ -2,33 +2,6 @@ import QuestionInteraction from '../db-models/question-interaction-model';
 import * as QuestionInteractionFetch from '../db-handlers/question-interaction-fetch';
 import { logger } from '../utils/logger';
 
-export const upsertQuestionInteraction = async object => {
-  logger.debug(`in upsertQuestionInteraction`);
-  try {
-    const result = await QuestionInteraction.updateOne(
-      {
-        user_id: object.user_id,
-        question_id: object.question_id,
-        exam_session_id: object.exam_session_id
-      },
-      object,
-      { upsert: true }
-    ).exec();
-
-    const record = await QuestionInteraction.findOne({
-      user_id: object.user_id,
-      question_id: object.question_id,
-      exam_session_id: object.exam_session_id
-    }).exec();
-
-    logger.debug(`upsertQuestionInteraction record ` + JSON.stringify(record));
-
-    return { result, record };
-  } catch (err) {
-    return Promise.reject('Error adding QuestionInteraction to DB ' + err);
-  }
-};
-
 export const processExamQuestionInteraction = async (
   user_id,
   question_id,
@@ -38,52 +11,69 @@ export const processExamQuestionInteraction = async (
   questionInteractionObjFields
 ) => {
   logger.debug(`in processExamQuestionInteraction`);
+
+  const docPayloadObj = { ...questionInteractionObjFields };
+
   const record = await QuestionInteractionFetch.fetchOneByIds(
     {
       user_id: user_id,
       question_id: question_id,
       exam_session_id: exam_session_id
     },
-    { _id: 1 }
+    {
+      _id: 1,
+      result: 1
+    }
   );
 
   if (record && record._id) {
-    try {
-      const result = await QuestionInteraction.updateOne(
-        {
-          _id: record._id
-        },
-        {
-          $push: {
-            answer_submissions: {
-              submitted_at: submitted_at,
-              response_data: response_data
-            }
-          }
+    if (response_data) {
+      docPayloadObj.$push = {
+        answer_submissions: {
+          submitted_at: submitted_at,
+          response_data: response_data
         }
-      ).exec();
-      return record._id;
-    } catch (err) {
-      logger.error(`Error updating QuestionInteraction ` + err);
-      return null;
+      };
     }
+    if (JSON.stringify(docPayloadObj) !== '{}') {
+      try {
+        await QuestionInteraction.updateOne(
+          {
+            _id: record._id
+          },
+          docPayloadObj
+        ).exec();
+      } catch (err) {
+        logger.error(`Error updating QuestionInteraction ` + err);
+        return null;
+      }
+    }
+    return record._id;
   } else {
+    if (response_data) {
+      docPayloadObj.answer_submissions = {
+        submitted_at: submitted_at,
+        response_data: response_data
+      };
+    }
+
+    if (!docPayloadObj.result) {
+      docPayloadObj.result = 'auto_generated';
+    }
+
+    let newRecord = { _id: null };
     try {
       const doc = {
         user_id: user_id,
         question_id: question_id,
         exam_session_id: exam_session_id,
-        answer_submissions: {
-          submitted_at: submitted_at,
-          response_data: response_data
-        },
-        ...questionInteractionObjFields
+        ...docPayloadObj
       };
-      const newRecord = await QuestionInteraction.create(doc);
-      return newRecord._id;
+      newRecord = await QuestionInteraction.create(doc);
     } catch (err) {
       logger.error(`Error creating QuestionInteraction record ` + err);
       return null;
     }
+    return newRecord._id;
   }
 };
