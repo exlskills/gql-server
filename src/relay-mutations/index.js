@@ -8,9 +8,15 @@ export default {
   readNotification: notification.readNotification,
   leaveExam: examSession.leaveExam,
   startExam: examSession.startExam,
-  submitAnswer: question.submitCardQuestionAnswer,
-  submitExamQuestionAnswer: question.submitExamQuestionAnswer,
+
+  // TODO remove after SPF update
+  submitAnswer: question.setCardQuestionAnswer,
+
+  getCurrentExamQuestionAnswer: question.getCurrentExamQuestionAnswer,
+  setCardQuestionAnswer: question.setCardQuestionAnswer,
+  setExamQuestionAnswer: question.setExamQuestionAnswer,
+
   updateUserProfile: userMutations.updateUserProfile,
   updateUserUnitStatus: userMutations.updateUserUnitStatus,
-  updateUserCourseRole: userCourseRoleMutations.updateUserCourseRole,
+  updateUserCourseRole: userCourseRoleMutations.updateUserCourseRole
 };

@@ -21,7 +21,8 @@ const QuestionInteractionSchema = new mongoose.Schema(
       index: true
     },
     exam_session_id: {
-      type: String,
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'ExamSession',
       index: true
     },
     is_complete: {

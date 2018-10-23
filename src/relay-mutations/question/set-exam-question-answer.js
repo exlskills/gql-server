@@ -5,7 +5,7 @@ import { processExamQuestionAnswer } from '../../relay-mutate-and-get/exam-quest
 import { logger } from '../../utils/logger';
 
 export default mutationWithClientMutationId({
-  name: 'SubmitExamQuestionAnswer',
+  name: 'SetExamQuestionAnswer',
   inputFields: {
     exam_session_id: { type: new GraphQLNonNull(GraphQLID) },
     question_id: { type: new GraphQLNonNull(GraphQLID) },

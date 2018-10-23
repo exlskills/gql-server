@@ -2,6 +2,8 @@ import { basicFind } from '../db-handlers/basic-query-handler';
 import QuestionInteraction from '../db-models/question-interaction-model.js';
 import { logger } from '../utils/logger';
 import Config from '../config';
+import ExamSession from '../db-models/exam-session-model';
+import mongoose from 'mongoose';
 
 export const fetchById = async (obj_id, selectVal, viewer, info) => {
   logger.debug(`in Quest Interact fetchById`);
@@ -113,4 +115,51 @@ export const computeQuestionsEMA = async (userId, questionIds) => {
   }
 
   return null;
+};
+
+export const fetchCurrentAnswer = async (
+  exam_session_id,
+  question_id,
+  user_id
+) => {
+  logger.debug(`in Question Interact fetchCurrentAnswer`);
+  try {
+    let array = [
+      {
+        $match: {
+          exam_session_id: mongoose.Types.ObjectId(exam_session_id),
+          user_id: user_id,
+          question_id: question_id
+        }
+      },
+      {
+        $project: {
+          answer_submissions: 1
+        }
+      },
+      {
+        $unwind: '$answer_submissions'
+      },
+      {
+        $project: {
+          _id: 0,
+          submitted_at: '$answer_submissions.submitted_at',
+          response_data: '$answer_submissions.response_data'
+        }
+      },
+      {
+        $sort: {
+          submitted_at: -1
+        }
+      },
+      { $limit: 1 }
+    ];
+    const qiRecord = await QuestionInteraction.aggregate(array).exec();
+    logger.debug(`   qiRecord ` + JSON.stringify(qiRecord));
+
+    return qiRecord ? qiRecord[0] : null;
+  } catch (err) {
+    logger.error(`Aggregation failed in fetchCurrentAnswer: ` + err);
+    return null;
+  }
 };

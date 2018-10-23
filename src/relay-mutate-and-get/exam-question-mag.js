@@ -20,7 +20,7 @@ import { fetchCourseUnitsBase } from '../db-handlers/course/course-unit-fetch';
 import * as ExamSessionFetch from '../db-handlers/exam-session-fetch';
 import moment from 'moment';
 import { recordIncident } from '../db-handlers/incidents-cud';
-import { recordQuestionInteractionId } from '../db-handlers/exam-session-cud';
+import * as QuestionInteractionFetch from '../db-handlers/question-interaction-fetch';
 
 export const processCardQuestionAction = async (
   question_id,
@@ -398,20 +398,14 @@ const gradeWSCQQuestionAnswer = async (question, response_data, viewer) => {
   return response;
 };
 
-export const processExamQuestionAnswer = async (
+// Returns completionObj if verification fails, otherwise returns {}
+export const verifyExamQuestionAnswerCall = async (
   question_id,
   exam_session_id,
-  response_data,
+  received_at,
   viewer
 ) => {
-  logger.debug(`in processExamQuestionAnswer`);
-  logger.debug(`   question_id ` + question_id);
-  logger.debug(`   exam_session_id ` + exam_session_id);
-  logger.debug(`   response_data ` + response_data);
-
-  const received_at = moment()
-    .utc()
-    .toDate();
+  logger.debug(`in verifyExamQuestionAnswerCall`);
 
   try {
     const question = await QuestionFetch.fetchById(question_id, {
@@ -428,7 +422,6 @@ export const processExamQuestionAnswer = async (
         }
       };
     }
-    logger.debug(`question ` + JSON.stringify(question));
 
     const examSession = await ExamSessionFetch.fetchById(exam_session_id, {
       unit_id: 1,
@@ -448,7 +441,7 @@ export const processExamQuestionAnswer = async (
       };
     }
 
-    if (examSession.active_till < received_at) {
+    if (received_at && examSession.active_till < received_at) {
       return {
         completionObj: {
           code: '1',
@@ -477,6 +470,46 @@ export const processExamQuestionAnswer = async (
       };
     }
 
+    return {};
+  } catch (error) {
+    logger.error(`Error ` + error);
+    return {
+      completionObj: {
+        code: '1',
+        msg: 'Processing failed',
+        msg_id: 'process_failed'
+      }
+    };
+  }
+};
+
+export const processExamQuestionAnswer = async (
+  question_id,
+  exam_session_id,
+  response_data,
+  viewer
+) => {
+  logger.debug(`in processExamQuestionAnswer`);
+  logger.debug(`   question_id ` + question_id);
+  logger.debug(`   exam_session_id ` + exam_session_id);
+  logger.debug(`   response_data ` + response_data);
+
+  const received_at = moment()
+    .utc()
+    .toDate();
+
+  const verification = await verifyExamQuestionAnswerCall(
+    question_id,
+    exam_session_id,
+    received_at,
+    viewer
+  );
+
+  if (verification.completionObj) {
+    return verification;
+  }
+
+  try {
     const questionInteraction_id = await processExamQuestionInteraction(
       viewer.user_id,
       question_id,
@@ -496,14 +529,66 @@ export const processExamQuestionAnswer = async (
       };
     }
 
-    // do not wait
-    recordQuestionInteractionId(exam_session_id, questionInteraction_id);
-
     return {
       completionObj: {
         code: '0',
         msg: 'Answer recorded',
         msg_id: 'answer_recorded'
+      }
+    };
+  } catch (error) {
+    logger.error(`Error ` + error);
+    return {
+      completionObj: {
+        code: '1',
+        msg: 'Processing failed',
+        msg_id: 'process_failed'
+      }
+    };
+  }
+};
+
+export const getCurrentExamQuestionAnswer = async (
+  question_id,
+  exam_session_id,
+  viewer
+) => {
+  logger.debug(`in getCurrentExamQuestionAnswer`);
+  logger.debug(`   question_id ` + question_id);
+  logger.debug(`   exam_session_id ` + exam_session_id);
+
+  const verification = await verifyExamQuestionAnswerCall(
+    question_id,
+    exam_session_id,
+    null,
+    viewer
+  );
+  if (verification.completionObj) {
+    return verification;
+  }
+
+  try {
+    const qiRecord = await QuestionInteractionFetch.fetchCurrentAnswer(
+      exam_session_id,
+      question_id,
+      viewer.user_id
+    );
+
+    if (!qiRecord) {
+      return {
+        completionObj: {
+          code: '2',
+          msg: 'Not found',
+          msg_id: 'not_found'
+        }
+      };
+    }
+    return {
+      ...qiRecord,
+      completionObj: {
+        code: '0',
+        msg: '',
+        msg_id: ''
       }
     };
   } catch (error) {

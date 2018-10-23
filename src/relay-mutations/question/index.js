@@ -1,7 +1,9 @@
-import submitCardQuestionAnswer from './submit-card-question-answer';
-import submitExamQuestionAnswer from './submit-exam-question-answer';
+import setCardQuestionAnswer from './set-card-question-answer';
+import getCurrentExamQuestionAnswer from './get-current-exam-question-answer';
+import setExamQuestionAnswer from './set-exam-question-answer';
 
 export default {
-  submitCardQuestionAnswer,
-  submitExamQuestionAnswer
+  getCurrentExamQuestionAnswer,
+  setCardQuestionAnswer,
+  setExamQuestionAnswer
 };

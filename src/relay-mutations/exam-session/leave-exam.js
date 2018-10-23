@@ -4,7 +4,7 @@ import { fromGlobalId, mutationWithClientMutationId } from 'graphql-relay';
 
 import { CompletionObjType } from '../../relay-models/completion-obj';
 
-import { leaveExam } from '../../relay-mutate-and-get/exam-attempt-mag';
+import { leaveExam } from '../../relay-mutate-and-get/exam-session-mag';
 
 export default mutationWithClientMutationId({
   name: 'LeaveExam',

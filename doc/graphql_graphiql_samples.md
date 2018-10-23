@@ -133,10 +133,10 @@ mutation startExam($courseUnit: StartExamInput!){
 }
 ```
 
-## Submit Exam Question Answer
+## Set Exam Question Answer
 ```
-mutation submitExamQA($submitEQA: SubmitExamQuestionAnswerInput!){
-  submitExamQuestionAnswer(input: $submitEQA) {
+mutation setExamQA($submitEQA: SetExamQuestionAnswerInput!){
+  setExamQuestionAnswer(input: $submitEQA) {
     completionObj{
       code
       msg
@@ -161,4 +161,26 @@ Prefixes:
 `QuestionMultipleData` 
 
 
-
+## Get Current Exam Question Answer
+```
+mutation getExamQA($getEQA: GetCurrentExamQuestionAnswerInput!){
+  getCurrentExamQuestionAnswer(input: $getEQA) {
+    submitted_at
+    response_data
+    completionObj{
+      code
+      msg
+      msg_id
+    }
+  }
+}
+```
+### Variables
+```
+{
+  "getEQA": {
+    "exam_session_id": "RXhhbVNlc3Npb246NWJjZGMwODY2NDcwZGUwYjkxNDY5MDg0",
+    "question_id": "UXVlc3Rpb246OGIzMTZkNjQ3M2I1NDBhOGI2NTg4YzgxNGY2ZDdiNGI="
+  }
+}
+```

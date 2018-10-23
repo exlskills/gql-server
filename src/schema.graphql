@@ -267,6 +267,19 @@ input FilterValues {
   filterValuesString: String
 }
 
+input GetCurrentExamQuestionAnswerInput {
+  exam_session_id: ID!
+  question_id: ID!
+  clientMutationId: String
+}
+
+type GetCurrentExamQuestionAnswerPayload {
+  submitted_at: DateTime
+  response_data: String
+  completionObj: CompletionObj
+  clientMutationId: String
+}
+
 # Item Price
 type ItemPriceType {
   amount: Int
@@ -302,7 +315,9 @@ type Mutation {
   leaveExam(input: LeaveExamInput!): LeaveExamPayload
   startExam(input: StartExamInput!): StartExamPayload
   submitAnswer(input: SubmitAnswerInput!): SubmitAnswerPayload
-  submitExamQuestionAnswer(input: SubmitExamQuestionAnswerInput!): SubmitExamQuestionAnswerPayload
+  getCurrentExamQuestionAnswer(input: GetCurrentExamQuestionAnswerInput!): GetCurrentExamQuestionAnswerPayload
+  setCardQuestionAnswer(input: SubmitAnswerInput!): SubmitAnswerPayload
+  setExamQuestionAnswer(input: SetExamQuestionAnswerInput!): SetExamQuestionAnswerPayload
   updateUserProfile(input: UpdateUserProfileInput!): UpdateUserProfilePayload
   updateUserUnitStatus(input: UpdateUserUnitStatusInput!): UpdateUserUnitStatusPayload
   updateUserCourseRole(input: UpdateUserCourseRoleInput!): UpdateUserCourseRolePayload
@@ -570,6 +585,18 @@ type SessionInstructorType implements Node {
   biography: String
 }
 
+input SetExamQuestionAnswerInput {
+  exam_session_id: ID!
+  question_id: ID!
+  response_data: String
+  clientMutationId: String
+}
+
+type SetExamQuestionAnswerPayload {
+  completionObj: CompletionObj
+  clientMutationId: String
+}
+
 input StartExamInput {
   courseId: ID!
   unitId: ID!
@@ -601,18 +628,6 @@ type SubmitAnswerPayload {
   grading_response: String
   completionObj: CompletionObj
   next_question: NextQuestion
-  clientMutationId: String
-}
-
-input SubmitExamQuestionAnswerInput {
-  exam_session_id: ID!
-  question_id: ID!
-  response_data: String
-  clientMutationId: String
-}
-
-type SubmitExamQuestionAnswerPayload {
-  completionObj: CompletionObj
   clientMutationId: String
 }
 

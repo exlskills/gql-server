@@ -29,10 +29,6 @@ const ExamSessionSchema = new mongoose.Schema(
       type: [String],
       ref: 'Question'
     },
-    question_interaction_ids: {
-      type: [mongoose.Schema.Types.ObjectId],
-      ref: 'QuestionInteraction'
-    },
     // Need index to quickly find active sessions
     is_active: {
       type: Boolean,
