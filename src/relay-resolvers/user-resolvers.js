@@ -32,14 +32,13 @@ export const findUserById = async (user_id, viewer, info) => {
 
 export const resolveUserProfile = async (obj, args, viewer, info) => {
   logger.debug(`in resolveUserProfile`);
-  console.log(args);
   try {
     let userId =
       args && args.user_id ? fromGlobalId(args.user_id).id : viewer.user_id;
     let userRecord = await fetchUserProfileById(userId, viewer);
     // TODO @stanvarlamov is this the best place to put this?
     if (!userRecord.is_instructor && userRecord._id !== viewer.user_id) {
-        throw new Error("Unauthorized");
+      throw new Error("Unauthorized");
     }
     let locale = viewer.locale;
     return mdbUserToGqlUser(userRecord, { userId, locale });

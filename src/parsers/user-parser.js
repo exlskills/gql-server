@@ -18,6 +18,11 @@ export const mdbUserToGqlUser = (user, viewer) => {
     if (gqlUser._id != viewer._id) {
       gqlUser.auth_strategies = [];
     }
+    if (gqlUser.instructor_topics) {
+      gqlUser.instructor_topics_en = gqlUser.instructor_topics;
+      // TODO @stanvarlamov map en to user locale?
+      gqlUser.instructor_topics_locale = gqlUser.instructor_topics;
+    }
     return gqlUser;
   } catch (err) {
     return Promise.reject(err);
