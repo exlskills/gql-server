@@ -4,6 +4,7 @@ import UserCourseRoleSchema from './user-course-role-model';
 import UserSubscriptionSchema from './user-subscription-model';
 import AuthStrategySchema from './auth-strategy-model';
 import UserOrganizationRoleSchema from './user-organization-role-model';
+import InstructorTimekitSchema from './instructor-timekit-model';
 import IntlStringSchema from './intl-string-model';
 
 /**
@@ -95,6 +96,15 @@ const UserSchema = new mongoose.Schema(
     },
     twitter_username: {
       type: String
+    },
+    linkedin_username: {
+      type: String
+    },
+    location_name: {
+      type: String
+    },
+    instructor_timekit: {
+      type: InstructorTimekitSchema
     },
     instructor_topics: {
       // "en" values. Each must match list_def.value where list_def.type='instructor_topic'
