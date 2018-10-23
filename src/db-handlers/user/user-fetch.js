@@ -143,6 +143,7 @@ export const fetchUserProfileById = async (obj_id, viewer, info) => {
         avatar_url: 1,
         is_verified: 1,
         course_roles: 1,
+        twitter_username: 1,
         created_at: 1,
         updated_at: 1
       }

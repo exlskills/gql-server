@@ -701,6 +701,7 @@ type User implements Node {
   primary_locale: String!
   subscription: UserSubscriptionConnection
   avatar_url: String
+  twitter_username: String
   is_verified: Boolean
   auth_strategies(after: String, first: Int, before: String, last: Int): AuthStrategyConnection
   organization_roles(after: String, first: Int, before: String, last: Int): UserOrganizationRoleConnection

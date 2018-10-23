@@ -76,6 +76,9 @@ export const UserType = new GraphQLObjectType({
     avatar_url: {
       type: GraphQLString
     },
+    twitter_username: {
+      type: GraphQLString
+    },
     is_verified: {
       type: GraphQLBoolean
     },

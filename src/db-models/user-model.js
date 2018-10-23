@@ -93,6 +93,9 @@ const UserSchema = new mongoose.Schema(
     zoho_ccy_code: {
       type: String
     },
+    twitter_username: {
+      type: String
+    },
     instructor_topics: {
       // "en" values. Each must match list_def.value where list_def.type='instructor_topic'
       // list_def.desc contains non-"en" values by locale
