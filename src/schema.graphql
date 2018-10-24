@@ -266,7 +266,7 @@ input FilterValues {
 }
 
 type InstructorTimekit {
-  intervals: TimekitInterval!
+  intervals: [TimekitInterval]
 }
 
 # Item Price

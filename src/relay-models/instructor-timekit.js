@@ -1,4 +1,4 @@
-import { GraphQLNonNull, GraphQLObjectType } from 'graphql';
+import { GraphQLList, GraphQLObjectType } from 'graphql';
 import { TimekitInterval } from './timekit-interval';
 
 export const InstructorTimekit = new GraphQLObjectType({
@@ -6,7 +6,7 @@ export const InstructorTimekit = new GraphQLObjectType({
   description: '',
   fields: () => ({
     intervals: {
-      type: new GraphQLNonNull(TimekitInterval)
+      type: new GraphQLList(TimekitInterval)
     }
   })
 });
