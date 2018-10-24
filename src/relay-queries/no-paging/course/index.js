@@ -1,15 +1,15 @@
-import courseById from './course-by-id';
-import courseDeliveryScheduleByMethod from './course-delivery-schedule-by-method';
-import sectionCardEntry from './card-entry';
-import cardByQuestion from './card-by-question';
-import topicFilter from './topic-filter';
-import courseUnit from './course-unit';
+import getCourseById from './course-get-query';
+import getCourseDeliverySchedule from './course-delivery-schedule-get-query';
+import { getCard, getCardByQuestion } from './card-get-query';
+
+import topicFilter from './topic-get-query';
+import courseUnit from './course-unit-get-query';
 
 export default {
-  courseById,
-  courseDeliveryScheduleByMethod,
-  sectionCardEntry,
-  cardByQuestion,
+  getCourseById,
+  getCourseDeliverySchedule,
+  getCard,
+  getCardByQuestion,
   topicFilter,
   courseUnit
 };

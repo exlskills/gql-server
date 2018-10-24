@@ -85,60 +85,6 @@ export const fetchExamSessionsByUserAndUnitJoinExam = async (
   }
 };
 
-// TODO - deprecate this
-export const fetchLastCancExamSessionByUserUnit = async (user_id, unit_id) => {
-  logger.debug(`in fetchLastCancExamSessionByUserUnit`);
-  logger.debug(`user_id ` + user_id);
-  logger.debug(`unit_id ` + unit_id);
-  let array = [];
-  array.push({
-    $match: {
-      unit_id,
-      user_id,
-      is_active: false,
-      is_cancelled: true
-    }
-  });
-  array.push(
-    {
-      $lookup: {
-        from: 'exam',
-        localField: 'exam_id',
-        foreignField: '_id',
-        as: 'exam'
-      }
-    },
-    { $unwind: '$exam' },
-    {
-      $project: {
-        started_at: 1,
-        submitted_at: 1,
-        time_limit: '$exam.time_limit',
-        updated_at: 1,
-        is_active: 1,
-        exam_id: 1
-      }
-    },
-    { $sort: { started_at: -1 } },
-    { $limit: 1 }
-  );
-  const arrayRet = await ExamSession.aggregate(array).exec();
-  const record = arrayRet && arrayRet[0] ? arrayRet[0] : null;
-
-  if (record) {
-    const time_limit = record.time_limit * 60;
-    const spent_time = (record.submitted_at - record.started_at) / 1000;
-    record.isContinue = spent_time < time_limit;
-    if (!record.isContinue) {
-      ExamSession.updateOne({ _id: record._id }, { is_active: false });
-    }
-  }
-  logger.debug(
-    `  fetchLastCancExamSessionByUserUnit result ` + JSON.stringify(record)
-  );
-  return record;
-};
-
 export const checkUserTookThisExam = async (exam_id, user_id, unit_id) => {
   logger.debug(`in checkUserTookThisExam`);
   let array = [];

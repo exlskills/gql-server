@@ -3,7 +3,7 @@ import { id_gen } from '../../utils/url-id-generator';
 import {
   setDefaultIntlStringLocale,
   updateIntlStringObject
-} from '../intl-string-utils';
+} from '../../utils/intl-string-utils';
 import { logger } from '../../utils/logger';
 
 export const createUser = async userObject => {

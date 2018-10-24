@@ -136,11 +136,10 @@ type CourseUnit implements Node {
   title: String
   headline: String
 
-  # Course units
+  # Units sections
   sections(orderBy: [OrderBy], filterValues: FilterValues, resolverArgs: [QueryResolverArgs], after: String, first: Int, before: String, last: Int): UnitSectionConnection
   sections_list: [UnitSection]
-  final_exams: [String]
-  pre_exams: [String]
+  has_exam: Boolean
   final_exam_weight_pct: Float
   attempts_left: Int
   unit_progress_state: Int
@@ -361,30 +360,40 @@ type Query {
     # The ID of an object
     id: ID!
   ): Node
+  getCourseById(course_id: String): Course
   courseById(course_id: String): Course
 
   # Course Unit
   courseUnit(course_id: String, unit_id: String): CourseUnit
+  getCourseDeliverySchedule(course_id: String, delivery_method: String, date_on_or_after: DateTime): CourseDeliverySchedule
   courseDeliverySchedule(course_id: String, delivery_method: String, date_on_or_after: DateTime): CourseDeliverySchedule
 
   # SectionCard Entry
   cardEntry(course_id: ID!, unit_id: ID!, section_id: ID!, card_id: ID!): SectionCard
 
+  # SectionCard Entry
+  getCard(course_id: ID!, unit_id: ID!, section_id: ID!, card_id: ID!): SectionCard
+
   # Card Entry by question ID
-  cardByQuestion(question_id: String!): SectionCard
-  userActivityCountByDate(dateRange: DateRange, activityTypes: [String]): [UserActivity]
+  getCardByQuestion(question_id: String!): SectionCard
+  topicFilter: [ListDef]
+  getUserActivityCountByDate(dateRange: DateRange, activityTypes: [String]): [UserActivity]
+  getUserProfile(user_id: String): User
   userProfile(user_id: String): User
   examToTake(unit_id: String, course_id: String): Exam
-  examAttempt(unit_id: String): [ExamSession]
+  examSession(unit_id: String): [ExamSession]
 
   # Activities
   listActivities(orderBy: [OrderBy], filterValues: FilterValues, resolverArgs: [QueryResolverArgs], activityTypes: [String], dateRange: DateRange, listDefVersion: Int, after: String, first: Int, before: String, last: Int): ActivityConnection
 
   # all Cards in the Section
-  cardPaging(orderBy: [OrderBy], filterValues: FilterValues, resolverArgs: [QueryResolverArgs], after: String, first: Int, before: String, last: Int): SectionCardConnection
+  listCards(orderBy: [OrderBy], filterValues: FilterValues, resolverArgs: [QueryResolverArgs], after: String, first: Int, before: String, last: Int): SectionCardConnection
 
   # all Courses in the database
   coursePaging(orderBy: [OrderBy], filterValues: FilterValues, resolverArgs: [QueryResolverArgs], after: String, first: Int, before: String, last: Int): CourseConnection
+
+  # all Courses in the database
+  listCourses(orderBy: [OrderBy], filterValues: FilterValues, resolverArgs: [QueryResolverArgs], after: String, first: Int, before: String, last: Int): CourseConnection
   langType: [Lang]
 
   # Instructors
@@ -394,20 +403,19 @@ type Query {
   notificationPaging: notificationPaging
 
   # Question Entry
+  getQuestionHint(orderBy: [OrderBy], filterValues: FilterValues, resolverArgs: [QueryResolverArgs], after: String, first: Int, before: String, last: Int): Question
+
+  # Question Entry
   questionHint(orderBy: [OrderBy], filterValues: FilterValues, resolverArgs: [QueryResolverArgs], after: String, first: Int, before: String, last: Int): Question
 
-  # get Question by Unit
-  questionPaging(orderBy: [OrderBy], filterValues: FilterValues, resolverArgs: [QueryResolverArgs], after: String, first: Int, before: String, last: Int): QuestionConnection
-
-  # get Questions For Exam
-  questionPagingExam(orderBy: [OrderBy], filterValues: FilterValues, resolverArgs: [QueryResolverArgs], after: String, first: Int, before: String, last: Int): QuestionConnection
-
   # all Sections in the Unit
-  sectionPaging(orderBy: [OrderBy], filterValues: FilterValues, resolverArgs: [QueryResolverArgs], after: String, first: Int, before: String, last: Int): UnitSectionConnection
-  topicFilter: [ListDef]
+  listSections(orderBy: [OrderBy], filterValues: FilterValues, resolverArgs: [QueryResolverArgs], after: String, first: Int, before: String, last: Int): UnitSectionConnection
 
   # all Units in the course
   unitPaging(orderBy: [OrderBy], filterValues: FilterValues, resolverArgs: [QueryResolverArgs], after: String, first: Int, before: String, last: Int): CourseUnitConnection
+
+  # all Units in the course
+  listUnits(orderBy: [OrderBy], filterValues: FilterValues, resolverArgs: [QueryResolverArgs], after: String, first: Int, before: String, last: Int): CourseUnitConnection
 
   # User exam status for Course
   userCourseUnitExamStatusPaging(orderBy: [OrderBy], filterValues: FilterValues, resolverArgs: [QueryResolverArgs], after: String, first: Int, before: String, last: Int): CourseUnitConnection
@@ -436,15 +444,6 @@ type Question implements Node {
   card_id: ID!
 }
 
-# A connection to a list of items.
-type QuestionConnection {
-  # Information to aid in pagination.
-  pageInfo: PageInfo!
-
-  # A list of edges.
-  edges: [QuestionEdge]
-}
-
 # Question data for several question types
 type QuestionData implements Node {
   # The ID of an object
@@ -455,15 +454,6 @@ type QuestionData implements Node {
   explanation: String
   src_files: String
   options: [QuestionMultipleData]
-}
-
-# An edge in a connection.
-type QuestionEdge {
-  # The item at the end of the edge
-  node: Question
-
-  # A cursor for use in pagination
-  cursor: String!
 }
 
 # Question data for the `multiple_choice_single` and `multiple_choice_many` question types

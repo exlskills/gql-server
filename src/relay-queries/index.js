@@ -6,32 +6,64 @@ import pagingQueries from './paging';
 import courseQueries from './no-paging/course';
 import questionQueries from './no-paging/question';
 import langQueries from './no-paging/lang';
-import examAttempt from './no-paging/exam-attempt';
+import examSession from './no-paging/exam-session';
 
 export default {
   node: NodeField,
+
   // Individual
-  courseById: courseQueries.courseById,
+
+  // TODO remove dup after spf update
+  getCourseById: courseQueries.getCourseById,
+  courseById: courseQueries.getCourseById,
+
   courseUnit: courseQueries.courseUnit,
-  courseDeliverySchedule: courseQueries.courseDeliveryScheduleByMethod,
-  cardEntry: courseQueries.sectionCardEntry,
-  cardByQuestion: courseQueries.cardByQuestion,
-  userActivityCountByDate: queryUsers.userActivityCountByDate,
-  userProfile: queryUsers.userProfile,
+
+  // TODO remove dup after spf update
+  getCourseDeliverySchedule: courseQueries.getCourseDeliverySchedule,
+  courseDeliverySchedule: courseQueries.getCourseDeliverySchedule,
+
+  // TODO remove dup after spf update
+  cardEntry: courseQueries.getCard,
+  getCard: courseQueries.getCard,
+  getCardByQuestion: courseQueries.getCardByQuestion,
+
+  topicFilter: courseQueries.topicFilter,
+
+  getUserActivityCountByDate: queryUsers.getUserActivityCountByDate,
+
+  // TODO remove dup after spf update
+  getUserProfile: queryUsers.getUserProfile,
+  userProfile: queryUsers.getUserProfile,
+
   examToTake: queryExam.examToTake,
-  examAttempt: examAttempt.examAttempt,
+
+  examSession: examSession.examAttempt,
+
   // Paging
   listActivities: pagingQueries.listActivities,
-  cardPaging: pagingQueries.cardPaging,
-  coursePaging: pagingQueries.coursePaging,
+  listCards: pagingQueries.listCards,
+
+  // TODO remove dup after spf update
+  coursePaging: pagingQueries.listCourses,
+  listCourses: pagingQueries.listCourses,
+
   langType: langQueries.langType,
   listInstructors: pagingQueries.listInstructors,
   notificationPaging: pagingQueries.notificationPaging,
-  questionHint: questionQueries.questionHint,
-  questionPaging: pagingQueries.questionPaging,
-  questionPagingExam: pagingQueries.questionPagingExam,
-  sectionPaging: pagingQueries.sectionPaging,
-  topicFilter: courseQueries.topicFilter,
-  unitPaging: pagingQueries.unitPaging,
+
+  // TODO remove dup after spf update
+  getQuestionHint: questionQueries.getQuestionHint,
+  questionHint: questionQueries.getQuestionHint,
+
+  //questionPaging: pagingQueries.questionPaging,
+  //questionPagingExam: pagingQueries.questionPagingExam,
+
+  listSections: pagingQueries.listSections,
+
+  // TODO remove dup after spf update
+  unitPaging: pagingQueries.listUnits,
+  listUnits: pagingQueries.listUnits,
+
   userCourseUnitExamStatusPaging: pagingQueries.userCourseUnitExamStatusPaging
 };

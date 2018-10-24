@@ -1,4 +1,37 @@
-## courseDeliverySchedule
+## List Units
+```
+query listUnits {
+  listUnits(resolverArgs: [{param: "course_id", value: "Q291cnNlOmFwX2phdmE="}]) {
+    edges {
+      node {
+        title
+        has_exam
+      }
+    }
+  }
+}
+```
+
+## Card
+```
+query getCard {
+   getCard(course_id: "Q291cnNlOmludHJvX3RvX3B5dGhvbg==", unit_id: "VW5pdDpWZ01KQWZoWVVwT1o=", section_id: "U2VjdGlvbjpzdUFMUlh1dW54Q2w=", card_id: "Q2FyZDpQVkdBZU1qS0p4b2Q="){
+     title
+   }
+}   
+```
+
+## Question Hint
+```
+query getQuestionHint {
+   getQuestionHint(resolverArgs: [{param: "question_id", value: ""UXVlc3Rpb246OGIzMTZkNjQ3M2I1NDBhOGI2NTg4YzgxNGY2ZDdiNGI=""}]){
+     hint
+   }
+}   
+```
+
+
+## Course Delivery Schedule
 
 `course_id` should be base64-encoded string: concatenated word `Course` followed by semicolon and the course ID, e,g `Course:ap_java` is represented in the example below 
 ```$xslt
@@ -101,7 +134,7 @@ new Date(Date.UTC(2017, 0, 10, 21, 33, 15, 233))
 ## User Activity Count by Date
 ```
 query listActivities {
-  userActivityCountByDate(activityTypes:["attempted_exam"],dateRange:{date_from:"2018-09-10T00:00:00.000Z",date_to:"2019-01-10T00:00:00.000Z"}){
+  getUserActivityCountByDate(activityTypes:["attempted_exam"],dateRange:{date_from:"2018-09-10T00:00:00.000Z",date_to:"2019-01-10T00:00:00.000Z"}){
     count
     date
   }

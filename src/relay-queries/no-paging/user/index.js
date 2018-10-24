@@ -1,7 +1,7 @@
-import userActivityCountByDate from './user-activity';
-import userProfile from './user-profile';
+import getUserActivityCountByDate from './user-activity';
+import getUserProfile from './user-profile';
 
 export default {
-  userProfile,
-  userActivityCountByDate
+  getUserProfile,
+  getUserActivityCountByDate
 };

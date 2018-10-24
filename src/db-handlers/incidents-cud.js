@@ -10,8 +10,9 @@ export const recordIncident = async (user_id, incident_type, incident_desc) => {
     incident_desc: incident_desc
   };
   // Timestamp is auto-added
+  let incidentRecord = null;
   try {
-    const incidentRecord = await Incident.create(newIncidentObj);
+    incidentRecord = await Incident.create(newIncidentObj);
   } catch (err) {
     logger.error(
       `Record Incident failed with error ` +
@@ -21,5 +22,5 @@ export const recordIncident = async (user_id, incident_type, incident_desc) => {
     );
     return null;
   }
-  return incidentRecord._id;
+  return incidentRecord ? incidentRecord._id : null;
 };

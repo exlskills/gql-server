@@ -1,6 +1,6 @@
 import { GraphQLString } from 'graphql';
-import { resolveUserProfile } from '../../../relay-resolvers/user-resolvers';
-import { UserType } from '../../../relay-models/user';
+import { resolveUserProfile } from '../../../relay-resolvers/user-resolver';
+import { UserType } from '../../../relay-models/user-type';
 
 export default {
   type: UserType,

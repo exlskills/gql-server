@@ -8,6 +8,7 @@ import { getUserAnswer } from '../db-handlers/question-interaction-fetch';
 import { toGlobalId } from 'graphql-relay';
 import { logger } from '../utils/logger';
 import Course from '../db-models/course-model';
+import { recordIncident } from './incidents-cud';
 
 export const fetchById = async (obj_id, selectVal, viewer, info) => {
   logger.debug(`in Question fetchById`);
@@ -36,6 +37,7 @@ export const fetchQuestionHint = async (fetchParameters, viewer) => {
   array.push(elem);
   elem = {
     $project: {
+      exam_only: 1,
       'hint.intlString': projectionWriter.writeIntlStringFilter(
         'hint',
         viewerLocale
@@ -45,14 +47,27 @@ export const fetchQuestionHint = async (fetchParameters, viewer) => {
   array.push(elem);
   elem = {
     $project: {
+      exam_only: 1,
       hint: projectionWriter.writeIntlStringEval('hint', viewerLocale)
     }
   };
   array.push(elem);
-  let result = await Question.aggregate(array).exec();
-  //  logger.debug(result);
-  // return Question.aggregate(array).exec();
-  return result;
+  let questionRecord = await Question.aggregate(array).exec();
+  logger.debug(`in fetchQuestionHint result ` + JSON.stringify(questionRecord));
+
+  if (questionRecord && questionRecord.length > 0) {
+    const result = { _id: questionRecord[0]._id };
+    if (questionRecord[0].exam_only) {
+      //  Do not wait for this
+      recordIncident(viewer.user_id, 'exam_question', 'hit requested');
+      result.hint = 'Not available for Exam questions';
+    } else {
+      result.hint = questionRecord[0].hint;
+    }
+    return result;
+  } else {
+    return [];
+  }
 };
 
 export const getQuestions = async (

@@ -1,8 +1,8 @@
 import { GraphQLList, GraphQLString } from 'graphql';
 
-import { UserActivityType } from '../../../relay-models/user-activity';
-import { resolveUserActivityCountByDate } from '../../../relay-resolvers/user-resolvers';
-import * as inputTypes from '../../input-types';
+import { UserActivityType } from '../../../relay-models/user-activity-type';
+import { resolveUserActivityCountByDate } from '../../../relay-resolvers/user-resolver';
+import * as inputTypes from '../../input-types-get-query';
 
 export default {
   type: new GraphQLList(UserActivityType),

@@ -93,6 +93,9 @@ export const fetchCourseUnitsBase = async (
       index: '$Units.index',
       title: '$Units.title',
       attempts_allowed_per_day: '$Units.attempts_allowed_per_day',
+      has_exam: {
+        $cond: [{ $gt: [{ $size: '$Units.final_exams' }, 0] }, true, false]
+      },
       headline: '$Units.headline',
       _id: '$Units._id',
       currentCourseId: '$Units.currentCourseId'
@@ -105,6 +108,7 @@ export const fetchCourseUnitsBase = async (
   elem = {
     $project: {
       attempts_allowed_per_day: 1,
+      has_exam: 1,
       _id: '$_id',
       index: 1,
       title: 1,
@@ -127,6 +131,7 @@ export const fetchCourseUnitsBase = async (
         viewerLocale
       ),
       attempts_allowed_per_day: 1,
+      has_exam: 1,
       _id: 1,
       index: 1,
       currentCourseId: 1
@@ -142,6 +147,7 @@ export const fetchCourseUnitsBase = async (
       title: projectionWriter.writeIntlStringEval('title', viewerLocale),
       headline: projectionWriter.writeIntlStringEval('headline', viewerLocale),
       attempts_allowed_per_day: 1,
+      has_exam: 1,
       _id: 1,
       index: 1,
       currentCourseId: 1
@@ -202,8 +208,6 @@ export const fetchCourseUnitsWithDetailedStatus = async (
   // Get individual Secions and Cards and calculate the progress status
   for (let unitElem of arrayCourseUnitsDetails) {
     unitElem.attempts_left = 0;
-    unitElem.is_continue_exam = false;
-    unitElem.exam_ = '';
     let unitEmaSum = 0;
     let unitEmaCount = 0;
     let sectionArray = [];
@@ -288,16 +292,6 @@ export const fetchCourseUnitsWithDetailedStatus = async (
       unitElem.final_exam_weight_pct =
         examStatusByCourseUnit[examStatusUnitIndex].final_exam_weight_pct;
       unitElem.passed = examStatusByCourseUnit[examStatusUnitIndex].passed;
-
-      // TODO - deprecate this
-      let lastCancelled = await fetchLastCancExamSessionByUserUnit(
-        userId,
-        unitElem._id
-      );
-      if (lastCancelled && lastCancelled.isContinue === true) {
-        unitElem.is_continue_exam = true;
-        unitElem.exam_ = lastCancelled._id;
-      }
     }
   } // End of loop on Course Units
 

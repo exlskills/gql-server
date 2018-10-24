@@ -1,5 +1,5 @@
-import questionHint from './question-hint.js';
+import getQuestionHint from './question-hint-get-query.js';
 
 export default {
-  questionHint
+  getQuestionHint
 };

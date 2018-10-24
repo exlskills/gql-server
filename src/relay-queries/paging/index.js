@@ -1,24 +1,24 @@
 import {
-  coursePaging,
-  unitPaging,
-  sectionPaging,
-  cardPaging,
+  listCourses,
+  listUnits,
+  listSections,
+  listCards,
   userCourseUnitExamStatusPaging
-} from './course-paging';
-import { questionPaging, questionPagingExam } from './question';
-import { listActivities } from './list-activities';
-import { notificationPaging } from './notification-paging';
-import { listInstructors } from './user-paging';
+} from './course-list-query';
+import { questionPaging, questionPagingExam } from './question-list-query';
+import { listActivities } from './activity-list-query';
+import { notificationPaging } from './notification-list-query';
+import { listInstructors } from './user-list-query';
 
 export default {
   listActivities,
-  cardPaging,
-  coursePaging,
+  listCards,
+  listCourses,
   listInstructors,
   notificationPaging,
   questionPaging,
   questionPagingExam,
-  sectionPaging,
-  unitPaging,
+  listSections,
+  listUnits,
   userCourseUnitExamStatusPaging
 };

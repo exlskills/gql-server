@@ -1,4 +1,4 @@
-import readNotification from './read-notification';
+import readNotification from './read-notification-mutation';
 
 export default {
   readNotification
