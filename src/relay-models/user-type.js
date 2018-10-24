@@ -21,6 +21,7 @@ import { UserOrganizationRoleConnection } from './user-organization-role-type';
 import { UserCourseRoleConnection } from './user-course-role-type';
 
 import { NodeInterface } from './node-definitions-type';
+import { InstructorTimekit } from './instructor-timekit-type';
 
 export const UserType = new GraphQLObjectType({
   name: 'User',
@@ -76,6 +77,15 @@ export const UserType = new GraphQLObjectType({
     avatar_url: {
       type: GraphQLString
     },
+    twitter_username: {
+      type: GraphQLString
+    },
+    linkedin_username: {
+      type: GraphQLString
+    },
+    location_name: {
+      type: GraphQLString
+    },
     is_verified: {
       type: GraphQLBoolean
     },
@@ -90,6 +100,9 @@ export const UserType = new GraphQLObjectType({
       args: connectionArgs,
       resolve: (user, args) =>
         connectionFromArray(getUserInfo.getOrganizationRoles(user), args)
+    },
+    instructor_timekit: {
+      type: InstructorTimekit
     },
     course_roles: {
       type: UserCourseRoleConnection,

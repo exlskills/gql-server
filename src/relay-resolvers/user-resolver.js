@@ -8,6 +8,7 @@ import { logger } from '../utils/logger';
 import { connectionFromDataSource } from '../paging-processor/connection-from-datasource';
 import { fetchUserList } from '../db-handlers/user/user-list-fetch';
 import { getUserActivityCountByDate } from '../db-handlers/activity-fetch';
+import { recordIncident } from '../db-handlers/incidents-cud';
 
 export const findUserById = async (user_id, viewer, info) => {
   logger.debug(`in findUserById`);
@@ -30,12 +31,21 @@ export const findUserById = async (user_id, viewer, info) => {
 
 export const resolveUserProfile = async (obj, args, viewer, info) => {
   logger.debug(`in resolveUserProfile`);
+
   try {
     let userId =
-      args && args.user_id ? fromGlobalId(userId).id : viewer.user_id;
+      args && args.user_id ? fromGlobalId(args.user_id).id : viewer.user_id;
     let userRecord = await fetchUserProfileById(userId, viewer);
+    if (!userRecord) {
+      return null;
+    }
+    if (!userRecord.is_instructor && userRecord._id !== viewer.user_id) {
+      //  Do not wait for this
+      recordIncident(viewer.user_id, 'user_profile', 'profile requested');
+      return null;
+    }
     let locale = viewer.locale;
-    return mdbUserToGqlUser(userRecord, { userId, locale });
+    return await mdbUserToGqlUser(userRecord, { userId, locale });
   } catch (error) {
     return Promise.reject(error);
   }

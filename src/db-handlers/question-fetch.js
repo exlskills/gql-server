@@ -59,7 +59,7 @@ export const fetchQuestionHint = async (fetchParameters, viewer) => {
     const result = { _id: questionRecord[0]._id };
     if (questionRecord[0].exam_only) {
       //  Do not wait for this
-      recordIncident(viewer.user_id, 'exam_question', 'hit requested');
+      recordIncident(viewer.user_id, 'exam_question', 'hint requested');
       result.hint = 'Not available for Exam questions';
     } else {
       result.hint = questionRecord[0].hint;

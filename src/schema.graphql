@@ -277,6 +277,8 @@ type GetCurrentExamQuestionAnswerPayload {
   response_data: String
   completionObj: CompletionObj
   clientMutationId: String
+type InstructorTimekit {
+  intervals: TimekitInterval!
 }
 
 # Item Price
@@ -623,6 +625,12 @@ type SubmitExamPayload {
   clientMutationId: String
 }
 
+type TimekitInterval {
+  credits: Int
+  duration_seconds: Int
+  project_id: String
+}
+
 # Section of an EXLskills unit
 type UnitSection implements Node {
   # The ID of an object
@@ -709,9 +717,13 @@ type User implements Node {
   primary_locale: String!
   subscription: UserSubscriptionConnection
   avatar_url: String
+  twitter_username: String
+  linkedin_username: String
+  location_name: String
   is_verified: Boolean
   auth_strategies(after: String, first: Int, before: String, last: Int): AuthStrategyConnection
   organization_roles(after: String, first: Int, before: String, last: Int): UserOrganizationRoleConnection
+  instructor_timekit: InstructorTimekit
   course_roles(after: String, first: Int, before: String, last: Int): UserCourseRoleConnection
 }
 
