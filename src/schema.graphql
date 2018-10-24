@@ -277,6 +277,8 @@ type GetCurrentExamQuestionAnswerPayload {
   response_data: String
   completionObj: CompletionObj
   clientMutationId: String
+}
+
 type InstructorTimekit {
   intervals: TimekitInterval!
 }

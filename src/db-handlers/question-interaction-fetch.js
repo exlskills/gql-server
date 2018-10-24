@@ -50,7 +50,10 @@ export const findByQuestionIds = async (
       conditions.exam_type = type;
     }
     if (!opts.includeEmpty) {
-      conditions.response_data = { $exists: true, $ne: null };
+      conditions.answer_submissions = {
+        $exists: true,
+        $ne: null
+      };
     }
 
     let query = QuestionInteraction.find(conditions);

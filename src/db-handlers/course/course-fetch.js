@@ -321,7 +321,7 @@ export const fetchCourseAndCardInteraction = async (
       .sort({ updated_at: -1 })
       .select({ card_id: 1, card_ref: 1 })
       .exec();
-    // logger.debug(`  lastAccessRefsResp ` + lastAccessRefsResp);
+    logger.debug(`  lastAccessRefsResp ` + lastAccessRefsResp);
     courseRecord.last_accessed_card = lastAccessRefsResp.card_id;
     const lastAccessRefs =
       lastAccessRefsResp.card_ref.EmbeddedDocRef.embedded_doc_refs;
