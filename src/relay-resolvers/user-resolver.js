@@ -1,5 +1,8 @@
 import { basicFind } from '../db-handlers/basic-query-handler';
-import { fetchUserProfileById } from '../db-handlers/user/user-fetch';
+import {
+  fetchUserProfileById,
+  fetchUserActivities
+} from '../db-handlers/user/user-fetch';
 import User from '../db-models/user-model';
 import { mdbUserToGqlUser } from '../parsers/user-parser';
 import { fromGlobalId } from 'graphql-relay';
@@ -7,7 +10,6 @@ import moment from 'moment';
 import { logger } from '../utils/logger';
 import { connectionFromDataSource } from '../paging-processor/connection-from-datasource';
 import { fetchUserList } from '../db-handlers/user/user-list-fetch';
-import { getUserActivityCountByDate } from '../db-handlers/activity-fetch';
 import { recordIncident } from '../db-handlers/incidents-cud';
 
 export const findUserById = async (user_id, viewer, info) => {
@@ -31,7 +33,6 @@ export const findUserById = async (user_id, viewer, info) => {
 
 export const resolveUserProfile = async (obj, args, viewer, info) => {
   logger.debug(`in resolveUserProfile`);
-
   try {
     let userId =
       args && args.user_id ? fromGlobalId(args.user_id).id : viewer.user_id;
@@ -51,41 +52,28 @@ export const resolveUserProfile = async (obj, args, viewer, info) => {
   }
 };
 
-export const resolveUserActivityCountByDate = async (
-  obj,
-  args,
-  viewer,
-  info
-) => {
-  logger.debug(`in resolveUserActivityCountByDate`);
-  logger.debug(` args ` + JSON.stringify(args));
-
-  let startDate = null;
-  let endDate = null;
-  if (args.dateRange) {
-    if (args.dateRange.date_from) {
-      startDate = args.dateRange.date_from;
-    }
-    if (args.dateRange.date_to) {
-      endDate = args.dateRange.date_to;
-    }
-  } else {
-    startDate = moment()
-      .utc()
-      .startOf('day')
-      .toDate();
-    endDate = moment()
-      .utc()
-      .endOf('day')
-      .toDate();
+export const resolveUserActivities = async (obj, args, viewer, info) => {
+  logger.debug(`in resolveUserActivities`);
+  if (!args || !args.start_date || !args.end_date) {
+    return Promise.reject('start_date and end_date are required');
   }
 
+  let startDate = moment(args.start_date, 'YYYY-MM-DD');
+  let endDate = moment(args.end_date, 'YYYY-MM-DD');
+  if (!startDate.isValid() || !endDate.isValid()) {
+    return Promise.reject('start_date and/or end_date are not valid');
+  }
+  startDate = startDate.startOf('day');
+  endDate = endDate.endOf('day');
+
+  let userId =
+    args && args.user_id ? fromGlobalId(args.user_id).id : viewer.user_id;
+
   try {
-    return await getUserActivityCountByDate(
-      viewer.user_id,
-      startDate,
-      endDate,
-      args.activityTypes
+    return await fetchUserActivities(
+      userId,
+      startDate.toDate(),
+      endDate.toDate()
     );
   } catch (error) {
     return Promise.reject(error);
@@ -99,7 +87,8 @@ export const resolveListInstructors = async (obj, args, viewer, info) => {
   const businessKey = '_id';
   args.filterValues = { is_instructor: true };
 
-  const resolverArgs = {};
+  const resolverArgs = { instructorTopics: args.instructorTopics };
+
   if (args.resolverArgs) {
     try {
       for (let arg of args.resolverArgs) {
@@ -112,7 +101,6 @@ export const resolveListInstructors = async (obj, args, viewer, info) => {
 
   const fetchParameters = {
     list_type: 'instructors',
-    instructorTopics: args.instructorTopics,
     resolverArgs: resolverArgs
   };
 

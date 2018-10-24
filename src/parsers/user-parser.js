@@ -1,6 +1,5 @@
 import { getStringByLocale } from './intl-string-parser';
 import { logger } from '../utils/logger';
-import { fetchLocalDescArrayByTypeAndValueArray } from '../db-handlers/list-def-fetch';
 
 export const mdbUserToGqlUser = async (user, viewer) => {
   logger.debug(`in mdbUserToGqlUser`);
