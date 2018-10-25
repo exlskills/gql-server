@@ -95,6 +95,7 @@ type Course implements Node {
   last_accessed_section: String
   last_accessed_card: String
   delivery_methods: [String]
+  instructor_timekit: InstructorTimekit
 }
 
 # A connection to a list of items.
@@ -280,7 +281,7 @@ type GetCurrentExamQuestionAnswerPayload {
 }
 
 type InstructorTimekit {
-  intervals: TimekitInterval!
+  intervals: [TimekitInterval]
 }
 
 # Item Price

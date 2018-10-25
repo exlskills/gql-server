@@ -50,8 +50,7 @@ export async function basicFind(
   }
 
   try {
-    result = await queryFunc.exec();
-    return result;
+    return await queryFunc.exec();
   } catch (err) {
     logger.error(`Find failed ` + err + `; model ` + model);
     return Promise.reject('Find failed', err);

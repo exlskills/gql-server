@@ -2,7 +2,6 @@ import { processExamQuestionInteraction } from '../db-handlers/question-interact
 import * as QuestionFetch from '../db-handlers/question-fetch';
 import { logger } from '../utils/logger';
 import * as ExamSessionFetch from '../db-handlers/exam-session-fetch';
-import moment from 'moment';
 import { recordIncident } from '../db-handlers/incidents-cud';
 import * as QuestionInteractionFetch from '../db-handlers/question-interaction-fetch';
 
@@ -116,9 +115,7 @@ export const processExamQuestionAnswer = async (
   logger.debug(`   exam_session_id ` + exam_session_id);
   logger.debug(`   response_data ` + response_data);
 
-  const received_at = moment()
-    .utc()
-    .toDate();
+  const received_at = new Date();
 
   const verification = await verifyExamQuestionAnswerCall(
     question_id,

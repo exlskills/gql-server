@@ -71,14 +71,26 @@ function startGraphQLServer(callback) {
 
   graphQLApp.use(bodyParser.json());
 
+  const graphQLHTTPOpts = {
+    graphiql: true,
+    pretty: true,
+    schema: Schema
+  };
+
+  if (process.env.NODE_ENV !== 'production') {
+    graphQLHTTPOpts.formatError = error => ({
+      message: error.message,
+      locations: error.locations,
+      stack: error.stack
+    });
+  }
+
   graphQLApp.use(
     '/graph',
     middleware.getViewer,
     middleware.loginRequired,
     graphQLHTTP((request, response, graphQLParams) => ({
-      graphiql: true,
-      pretty: true,
-      schema: Schema,
+      ...graphQLHTTPOpts,
       context: request.gqlviewer
     }))
   );

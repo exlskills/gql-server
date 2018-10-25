@@ -49,6 +49,7 @@ export const findByQuestionIds = async (
     if (type) {
       conditions.exam_type = type;
     }
+
     if (!opts.includeEmpty) {
       conditions.answer_submissions = {
         $exists: true,

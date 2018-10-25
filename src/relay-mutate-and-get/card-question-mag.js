@@ -1,5 +1,4 @@
 import { logger } from '../utils/logger';
-import moment from 'moment';
 import * as QuestionFetch from '../db-handlers/question-fetch';
 import { QUESTION_TYPES } from '../db-models/question-model';
 import {
@@ -21,9 +20,7 @@ export const processCardQuestionAction = async (
   logger.debug(`   question_id ` + question_id);
   logger.debug(`   response_data ` + response_data);
 
-  const received_at = moment()
-    .utc()
-    .toDate();
+  const received_at = new Date();
 
   try {
     const question = await QuestionFetch.fetchById(question_id, {

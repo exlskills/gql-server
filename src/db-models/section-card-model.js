@@ -31,12 +31,11 @@ export default new mongoose.Schema(
       required: true
     },
     question_ids: {
-      type: [String],
-      requrired: true
+      type: [String]
     },
+    // TODO deprecate and remove
     card_ref: {
-      type: EmbeddedDocRef,
-      required: true
+      type: EmbeddedDocRef
     },
     course_item_ref: {
       type: CourseItemRefSchema

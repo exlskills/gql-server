@@ -1,11 +1,11 @@
 import Course from '../../db-models/course-model';
-import ListDef from '../../db-models/list-def-model';
 import * as projectionWriter from '../../utils/projection-writer';
 import { basicFind } from '../../db-handlers/basic-query-handler';
 import { getStringByLocale } from '../../parsers/intl-string-parser';
 import CardInteraction from '../../db-models/card-interaction-model';
 import { logger } from '../../utils/logger';
 import { toClientUrlId } from '../../utils/client-url';
+import { getLastAccessedCourseItemForUser } from '../card-interaction-fetch';
 
 export const fetchById = async (obj_id, selectVal, viewer, info) => {
   logger.debug(`in Course fetchById`);
@@ -288,10 +288,14 @@ export const fetchCourseAndCardInteraction = async (
   logger.debug(`in fetchCourseAndCardInteraction`);
   logger.debug(`   course_id ` + course_id);
   logger.debug(`   user_id ` + viewer.user_id);
-  const selectVal = {
-    units: 0
-  };
-  let courseRecord = await fetchById(course_id, selectVal, viewer, info);
+  let courseRecord = await fetchById(
+    course_id,
+    {
+      units: 0
+    },
+    viewer,
+    info
+  );
   if (!courseRecord) {
     return {};
   }
@@ -313,34 +317,16 @@ export const fetchCourseAndCardInteraction = async (
     courseRecord.info_md,
     viewer.locale
   ).text;
-  try {
-    const lastAccessRefsResp = await CardInteraction.findOne({
-      user_id: viewer.user_id,
-      'card_ref.EmbeddedDocRef.embedded_doc_refs.0.doc_id': courseRecord._id
-    })
-      .sort({ updated_at: -1 })
-      .select({ card_id: 1, card_ref: 1 })
-      .exec();
-    logger.debug(`  lastAccessRefsResp ` + lastAccessRefsResp);
-    courseRecord.last_accessed_card = lastAccessRefsResp.card_id;
-    const lastAccessRefs =
-      lastAccessRefsResp.card_ref.EmbeddedDocRef.embedded_doc_refs;
-    lastAccessRefs.forEach(ref => {
-      switch (ref.level) {
-        case 'unit':
-          courseRecord.last_accessed_unit = ref.doc_id;
-          break;
-        case 'section':
-          courseRecord.last_accessed_section = ref.doc_id;
-          break;
-      }
-    });
-  } catch (err) {
-    logger.debug(`  course-fetch error ` + err);
-    courseRecord.last_accessed_unit = '';
-    courseRecord.last_accessed_section = '';
-    courseRecord.last_accessed_card = '';
-  }
+
+  const lastAccessedObj = await getLastAccessedCourseItemForUser(
+    viewer.user_id,
+    course_id
+  );
+
+  courseRecord = { ...courseRecord, ...lastAccessedObj };
+  logger.debug(
+    `    fetchCourseAndCardInteraction result ` + JSON.stringify(courseRecord)
+  );
   return courseRecord;
 };
 

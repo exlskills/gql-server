@@ -14,7 +14,6 @@ import { logger } from '../utils/logger';
 import { fetchByCourseAndUnitId } from '../db-handlers/course/course-unit-fetch';
 import { fetchExamSessionsByUserAndUnitToday } from '../db-handlers/exam-session-fetch';
 import { findActiveExamSessionsForUser } from '../db-handlers/exam-session-fetch';
-import moment from 'moment';
 import { recordIncident } from '../db-handlers/incidents-cud';
 import {
   gradeMCQuestionAnswer,
@@ -112,9 +111,7 @@ export const startExam = async (courseId, unitId, viewer, info) => {
     const exam = await examFetchById(exam_id, { time_limit: 1 });
     // Everything is validated and ready at this point
 
-    const started_at = moment()
-      .utc()
-      .toDate();
+    const started_at = new Date();
     // TODO - add a "grace period" based on the user connection speed
     const active_till = new Date(
       started_at.getTime() + exam.time_limit * 60000
@@ -176,9 +173,7 @@ export const startExam = async (courseId, unitId, viewer, info) => {
 export const processExamSubmission = async (exam_session_id, viewer, info) => {
   logger.debug(`in processExamSubmission`);
 
-  const received_at = moment()
-    .utc()
-    .toDate();
+  const received_at = new Date();
 
   const examSession = await ExamSessionFetch.fetchById(exam_session_id, {
     user_id: 1,

@@ -5,7 +5,7 @@ export default new mongoose.Schema({
     type: String,
     enum: [
       'view', // View card in the normal learning flow
-      'view_fq', // View card from Quiz link
+      'view_d', // View card from Discussion link
       'answ_c', // Correctly answered
       'answ_ic', // Incorrectly answered
       'skip', // Skipped actively - TBD
