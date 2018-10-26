@@ -216,6 +216,8 @@ export const fetchDigitalDiploma = async (digital_diploma_id, viewer, info) => {
     viewer.locale
   ).text;
 
+  localizeDigitalDiplomaPlans(digitalDiplomaRecord.plans, viewer.locale);
+
   return digitalDiplomaRecord;
 };
 
