@@ -286,7 +286,7 @@ type InstructorTimekit {
 
 # Item Price
 type ItemPriceType {
-  amount: Int
+  amount: Float
 }
 
 # Application Lang
