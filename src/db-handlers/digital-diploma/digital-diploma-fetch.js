@@ -194,7 +194,7 @@ export const fetchDigitalDiploma = async (digital_diploma_id, viewer, info) => {
     viewer,
     info
   );
-  if (!courseRecord) {
+  if (!digitalDiplomaRecord) {
     return {};
   }
   // logger.debug(`  digitalDiplomaRecord ` + digitalDiplomaRecord);
