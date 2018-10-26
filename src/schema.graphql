@@ -629,7 +629,7 @@ type SubmitExamPayload {
 }
 
 type TimekitInterval {
-  credits: Int
+  credits: Float
   duration_seconds: Int
   project_id: String
 }
