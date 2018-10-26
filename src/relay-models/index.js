@@ -30,3 +30,5 @@ export * from './user-subscription-type';
 export * from './user-type';
 export * from './versioned-content-record-type';
 export * from './versioned-content-type';
+export * from './digital-diploma-type';
+export * from './digital-diploma-plan-type';

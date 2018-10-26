@@ -190,6 +190,52 @@ input DateRange {
 # 8601 standard for representation of dates and times using the Gregorian calendar.
 scalar DateTime
 
+# EXLskills Digital Diploma Program
+type DigitalDiploma implements Node {
+  # The ID of an object
+  id: ID!
+  title: String!
+  headline: String!
+  description: String!
+  organization_ids: [ID]
+  primary_locale: String
+  logo_url: String!
+  cover_url: String!
+  is_published: Boolean!
+  topics: [String]
+  info_md: String!
+  skill_level: Int
+  est_minutes: Int
+  primary_topic: String
+  instructor_timekit: InstructorTimekit
+  plans: [DigitalDiplomaPlan]
+}
+
+# A connection to a list of items.
+type DigitalDiplomaConnection {
+  # Information to aid in pagination.
+  pageInfo: PageInfo!
+
+  # A list of edges.
+  edges: [DigitalDiplomaEdge]
+}
+
+# An edge in a connection.
+type DigitalDiplomaEdge {
+  # The item at the end of the edge
+  node: DigitalDiploma
+
+  # A cursor for use in pagination
+  cursor: String!
+}
+
+type DigitalDiplomaPlan {
+  _id: String
+  title: String
+  headline: String
+  cost: Float
+}
+
 type EmbeddedDocRef {
   embedded_doc_refs: EmbeddedDocRefRecordConnection!
 }
@@ -365,6 +411,7 @@ type Query {
     # The ID of an object
     id: ID!
   ): Node
+  getDigitalDiplomaById(digital_diploma_id: String): DigitalDiploma
   getCourseById(course_id: String): Course
   courseById(course_id: String): Course
 
@@ -421,6 +468,9 @@ type Query {
 
   # all Units in the course
   listUnits(orderBy: [OrderBy], filterValues: FilterValues, resolverArgs: [QueryResolverArgs], after: String, first: Int, before: String, last: Int): CourseUnitConnection
+
+  # all DigitalDiplomas in the database
+  listDigitalDiplomas(orderBy: [OrderBy], filterValues: FilterValues, resolverArgs: [QueryResolverArgs], after: String, first: Int, before: String, last: Int): DigitalDiplomaConnection
 
   # User exam status for Course
   userCourseUnitExamStatusPaging(orderBy: [OrderBy], filterValues: FilterValues, resolverArgs: [QueryResolverArgs], after: String, first: Int, before: String, last: Int): CourseUnitConnection
