@@ -19,6 +19,15 @@ export default new mongoose.Schema(
     cost: {
       type: Number,
       required: true
+    },
+    is_hidden: {
+      type: Boolean
+    },
+    closes_at: {
+      type: Date
+    },
+    opens_at: {
+      type: Date
     }
   },
   {

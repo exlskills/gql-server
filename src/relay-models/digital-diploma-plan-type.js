@@ -1,4 +1,4 @@
-import { GraphQLFloat, GraphQLString, GraphQLObjectType } from 'graphql';
+import { GraphQLFloat, GraphQLString, GraphQLBoolean, GraphQLObjectType } from 'graphql';
 
 export const DigitalDiplomaPlan = new GraphQLObjectType({
   name: 'DigitalDiplomaPlan',
@@ -15,6 +15,15 @@ export const DigitalDiplomaPlan = new GraphQLObjectType({
     },
     cost: {
       type: GraphQLFloat
+    },
+    is_hidden: {
+      type: GraphQLBoolean
+    },
+    closes_at: {
+      type: GraphQLString
+    },
+    opens_at: {
+      type: GraphQLString
     }
   })
 });

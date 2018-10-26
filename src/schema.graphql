@@ -234,6 +234,9 @@ type DigitalDiplomaPlan {
   title: String
   headline: String
   cost: Float
+  is_hidden: Boolean
+  closes_at: String
+  opens_at: String
 }
 
 type EmbeddedDocRef {

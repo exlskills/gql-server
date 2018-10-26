@@ -188,9 +188,7 @@ export const fetchDigitalDiploma = async (digital_diploma_id, viewer, info) => {
   logger.debug(`   user_id ` + viewer.user_id);
   let digitalDiplomaRecord = await fetchById(
     digital_diploma_id,
-    {
-      units: 0
-    },
+    {},
     viewer,
     info
   );
