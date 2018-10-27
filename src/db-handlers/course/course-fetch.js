@@ -152,7 +152,7 @@ export const fetchCourses = async (
       // filter courses to those where the user has any role
       elem = {
         $match: {
-          'users.course_roles._id': { $exists: true }
+          'users.course_roles.course_id': { $exists: true }
         }
       };
     }

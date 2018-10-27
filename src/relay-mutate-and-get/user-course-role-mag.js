@@ -9,11 +9,12 @@ export const updateUserCourseRole = async (
   info
 ) => {
   logger.debug(`in updateUserCourseRole`);
+  logger.debug(`     cudContent ` + JSON.stringify(cudContent));
   let completionObj = {
     code: '0',
     msg: ''
   };
-  // TODO discriminate between the different potentially-assigned roles and admin viewers
+  // TODO allow different roles and admin viewers
   if (viewer.user_id !== localUserId) {
     return Promise.reject('forbidden');
   }

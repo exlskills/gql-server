@@ -32,6 +32,8 @@ const ExamSessionSchema = new mongoose.Schema(
     // Need this low-cardinality index to quickly find active sessions
     is_active: {
       type: Boolean,
+      required: true,
+      default: true,
       index: true
     },
     started_at: {
@@ -45,10 +47,22 @@ const ExamSessionSchema = new mongoose.Schema(
       type: Date
     },
     time_limit_exceeded: {
-      type: Boolean
+      type: Boolean,
+      required: true,
+      default: false
     },
     final_grade_pct: {
       type: Number
+    },
+    is_being_graded: {
+      type: Boolean,
+      required: true,
+      default: false
+    },
+    grading_failed: {
+      type: Boolean,
+      required: true,
+      default: false
     }
   },
   {

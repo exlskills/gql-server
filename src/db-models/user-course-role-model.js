@@ -1,5 +1,4 @@
 import mongoose from 'mongoose';
-import EmbeddedDocRefSchema from './embedded-doc-ref-model';
 
 export default new mongoose.Schema(
   {
@@ -20,9 +19,6 @@ export default new mongoose.Schema(
     },
     last_accessed_at: {
       type: Date
-    },
-    last_accessed_item: {
-      type: EmbeddedDocRefSchema
     }
   },
   {

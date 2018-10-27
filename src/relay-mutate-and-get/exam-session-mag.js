@@ -176,6 +176,7 @@ export const processExamSubmission = async (exam_session_id, viewer, info) => {
   const received_at = new Date();
 
   const examSession = await ExamSessionFetch.fetchById(exam_session_id, {
+    _id: 1,
     user_id: 1,
     exam_id: 1,
     question_ids: 1,
@@ -222,13 +223,13 @@ export const processExamSubmission = async (exam_session_id, viewer, info) => {
     };
   }
 
-  const examRec = await examFetchById(examSession.exam_id, {
-    _id: 0,
-    pass_mark_pct: 1
-  });
-  logger.debug(`  examRec ` + JSON.stringify(examRec));
+  if (!examSession.is_active && !examSession.is_being_graded) {
+    const examRec = await examFetchById(examSession.exam_id, {
+      _id: 0,
+      pass_mark_pct: 1
+    });
+    logger.debug(`  examRec ` + JSON.stringify(examRec));
 
-  if (!examSession.is_active) {
     return {
       final_grade_pct: examSession.final_grade_pct,
       pass_mark_pct: examRec.pass_mark_pct,
@@ -240,12 +241,62 @@ export const processExamSubmission = async (exam_session_id, viewer, info) => {
     };
   }
 
+  // Don't wait for this
+  updateExamSession(
+    { _id: examSession._id },
+    {
+      submitted_at: received_at
+    }
+  );
+
+  let final_grade_pct = 0;
+  try {
+    final_grade_pct = await gradeExamSession(examSession, viewer, info);
+  } catch (gradingError) {
+    return {
+      completionObj: {
+        code: '1',
+        msg: 'Exam grading failed',
+        msg_id: 'grading_issue'
+      }
+    };
+  }
+
+  const examRec = await examFetchById(examSession.exam_id, {
+    _id: 0,
+    pass_mark_pct: 1
+  });
+  logger.debug(`  examRec ` + JSON.stringify(examRec));
+
+  return {
+    final_grade_pct: final_grade_pct,
+    pass_mark_pct: examRec.pass_mark_pct,
+    completionObj: {
+      code: '0',
+      msg: '',
+      msg_id: ''
+    }
+  };
+};
+
+export const gradeExamSession = async (examSession, viewer, info) => {
+  logger.debug(`in gradeExamSession`);
+
+  // Ensure the session is inactivated and marked as being graded
+  await updateExamSession(
+    { _id: examSession._id },
+    {
+      is_active: false,
+      is_being_graded: true
+    }
+  );
+
   let sum_pct_score = 0;
   for (let question_id of examSession.question_ids) {
     let gradingObj = { pct_score: 0 };
 
     const qiRecord = await fetchFinalAnswerJoinQuestion(
-      exam_session_id,
+      examSession._id,
       question_id,
       viewer.user_id
     );
@@ -276,36 +327,33 @@ export const processExamSubmission = async (exam_session_id, viewer, info) => {
             'Grading logic not implemented for question type ' +
               qiRecord.question.question_type
           );
-          return {
-            completionObj: {
-              code: '1',
-              msg: 'Exam grading failed',
-              msg_id: 'grading_issue'
-            }
-          };
+          throw new Error();
         }
       }
     } catch (err) {
       logger.error(
         `Grade question failed exam_session_id: ` +
-          exam_session_id +
+          examSession._id +
           ` question_id ` +
           question_id
       );
-      return {
-        completionObj: {
-          code: '1',
-          msg: 'Exam grading failed',
-          msg_id: 'grading_issue'
+      // Ensure the grading status is updated
+      await updateExamSession(
+        { _id: examSession._id },
+        {
+          is_being_graded: false,
+          grading_failed: true,
+          final_grade_pct: 0
         }
-      };
+      );
+      throw new Error('grading failed');
     }
 
     // Do not wait for this
     processExamQuestionInteraction(
       viewer.user_id,
       question_id,
-      exam_session_id,
+      examSession._id,
       received_at,
       null,
       {
@@ -320,24 +368,13 @@ export const processExamSubmission = async (exam_session_id, viewer, info) => {
   const final_grade_pct = sum_pct_score / examSession.question_ids.length;
   logger.debug(`  final_grade_pct ` + final_grade_pct);
 
-  // do not wait
-  updateExamSession(
-    { _id: exam_session_id },
+  // Ensure the grading status is updated
+  await updateExamSession(
+    { _id: examSession._id },
     {
-      is_active: false,
-      submitted_at: received_at,
-      time_limit_exceeded: false,
+      is_being_graded: false,
       final_grade_pct: final_grade_pct
     }
   );
-
-  return {
-    final_grade_pct: final_grade_pct,
-    pass_mark_pct: examRec.pass_mark_pct,
-    completionObj: {
-      code: '0',
-      msg: '',
-      msg_id: ''
-    }
-  };
+  return final_grade_pct;
 };
