@@ -9,6 +9,7 @@ import { questionPaging, questionPagingExam } from './question-list-query';
 import { listActivities } from './activity-list-query';
 import { notificationPaging } from './notification-list-query';
 import { listInstructors } from './user-list-query';
+import { listDigitalDiplomas } from './digital-diploma-list-query';
 
 export default {
   listActivities,
@@ -20,5 +21,6 @@ export default {
   questionPagingExam,
   listSections,
   listUnits,
-  userCourseUnitExamStatusPaging
+  userCourseUnitExamStatusPaging,
+  listDigitalDiplomas
 };

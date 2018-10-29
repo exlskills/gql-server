@@ -4,6 +4,7 @@ import queryUsers from './no-paging/user';
 import queryExam from './no-paging/exams';
 import pagingQueries from './paging';
 import courseQueries from './no-paging/course';
+import digitalDiplomaQueries from './no-paging/digital-diploma';
 import questionQueries from './no-paging/question';
 import langQueries from './no-paging/lang';
 import examSession from './no-paging/exam-session';
@@ -12,6 +13,8 @@ export default {
   node: NodeField,
 
   // Individual
+
+  getDigitalDiplomaById: digitalDiplomaQueries.getDigitalDiplomaById,
 
   // TODO remove dup after spf update
   getCourseById: courseQueries.getCourseById,
@@ -64,6 +67,8 @@ export default {
   // TODO remove dup after spf update
   unitPaging: pagingQueries.listUnits,
   listUnits: pagingQueries.listUnits,
+
+  listDigitalDiplomas: pagingQueries.listDigitalDiplomas,
 
   userCourseUnitExamStatusPaging: pagingQueries.userCourseUnitExamStatusPaging
 };

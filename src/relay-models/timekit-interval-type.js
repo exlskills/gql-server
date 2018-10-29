@@ -1,11 +1,11 @@
-import { GraphQLInt, GraphQLString, GraphQLObjectType } from 'graphql';
+import { GraphQLFloat, GraphQLInt, GraphQLString, GraphQLObjectType } from 'graphql';
 
 export const TimekitInterval = new GraphQLObjectType({
   name: 'TimekitInterval',
   description: '',
   fields: () => ({
     credits: {
-      type: GraphQLInt
+      type: GraphQLFloat
     },
     duration_seconds: {
       type: GraphQLInt
