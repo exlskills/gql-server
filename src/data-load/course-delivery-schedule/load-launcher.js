@@ -14,6 +14,7 @@ async function startRun() {
   logger.debug(`in startRun`);
   try {
     logger.info('Connecting to ' + config.mongo.uri + '/' + config.mongo.db);
+    mongoose.set('useCreateIndex', true);
     await mongoose.connect(
       config.mongo.uri + '/' + config.mongo.db,
       {

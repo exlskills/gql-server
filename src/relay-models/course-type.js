@@ -121,6 +121,9 @@ export const CourseType = new GraphQLObjectType({
     },
     instructor_timekit: {
       type: InstructorTimekit
+    },
+    weight: {
+      type: GraphQLFloat
     }
   }),
   interfaces: [NodeInterface]

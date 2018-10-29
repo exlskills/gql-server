@@ -1,3 +1,27 @@
+## List Courses
+```
+query listCourses {
+  listCourses(first: 9999, resolverArgs: [{param: "list", value: "relevant"}]) {
+    edges {
+      node {
+        id
+        title
+        headline
+        enrolled_count
+        view_count
+        logo_url
+        skill_level
+        est_minutes
+        primary_topic
+        verified_cert_cost
+        delivery_methods
+        weight
+      }
+    }
+  }
+}
+```
+
 ## List Units
 ```
 query listUnits {

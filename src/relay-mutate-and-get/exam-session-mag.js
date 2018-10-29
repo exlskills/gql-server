@@ -22,6 +22,8 @@ import {
 import { fetchFinalAnswerJoinQuestion } from '../db-handlers/question-interaction-fetch';
 import { QUESTION_TYPES } from '../db-models/question-model';
 import { processExamQuestionInteraction } from '../db-handlers/question-interaction-cud';
+import moment from 'moment';
+import { agenda } from '../scheduler/agenda-jobs';
 
 export const startExam = async (courseId, unitId, viewer, info) => {
   logger.debug(`in startExam`);
@@ -147,6 +149,13 @@ export const startExam = async (courseId, unitId, viewer, info) => {
         unit_id: unitId,
         exam_session_id: sessionDocId
       }
+    });
+
+    const schedTime = moment(active_till)
+      .add(10, 'seconds')
+      .toDate();
+    agenda.schedule(schedTime, 'closeExamSession', {
+      exam_session_id: sessionDocId
     });
 
     return {
@@ -300,6 +309,7 @@ export const gradeExamSession = async (examSession, viewer, info) => {
       question_id,
       viewer.user_id
     );
+    logger.debug(` qiRecord received ` + JSON.stringify(qiRecord));
     try {
       if (qiRecord && qiRecord.response_data) {
         if (
@@ -349,21 +359,22 @@ export const gradeExamSession = async (examSession, viewer, info) => {
       throw new Error('grading failed');
     }
 
-    // Do not wait for this
-    processExamQuestionInteraction(
-      viewer.user_id,
-      question_id,
-      examSession._id,
-      received_at,
-      null,
-      {
-        points: gradingObj.points,
-        pct_score: gradingObj.pct_score
-      }
-    );
-
+    if (qiRecord && qiRecord.response_data) {
+      // Do not wait for this
+      processExamQuestionInteraction(
+        viewer.user_id,
+        question_id,
+        examSession._id,
+        null,
+        null,
+        {
+          points: gradingObj.points,
+          pct_score: gradingObj.pct_score
+        }
+      );
+    }
     sum_pct_score += gradingObj.pct_score;
-  }
+  } // END OF LOOP on Exam Questions
 
   const final_grade_pct = sum_pct_score / examSession.question_ids.length;
   logger.debug(`  final_grade_pct ` + final_grade_pct);

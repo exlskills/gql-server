@@ -1,7 +1,6 @@
 import { basicFind } from '../../db-handlers/basic-query-handler';
 import User from '../../db-models/user-model';
 import * as projectionWriter from '../../utils/projection-writer';
-import Activity from '../../db-models/activity-model';
 import Organization from '../../db-models/organization-model';
 import mongoose from 'mongoose';
 import { logger } from '../../utils/logger';

@@ -65,7 +65,8 @@ export const fetchCourses = async (
     logo_url: 1,
     _id: 1,
     delivery_methods: 1,
-    delivery_structures: 1
+    delivery_structures: 1,
+    weight: { $ifNull: ['$weight', 0] }
   };
   let courseIntlStringFields = {
     title: 1,
@@ -73,13 +74,13 @@ export const fetchCourses = async (
     description: 1
   };
 
-  // TODO: find easier way for custom sort...
-  // let sort = aggregateArray.find(item => !!item.$sort);
+  // Default sort is overridden below for specific queries
   let sort = {
     $sort: {
       title: 1
     }
   };
+
   let skip = aggregateArray.find(item => !!item.$skip);
   let limit = aggregateArray.find(item => !!item.$limit);
 
@@ -183,15 +184,12 @@ export const fetchCourses = async (
     };
     array.push(elem);
 
-    // TODO add relevancy logic based on Course counter fields
-    /*
     sort = {
       $sort: {
-        TBD
+        weight: -1,
         title: 1
       }
     };
-    */
   }
 
   if (fetchParameters.trending) {

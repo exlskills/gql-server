@@ -118,3 +118,26 @@ export const findActiveExamSessionsForUser = async (user_id, selectVal) => {
     return null;
   }
 };
+
+export const getExpiredExamSessionsToClose = async () => {
+  logger.debug(`in getExpiredExamSessionsToClose`);
+  try {
+    return await basicFind(
+      ExamSession,
+      null,
+      {
+        is_active: true,
+        is_being_graded: false,
+        active_till: {
+          $lt: moment()
+            .utc()
+            .toDate()
+        }
+      },
+      { started_at: -1 },
+      { _id: 1 }
+    );
+  } catch (errInternalAlreadyReported) {
+    return null;
+  }
+};

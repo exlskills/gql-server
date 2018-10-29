@@ -10,3 +10,5 @@ const schemaPath = path.resolve(__dirname, "../src/schema.graphql");
 fs.writeFileSync(schemaPath, printSchema(Schema));
 
 console.log("Wrote " + schemaPath);
+
+process.exit(0);

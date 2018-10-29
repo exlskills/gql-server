@@ -29,8 +29,8 @@ function startGraphQLServer(callback) {
   let promiseDb = mongoose.connect(
     config.mongo.uri + '/' + config.mongo.db,
     {
-      autoReconnect: true,
-      useNewUrlParser: true
+      useNewUrlParser: true,
+      autoReconnect: true
     }
   );
 

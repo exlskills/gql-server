@@ -98,6 +98,11 @@ const CourseSchema = new mongoose.Schema(
     },
     instructor_timekit: {
       type: InstructorTimekitSchema
+    },
+    weight: {
+      type: Number,
+      required: true,
+      default: 0
     }
   },
   {
