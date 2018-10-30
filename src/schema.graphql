@@ -240,35 +240,6 @@ type DigitalDiplomaPlan {
   opens_at: String
 }
 
-type EmbeddedDocRef {
-  embedded_doc_refs: EmbeddedDocRefRecordConnection!
-}
-
-type EmbeddedDocRefRecord implements Node {
-  # The ID of an object
-  id: ID!
-  level: Int!
-  doc_id: String!
-}
-
-# A connection to a list of items.
-type EmbeddedDocRefRecordConnection {
-  # Information to aid in pagination.
-  pageInfo: PageInfo!
-
-  # A list of edges.
-  edges: [EmbeddedDocRefRecordEdge]
-}
-
-# An edge in a connection.
-type EmbeddedDocRefRecordEdge {
-  # The item at the end of the edge
-  node: EmbeddedDocRefRecord
-
-  # A cursor for use in pagination
-  cursor: String!
-}
-
 # Event Duration
 type EventDuration {
   months: Int
@@ -579,7 +550,6 @@ type SectionCard implements Node {
   tags: [String]
   question_ids: [ID]
   ema: Float
-  card_ref: EmbeddedDocRef
   content: VersionedContentRecord
   question: Question
   questions: [Question]

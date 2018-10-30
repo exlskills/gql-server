@@ -1,5 +1,4 @@
 import mongoose from 'mongoose';
-import EmbeddedDocRefSchema from './embedded-doc-ref-model';
 import CardActionSchema from './card-action-model';
 import CourseItemRefSchema from './course-item-ref-model';
 
@@ -20,11 +19,6 @@ const CardInteractionSchema = new mongoose.Schema(
       required: true,
       index: true
     },
-    // TODO - deprecate after moving
-    card_ref: {
-      type: EmbeddedDocRefSchema,
-      required: true
-    },
     course_item_ref: {
       type: CourseItemRefSchema
     },
@@ -38,10 +32,6 @@ const CardInteractionSchema = new mongoose.Schema(
     timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' }
   }
 );
-
-CardInteractionSchema.index({
-  'card_ref.EmbeddedDocRef.embedded_doc_refs.doc_id': 1
-});
 
 export default mongoose.model(
   'CardInteraction',

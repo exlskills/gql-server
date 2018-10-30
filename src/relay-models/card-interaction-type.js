@@ -4,14 +4,15 @@ import { connectionDefinitions, globalIdField } from 'graphql-relay';
 
 import { NodeInterface } from './node-definitions-type';
 import { CardActionType } from './card-action-type';
+import { CourseItemRefType } from './course-item-ref-type';
 
 export const CardInteractionType = new GraphQLObjectType({
   name: 'CardInteraction',
   description: '',
   fields: () => ({
     id: globalIdField('CardInteraction', obj => obj._id),
-    card_ref: {
-      type: new GraphQLNonNull(EmbededDocRefType)
+    course_item_ref: {
+      type: new GraphQLNonNull(CourseItemRefType)
     },
     action: {
       type: new GraphQLNonNull(CardActionType)

@@ -11,9 +11,8 @@ import { connectionDefinitions, globalIdField } from 'graphql-relay';
 
 import { VersionedContentRecordType } from './versioned-content-record-type';
 import { QuestionType } from './question-type';
-import { EmbeddedDocRefType } from './embedded-doc-ref-type';
 import { NodeInterface } from './node-definitions-type';
-// import { resolveSectionCardEma } from '../relay-resolvers/ema-resolvers';
+// import { CourseItemRefType } from './course-item-ref-type';
 
 export const SectionCardType = new GraphQLObjectType({
   name: 'SectionCard',
@@ -41,9 +40,10 @@ export const SectionCardType = new GraphQLObjectType({
     ema: {
       type: GraphQLFloat
     },
-    card_ref: {
-      type: EmbeddedDocRefType
-    },
+    // This is not passed as the course-unit-section IDs are available - see the globalIds below
+    //course_item_ref: {
+    //  type: CourseItemRefType
+    //},
     content: {
       type: VersionedContentRecordType
     },
