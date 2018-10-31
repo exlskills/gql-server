@@ -64,6 +64,10 @@ const DigitalDiplomaSchema = new mongoose.Schema(
     instructor_timekit: {
       type: InstructorTimekitSchema
     },
+    is_project: {
+      type: Boolean,
+      default: false
+    },
     plans: {
       type: [DigitalDiplomaPlanSchema]
     }
