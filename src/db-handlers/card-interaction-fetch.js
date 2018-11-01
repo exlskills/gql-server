@@ -20,6 +20,20 @@ export const fetchById = async (obj_id, selectVal, viewer, info) => {
   return record;
 };
 
+export const fetchByUserIdAndCardId = async (user_id, card_id, selectVal) => {
+  try {
+    return await basicFind(
+      CardInteraction,
+      { isOne: true },
+      { user_id, card_id },
+      null,
+      selectVal
+    );
+  } catch (err) {
+    return null;
+  }
+};
+
 export const checkUserViewedCard = async (user_id, card_id) => {
   logger.debug(`in checkUserViewedCard`);
   let record;

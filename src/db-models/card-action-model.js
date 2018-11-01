@@ -1,6 +1,7 @@
 import mongoose from 'mongoose';
 
 export default new mongoose.Schema({
+  _id: false,
   action: {
     type: String,
     enum: [

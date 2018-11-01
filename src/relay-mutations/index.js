@@ -3,6 +3,7 @@ import examSession from './exam-session';
 import userMutations from './user';
 import userCourseRoleMutations from './user-course-role';
 import question from './question';
+import cardInteraction from './section-card';
 
 export default {
   readNotification: notification.readNotification,
@@ -19,5 +20,7 @@ export default {
 
   updateUserProfile: userMutations.updateUserProfile,
   updateUserUnitStatus: userMutations.updateUserUnitStatus,
-  updateUserCourseRole: userCourseRoleMutations.updateUserCourseRole
+  updateUserCourseRole: userCourseRoleMutations.updateUserCourseRole,
+
+  setCardInteraction: cardInteraction.setCardInteraction
 };

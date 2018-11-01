@@ -82,6 +82,7 @@ export const resolveGetCard = async (obj, args, viewer, info) => {
       if (scrolling.value === 'prev') {
         scrollingDir = -1;
       }
+      // NOTE: This below is not implemented
       fetchParameters = await SectionCardFetch.scrollToCard(
         scrollingDir,
         fetchParameters

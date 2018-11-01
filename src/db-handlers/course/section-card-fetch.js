@@ -436,56 +436,75 @@ export const fetchSectionCardIDsForUnit = async (course_id, unit_id) => {
   return result[0];
 };
 
-export const fetchSectionsCardIDs = async (course_id, unit_id, section_id) => {
-  logger.debug(`in fetchSectionsCardIDs`);
+export const scrollToCard = async (scrollingDir, fetchParameters) => {
+  logger.debug(`in scrollToCard`);
+  // FUTURE - call fetchSectionsCardIDs and navigate the the next or prev
+  // Currently, the evaluation is done on the client
+  return fetchParameters;
+};
 
+export const fetchCourseItemRefByCourseUnitCardId = async (
+  courseId,
+  unitId,
+  cardId
+) => {
+  logger.debug(`in fetchCourseItemRefByCourseUnitCardId`);
   let array = [];
+  let selectFields = {};
 
   // Find the course
-  array.push({ $match: { _id: course_id } });
+  array.push({ $match: { _id: courseId } });
 
   // Find the unit
   array.push({
     $project: {
+      ...selectFields,
       unit: {
         $filter: {
           input: '$units.Units',
-          cond: { $eq: ['$$this._id', unit_id] }
+          cond: { $eq: ['$$this._id', unitId] }
         }
       }
     }
   });
   array.push({ $unwind: '$unit' });
 
-  // Find the section
+  // Unwind Unit Sections
   array.push({
     $project: {
-      section: {
-        $filter: {
-          input: '$unit.sections.Sections',
-          cond: { $eq: ['$$this._id', section_id] }
-        }
-      }
+      ...selectFields,
+      section: '$unit.sections.Sections'
     }
   });
   array.push({ $unwind: '$section' });
 
+  // Find the card
   array.push({
     $project: {
-      'section.cards.Cards._id': 1,
-      'section.cards.Cards.index': 1
+      ...selectFields,
+      cards: {
+        $filter: {
+          input: '$section.cards.Cards',
+          cond: { $eq: ['$$this._id', cardId] }
+        }
+      }
     }
   });
 
-  let result = await Course.aggregate(array).exec();
-  logger.debug(`   section's fetched cards ` + JSON.stringify(result));
+  // Prepare card data
+  array.push({ $unwind: '$cards' });
+  array.push({
+    $project: {
+      ...selectFields,
+      course_item_ref: '$cards.course_item_ref'
+    }
+  });
 
-  return result[0];
-};
-
-export const scrollToCard = async (scrollingDir, fetchParameters) => {
-  logger.debug(`in scrollToCard`);
-  // FUTURE - call fetchSectionsCardIDs and navigate the the next or prev
-  // Currently, the evaluation is done on the client
-  return fetchParameters;
+  try {
+    const result = await Course.aggregate(array).exec();
+  } catch (err) {
+    logger.error(`in fetchCourseItemRefByCourseUnitCardId ` + err);
+    return null;
+  }
+  return result.length > 0 ? result[0] : null;
 };

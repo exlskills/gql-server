@@ -1,3 +1,9 @@
+
+Access:  http://localhost:8080/graph 
+
+Must have the cookies present in the browser - access the local Learn site at http://localhost:3000/learn  first 
+ 
+
 ## List Courses
 ```
 query listCourses {
@@ -261,6 +267,31 @@ mutation submitExam($submitExam: SubmitExamInput!){
 {
   "submitExam": {
     "exam_session_id": "RXhhbVNlc3Npb246NWJjZGMwODY2NDcwZGUwYjkxNDY5MDg0"
+  }
+}
+```
+
+## Set Card Interaction
+```
+mutation setCardInteraction($cardInteraction: SetCardInteractionInput!){
+  setCardInteraction(input: $cardInteraction) {
+    completionObj{
+      code
+      msg
+      msg_id
+    }
+  }
+}
+```
+### Variables
+```
+{
+  "cardInteraction": {
+    "course_id": "Q291cnNlOmludHJvX3RvX3B5dGhvbg==",
+    "unit_id": "VW5pdDpCWEVtZ3ZwaExCQVc=",
+    "section_id": "U2VjdGlvbjpsaWNyWnNFY2hqcUY=",
+    "card_id": "Q2FyZDpmRllTTXVSWXdlRG4=",
+    "interaction": "view"
   }
 }
 ```

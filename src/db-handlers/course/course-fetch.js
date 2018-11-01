@@ -31,6 +31,36 @@ export const fetchById = async (obj_id, selectVal, viewer, info) => {
   return record;
 };
 
+export const fetchOneCourseRecord = async (
+  queryVal,
+  selectVal,
+  viewer,
+  info
+) => {
+  logger.debug(`in fetchOneCourseRecord`);
+  logger.debug(`  queryVal ` + JSON.stringify(queryVal));
+
+  // NOTE: always specify selectVal to pull only fields required - or use aggregations
+  // E.g., { _id: 1, title: 1, headline: 1, description: 1 } or { units: 0 }
+
+  let record;
+  try {
+    //model, runParams, queryVal, sortVal, selectVal
+    record = await basicFind(
+      Course,
+      {
+        isOne: true
+      },
+      queryVal,
+      null,
+      selectVal
+    );
+  } catch (errInternalAlreadyReported) {
+    return null;
+  }
+  return record;
+};
+
 /**
  * Fetch Courses with filters and paging
  * @param {object} filterValues Contains `filterValuesString` as a free-form string
