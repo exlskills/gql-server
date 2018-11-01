@@ -239,6 +239,7 @@ type DigitalDiplomaPlan {
   is_hidden: Boolean
   closes_at: String
   opens_at: String
+  is_shipping_required: Boolean
 }
 
 # Event Duration
