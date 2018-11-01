@@ -28,6 +28,9 @@ export default new mongoose.Schema(
     },
     opens_at: {
       type: Date
+    },
+    is_shipping_required: {
+      type: Boolean
     }
   },
   {
