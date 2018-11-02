@@ -5,7 +5,33 @@ import { fetchCourseItemRefByCourseUnitCardId } from '../db-handlers/course/sect
 import CardInteraction from '../db-models/card-interaction-model';
 import { updateLastAccessedAt } from '../db-handlers/user/user-course-role-cud';
 
-export const processCardInteraction = async (
+export const processCardInteractionWrapper = (
+  course_id,
+  unit_id,
+  section_id,
+  card_id,
+  interaction,
+  viewer
+) => {
+  // Launching but not waiting
+  processCardInteraction(
+    course_id,
+    unit_id,
+    section_id,
+    card_id,
+    interaction,
+    viewer
+  );
+  return {
+    completionObj: {
+      code: '0',
+      msg: 'Action received',
+      msg_id: 'action_received'
+    }
+  };
+};
+
+const processCardInteraction = async (
   course_id,
   unit_id,
   section_id,

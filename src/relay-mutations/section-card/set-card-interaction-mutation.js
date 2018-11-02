@@ -2,7 +2,7 @@ import { GraphQLID, GraphQLNonNull, GraphQLString } from 'graphql';
 import { fromGlobalId, mutationWithClientMutationId } from 'graphql-relay';
 import { CompletionObjType } from '../../relay-models/completion-obj-type';
 import { logger } from '../../utils/logger';
-import { processCardInteraction } from '../../relay-mutate-and-get/card-interaction-mag';
+import { processCardInteractionWrapper } from '../../relay-mutate-and-get/card-interaction-mag';
 
 export default mutationWithClientMutationId({
   name: 'SetCardInteraction',
@@ -28,13 +28,14 @@ export default mutationWithClientMutationId({
     const localUnitId = fromGlobalId(unit_id).id;
     const localSectionId = fromGlobalId(section_id).id;
     const localCardId = fromGlobalId(card_id).id;
-    return processCardInteraction(
+    return processCardInteractionWrapper(
       localCourseId,
       localUnitId,
       localSectionId,
       localCardId,
       interaction,
       viewer
-    ).then(returnObj => returnObj);
+    );
+    // .then(returnObj => returnObj);
   }
 });

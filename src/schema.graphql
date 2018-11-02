@@ -336,6 +336,7 @@ type Mutation {
   updateUserProfile(input: UpdateUserProfileInput!): UpdateUserProfilePayload
   updateUserUnitStatus(input: UpdateUserUnitStatusInput!): UpdateUserUnitStatusPayload
   updateUserCourseRole(input: UpdateUserCourseRoleInput!): UpdateUserCourseRolePayload
+  setCardInteraction(input: SetCardInteractionInput!): SetCardInteractionPayload
 }
 
 # NextQuestion
@@ -592,6 +593,20 @@ type SessionInstructorType implements Node {
   avatar_url: String
   headline: String
   biography: String
+}
+
+input SetCardInteractionInput {
+  course_id: ID!
+  unit_id: ID!
+  section_id: ID
+  card_id: ID!
+  interaction: String
+  clientMutationId: String
+}
+
+type SetCardInteractionPayload {
+  completionObj: CompletionObj
+  clientMutationId: String
 }
 
 input SetExamQuestionAnswerInput {
