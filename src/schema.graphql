@@ -207,6 +207,7 @@ type DigitalDiploma implements Node {
   info_md: String!
   skill_level: Int
   est_minutes: Int
+  is_project: Boolean
   primary_topic: String
   instructor_timekit: InstructorTimekit
   plans: [DigitalDiplomaPlan]
@@ -238,6 +239,7 @@ type DigitalDiplomaPlan {
   is_hidden: Boolean
   closes_at: String
   opens_at: String
+  is_shipping_required: Boolean
 }
 
 # Event Duration

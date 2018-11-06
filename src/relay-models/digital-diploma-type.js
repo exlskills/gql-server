@@ -60,6 +60,9 @@ export const DigitalDiplomaType = new GraphQLObjectType({
     est_minutes: {
       type: GraphQLInt
     },
+    is_project: {
+      type: GraphQLBoolean
+    },
     primary_topic: {
       type: GraphQLString
     },

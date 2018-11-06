@@ -24,6 +24,9 @@ export const DigitalDiplomaPlan = new GraphQLObjectType({
     },
     opens_at: {
       type: GraphQLString
+    },
+    is_shipping_required: {
+      type: GraphQLBoolean
     }
   })
 });

@@ -66,6 +66,8 @@ export const fetchDigitalDiplomas = async (
     skill_level: 1,
     est_minutes: 1,
     primary_topic: 1,
+    is_published: 1,
+    is_project: 1,
     logo_url: 1,
     _id: 1,
     plans: 1
