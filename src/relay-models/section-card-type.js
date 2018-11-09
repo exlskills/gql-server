@@ -44,6 +44,9 @@ export const SectionCardType = new GraphQLObjectType({
     //course_item_ref: {
     //  type: CourseItemRefType
     //},
+    github_edit_url: {
+      type: GraphQLString
+    },
     content: {
       type: VersionedContentRecordType
     },

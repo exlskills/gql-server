@@ -35,6 +35,9 @@ export default new mongoose.Schema(
     },
     course_item_ref: {
       type: CourseItemRefSchema
+    },
+    github_edit_url: {
+      type: String
     }
   },
   {

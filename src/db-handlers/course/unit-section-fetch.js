@@ -68,7 +68,7 @@ export const fetchUnitSections = async (
         'Sections.headline',
         viewerLocale
       ),
-      // cards_list: '$Sections.cards.Cards',
+      cards_list: '$Sections.cards.Cards._id',
       _id: '$Sections._id',
       index: '$Sections.index',
       currentCourseId: 1,
@@ -82,7 +82,7 @@ export const fetchUnitSections = async (
     $project: {
       title: projectionWriter.writeIntlStringEval('title', viewerLocale),
       headline: projectionWriter.writeIntlStringEval('headline', viewerLocale),
-      // cards_list: 1,
+      cards_list: 1,
       _id: 1,
       index: 1,
       currentCourseId: 1,

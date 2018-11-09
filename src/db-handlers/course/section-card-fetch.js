@@ -82,8 +82,9 @@ export const fetchCardDetailsById = async (
       _id: '$cards._id',
       index: '$cards.index',
       content_id: '$cards.content_id',
-      tags: '$cards.tags'
+      tags: '$cards.tags',
       // question_ids: '$cards.question_ids',
+      github_edit_url: '$cards.github_edit_url'
     }
   });
   selectFields._id = 1;
@@ -91,6 +92,7 @@ export const fetchCardDetailsById = async (
   selectFields.content_id = 1;
   selectFields.tags = 1;
   // selectFields.question_ids = 1;
+  selectFields.github_edit_url = 1;
 
   array.push({
     $project: {
@@ -193,6 +195,10 @@ export const fetchSectionCards = async (
   fetchParameters
 ) => {
   logger.debug(`in fetchSectionCards`);
+  logger.debug(`  course_ID ` + fetchParameters.courseId);
+  logger.debug(`  unit_ID ` + fetchParameters.unitId);
+  logger.debug(`  section_ID ` + fetchParameters.sectionId);
+  logger.debug(`  card_ID ` + fetchParameters.cardId);
   let sort = { $sort: { index: 1 } };
   let skip = aggregateArray.find(item => !!item.$skip);
   let limit = aggregateArray.find(item => !!item.$limit);
@@ -273,7 +279,8 @@ export const fetchSectionCards = async (
       index: '$cards.index',
       content_id: '$cards.content_id',
       tags: '$cards.tags',
-      question_ids: '$cards.question_ids'
+      question_ids: '$cards.question_ids',
+      github_edit_url: '$cards.github_edit_url'
     }
   });
   selectFields._id = 1;
@@ -281,6 +288,7 @@ export const fetchSectionCards = async (
   selectFields.content_id = 1;
   selectFields.tags = 1;
   selectFields.question_ids = 1;
+  selectFields.github_edit_url = 1;
 
   array.push({
     $project: {

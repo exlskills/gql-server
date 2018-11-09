@@ -45,10 +45,32 @@ query listUnits {
 ## Card
 ```
 query getCard {
-   getCard(course_id: "Q291cnNlOmludHJvX3RvX3B5dGhvbg==", unit_id: "VW5pdDpWZ01KQWZoWVVwT1o=", section_id: "U2VjdGlvbjpzdUFMUlh1dW54Q2w=", card_id: "Q2FyZDpQVkdBZU1qS0p4b2Q="){
-     title
-   }
-}   
+  getCard(course_id: "Q291cnNlOmFwX2phdmE=", unit_id: "VW5pdDo5Yjg1OGFlYjczMTA0ZDEyOTJiZmFhYTRiZWE2Y2JjNA==", section_id: "U2VjdGlvbjpmZjgzMTcwYWE5ZjQ0NWNmODg3ZWExNzAwNGRjNWQxZA==", card_id: "Q2FyZDpkNGY5YTFhMGE2YTE0NDE4YTI3NzYwMTA5NmFjN2MzMQ==") {
+    title
+    github_edit_url
+  }
+}
+```
+
+## Course
+```
+query getCourse {
+  getCourseById(course_id: "Q291cnNlOmFwX2phdmE=") {
+    title
+    units {
+      edges {
+        node {
+          sections_list {
+            cards_list {
+              title
+              github_edit_url
+            }
+          }
+        }
+      }
+    }
+  }
+}
 ```
 
 ## Question Hint
