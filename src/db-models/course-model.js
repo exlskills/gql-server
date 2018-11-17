@@ -102,7 +102,8 @@ const CourseSchema = new mongoose.Schema(
     weight: {
       type: Number,
       required: true,
-      default: 0
+      default: 0,
+      index: true
     }
   },
   {

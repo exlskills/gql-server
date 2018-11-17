@@ -12,7 +12,8 @@ export default new mongoose.Schema(
     },
     index: {
       type: Number,
-      required: true
+      required: true,
+      index: true
     },
     title: {
       type: IntlString,

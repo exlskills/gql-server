@@ -80,7 +80,7 @@ export const getQuestions = async (
   logger.debug(`in getQuestions`);
   let filterArray = [];
   let elem;
-  let sort = { $sort: { index: 1 } };
+  let sort = { $sort: { _id: 1 } };
   let skip = aggregateArray.find(item => !!item.$skip);
   let limit = aggregateArray.find(item => !!item.$limit);
   if (fetchParameters.unitId) {

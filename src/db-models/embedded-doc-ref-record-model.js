@@ -4,11 +4,13 @@ export default new mongoose.Schema(
   {
     level: {
       type: String,
-      required: true
+      required: true,
+      index: true
     },
     doc_id: {
       type: String,
-      required: true
+      required: true,
+      index: true
     }
   },
   {

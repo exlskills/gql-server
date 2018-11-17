@@ -313,6 +313,10 @@ export const fetchSectionCards = async (
   delete selectFields.content_id;
 
   // get latest content version if not asked
+  fetchParameters.version = fetchParameters.version
+    ? fetchParameters.version
+    : 0;
+
   array.push({
     $project: {
       ...selectFields,

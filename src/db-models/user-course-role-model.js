@@ -18,7 +18,8 @@ export default new mongoose.Schema(
       required: true
     },
     last_accessed_at: {
-      type: Date
+      type: Date,
+      index: true
     }
   },
   {
