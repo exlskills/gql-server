@@ -32,7 +32,15 @@ const cfg = {
   db_debug_log:
     process.env.DB_DEBUG_LOG || process.env.NODE_ENV !== 'production',
   github_user_token: process.env.GITHUB_USER_TOKEN || 'create_me',
-  github_wh_token: process.env.GITHUB_WH_TOKEN || null
+  github_wh_token: process.env.GITHUB_WH_TOKEN || null,
+  elasticsearch: {
+    url: process.env.ELASTICSEARCH_URL || null,
+    api_version: process.env.ELASTICSEARCH_API_VERSION || '6.3',
+    course_base_index: process.env.ELASTICSEARCH_COURSE_BASE_INDEX || 'learn',
+    log_level:
+      process.env.ELASTICSEARCH_LOG_LEVEL ||
+      (process.env.NODE_ENV === 'production' ? 'warning' : 'trace')
+  }
 };
 
 export default cfg;

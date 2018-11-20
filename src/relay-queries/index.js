@@ -51,6 +51,8 @@ export default {
   coursePaging: pagingQueries.listCourses,
   listCourses: pagingQueries.listCourses,
 
+  listTextMatchingCourseItems: pagingQueries.listTextMatchingCourseItems,
+
   langType: langQueries.langType,
   listInstructors: pagingQueries.listInstructors,
   notificationPaging: pagingQueries.notificationPaging,

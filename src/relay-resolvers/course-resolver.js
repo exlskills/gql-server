@@ -9,6 +9,8 @@ import {
 import { fromGlobalId, toGlobalId } from 'graphql-relay';
 import { logger } from '../utils/logger';
 
+import { fetchTextMatchingCourseItems } from '../es-handlers/text-search';
+
 /**
  * Resolve function for CoursePaging query
  * @param {any} obj Not used for the moment
@@ -102,4 +104,31 @@ export const resolveCourseById = async (obj, args, viewer, info) => {
   } catch (err) {
     return Promise.reject(err);
   }
+};
+
+export const resolveListTextMatchingCourseItems = async (
+  obj,
+  args,
+  viewer,
+  info
+) => {
+  logger.debug(`in resolveListTextMatchingCourseItems`);
+  const businessKey = '_id';
+  const fetchParameters = { searchText: args.searchText };
+
+  fetchParameters.course_id = args.course_id
+    ? fromGlobalId(args.course_id).id
+    : null;
+  fetchParameters.unit_id = args.unit_id ? fromGlobalId(args.unit_id).id : null;
+  fetchParameters.section_id = args.section_id
+    ? fromGlobalId(args.section_id).id
+    : null;
+
+  const execDetails = {
+    queryFunction: fetchTextMatchingCourseItems,
+    businessKey: businessKey,
+    fetchParameters: fetchParameters
+  };
+
+  return connectionFromDataSource(execDetails, obj, args, viewer, info);
 };

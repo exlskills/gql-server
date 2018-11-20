@@ -50,6 +50,7 @@
     "cors": "^2.8.3",
     "diff-match-patch": "^1.0.0",
     "dotenv": "^6.0.0",
+    "elasticsearch": "^15.2.0",
     "express": "^4.16.3",
     "express-graphql": "^0.6.4",
     "express-healthcheck": "^0.1.0",

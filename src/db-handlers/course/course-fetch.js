@@ -2,7 +2,6 @@ import Course from '../../db-models/course-model';
 import * as projectionWriter from '../../utils/projection-writer';
 import { basicFind } from '../../db-handlers/basic-query-handler';
 import { getStringByLocale } from '../../parsers/intl-string-parser';
-import CardInteraction from '../../db-models/card-interaction-model';
 import { logger } from '../../utils/logger';
 import { toClientUrlId } from '../../utils/client-url';
 import { getLastAccessedCourseItemForUser } from '../card-interaction-fetch';

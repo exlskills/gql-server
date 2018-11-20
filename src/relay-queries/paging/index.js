@@ -3,7 +3,8 @@ import {
   listUnits,
   listSections,
   listCards,
-  userCourseUnitExamStatusPaging
+  userCourseUnitExamStatusPaging,
+  listTextMatchingCourseItems
 } from './course-list-query';
 import { questionPaging, questionPagingExam } from './question-list-query';
 import { listActivities } from './activity-list-query';
@@ -22,5 +23,6 @@ export default {
   listSections,
   listUnits,
   userCourseUnitExamStatusPaging,
-  listDigitalDiplomas
+  listDigitalDiplomas,
+  listTextMatchingCourseItems
 };

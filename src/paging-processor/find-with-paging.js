@@ -100,7 +100,7 @@ export async function findWithPaging(execDetails, args, viewerLocale) {
 
   limitVal = limitVal ? limitVal : -1;
 
-  array = await findOptimisticArray(
+  array = await fetchFromDatasource(
     execDetails,
     args,
     viewerLocale,
@@ -152,7 +152,7 @@ export async function findWithPaging(execDetails, args, viewerLocale) {
     hasPreviousPage = true;
   }
   if (movement) {
-    array = await findOptimisticArray(
+    array = await fetchFromDatasource(
       execDetails,
       args,
       viewerLocale,
@@ -196,7 +196,7 @@ export async function findWithPaging(execDetails, args, viewerLocale) {
   return { array, hasPreviousPage, hasNextPage, offset, anchor };
 }
 
-export async function findOptimisticArray(
+export async function fetchFromDatasource(
   execDetails,
   args,
   viewerLocale,
@@ -204,7 +204,7 @@ export async function findOptimisticArray(
   skipVal,
   limitVal
 ) {
-  logger.debug(`in (.....) findOptimisticArray`);
+  logger.debug(`in (.....) fetchFromDatasource`);
   let aggregateArray = aggregateBuilder(sortVal, skipVal, limitVal);
   try {
     return await execDetails.queryFunction(
@@ -214,7 +214,7 @@ export async function findOptimisticArray(
       execDetails.fetchParameters
     );
   } catch (error) {
-    logger.error(`catch in findOptimisticArray ` + error);
+    logger.error(`In fetchFromDatasource ` + error);
     return Promise.reject(error);
   }
 }

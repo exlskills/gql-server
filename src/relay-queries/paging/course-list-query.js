@@ -6,16 +6,21 @@ import {
   CourseConnection,
   CourseUnitConnection,
   SectionCardConnection,
+  TextDocCourseItemConnection,
   UnitSectionConnection
 } from '../../relay-models';
 
-import { resolveListCourses } from '../../relay-resolvers/course-resolver';
+import {
+  resolveListCourses,
+  resolveListTextMatchingCourseItems
+} from '../../relay-resolvers/course-resolver';
 import {
   resolveCourseUnits,
   resolveUserCourseUnitExamStatus
 } from '../../relay-resolvers/course-unit-resolver';
 import { resolveUnitSections } from '../../relay-resolvers/unit-section-resolver';
 import { resolveSectionCards } from '../../relay-resolvers/section-card-resolver';
+import { GraphQLString, GraphQLNonNull } from 'graphql';
 
 export const listCourses = {
   type: CourseConnection,
@@ -32,7 +37,8 @@ export const listCourses = {
     },
     ...connectionArgs
   },
-  resolve: (obj, args, viewer, info) => resolveListCourses(obj, args, viewer, info)
+  resolve: (obj, args, viewer, info) =>
+    resolveListCourses(obj, args, viewer, info)
 };
 
 export const listUnits = {
@@ -109,4 +115,35 @@ export const listCards = {
   },
   resolve: (obj, args, viewer, info) =>
     resolveSectionCards(obj, args, viewer, info)
+};
+
+export const listTextMatchingCourseItems = {
+  type: TextDocCourseItemConnection,
+  description: 'Text Docs for Matching Course Items',
+  args: {
+    searchText: {
+      type: new GraphQLNonNull(GraphQLString)
+    },
+    course_id: {
+      type: GraphQLString
+    },
+    unit_id: {
+      type: GraphQLString
+    },
+    section_id: {
+      type: GraphQLString
+    },
+    orderBy: {
+      type: inputTypes.OrderByType
+    },
+    filterValues: {
+      type: inputTypes.FilterValuesType
+    },
+    resolverArgs: {
+      type: inputTypes.QueryResolverArgsType
+    },
+    ...connectionArgs
+  },
+  resolve: (obj, args, viewer, info) =>
+    resolveListTextMatchingCourseItems(obj, args, viewer, info)
 };

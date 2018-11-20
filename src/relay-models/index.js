@@ -6,6 +6,7 @@ export * from './char-range-type';
 export * from './completion-obj-type';
 export * from './course-unit-type';
 export * from './course-type';
+export * from './text-doc-matched-course-item-type';
 export * from './embedded-doc-ref-record-type';
 export * from './embedded-doc-ref-type';
 export * from './exam-session-type';

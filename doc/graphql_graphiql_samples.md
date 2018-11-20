@@ -73,6 +73,33 @@ query getCourse {
 }
 ```
 
+## List Text Match
+```
+query listTextMatchingCourseItems {
+  listTextMatchingCourseItems(searchText: "Classes", course_id: "Q291cnNlOnN5bnRheF9qYXZh") {
+    edges {
+      node {
+        id
+        itemType
+        score
+        title
+        headline
+        course_id
+        unit_id
+        section_id
+        card_id
+        highlights {
+          inTitle
+          inHeadline
+          inText
+          inCode
+        }
+      }
+    }
+  }
+}
+```
+
 ## Question Hint
 ```
 query getQuestionHint {
