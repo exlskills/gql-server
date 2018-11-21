@@ -10,9 +10,12 @@ export const getValueByPathToKey = (obj, path) => {
   let value = obj;
   const parts = path.split('.');
   if (parts.length) {
-    path.split('.').filter(Boolean).forEach(part => {
-      value = value[part];
-    });
+    path
+      .split('.')
+      .filter(Boolean)
+      .forEach(part => {
+        value = value[part];
+      });
   } else {
     value = obj[path];
   }

@@ -35,8 +35,8 @@ export const fetchTextMatchingCourseItems = async (
     const searchObjBodyQueryBoolShouldMultimatch = {
       query: fetchParameters.searchText,
       fields: [
-        'title^30',
-        'title.exact',
+        'title^20',
+        'title.title_exact^40',
         'headline',
         'text_content',
         'code_content'
@@ -83,22 +83,25 @@ export const fetchTextMatchingCourseItems = async (
     searchObjBody.highlight = {
       fields: {
         title: {},
+        'title.title_exact': {},
         headline: {},
         text_content: {},
         code_content: {}
       }
     };
 
-    searchObj.body = searchObjBody;
+    searchObjBody.min_score = 0.1;
 
     const skip = aggregateArray.find(item => !!item.$skip);
     if (skip) {
-      searchObj.from = skip;
+      searchObjBody.from = skip.$skip + 1;
     }
     const limit = aggregateArray.find(item => !!item.$limit);
     if (limit) {
-      searchObj.size = limit;
+      searchObjBody.size = limit.$limit;
     }
+
+    searchObj.body = searchObjBody;
 
     logger.debug(` searchObj ` + JSON.stringify(searchObj));
 
@@ -146,7 +149,11 @@ export const fetchTextMatchingCourseItems = async (
           inText: [],
           inCode: []
         };
-        if (hit.highlight.title) {
+        if (hit.highlight['title.title_exact']) {
+          for (let highlightLine of hit.highlight['title.title_exact']) {
+            highlightObj.inTitle.push(highlightLine);
+          }
+        } else if (hit.highlight.title) {
           for (let highlightLine of hit.highlight.title) {
             highlightObj.inTitle.push(highlightLine);
           }

@@ -76,7 +76,7 @@ query getCourse {
 ## List Text Match
 ```
 query listTextMatchingCourseItems {
-  listTextMatchingCourseItems(searchText: "Classes", course_id: "Q291cnNlOnN5bnRheF9qYXZh") {
+  listTextMatchingCourseItems(first: 50, searchText: "Classes", course_id: "Q291cnNlOnN5bnRheF9qYXZh") {
     edges {
       node {
         id
