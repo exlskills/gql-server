@@ -4,7 +4,7 @@ import {
   fetchCourseDeliveryMethods,
   fetchCourseDeliverySchedule
 } from '../db-handlers/course/course-delivery-schedule-fetch';
-import { fetchByUserAndItemRefId } from '../db-handlers/user/user-orders-handler';
+import { fetchByUserAndItemRefId } from '../db-handlers/user/user-order-handler';
 import {
   ITEM_CATEGORY_COURSE_CERTIFICATE,
   ITEM_CATEGORY_COURSE_RUN

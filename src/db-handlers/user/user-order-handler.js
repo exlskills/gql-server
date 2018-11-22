@@ -1,6 +1,6 @@
 import { logger } from '../../utils/logger';
 import { basicFind } from '../basic-query-handler';
-import UserOrders from '../../db-models/user-orders-model';
+import UserOrder from '../../db-models/user-order-model';
 import {
   ITEM_CATEGORY_COURSE_CERTIFICATE,
   ITEM_CATEGORY_COURSE_RUN
@@ -25,7 +25,7 @@ export const fetchByUserAndItemRefId = async (
   }
   let record;
   try {
-    record = await basicFind(UserOrders, { isOne: true }, queryVal, null, null);
+    record = await basicFind(UserOrder, { isOne: true }, queryVal, null, null);
   } catch (errInternalAlreadyReported) {
     return null;
   }
