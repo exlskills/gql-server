@@ -130,6 +130,20 @@ type CourseEdge {
   cursor: String!
 }
 
+enum CourseItem {
+  course
+  unit
+  section
+  card
+}
+
+type CourseItemHighlight {
+  inTitle: [String]
+  inHeadline: [String]
+  inText: [String]
+  inCode: [String]
+}
+
 # Unit of an EXLskills course
 type CourseUnit implements Node {
   # The ID of an object
@@ -424,6 +438,9 @@ type Query {
 
   # all Courses in the database
   listCourses(orderBy: [OrderBy], filterValues: FilterValues, resolverArgs: [QueryResolverArgs], after: String, first: Int, before: String, last: Int): CourseConnection
+
+  # Text Docs for Matching Course Items
+  listTextMatchingCourseItems(searchText: String!, course_id: String, unit_id: String, section_id: String, orderBy: [OrderBy], filterValues: FilterValues, resolverArgs: [QueryResolverArgs], after: String, first: Int, before: String, last: Int): TextDocCourseItemConnection
   langType: [Lang]
 
   # Instructors
@@ -553,6 +570,7 @@ type SectionCard implements Node {
   tags: [String]
   question_ids: [ID]
   ema: Float
+  github_edit_url: String
   content: VersionedContentRecord
   question: Question
   questions: [Question]
@@ -565,6 +583,7 @@ type SectionCard implements Node {
 
   # The ID of an object
   currentSectionId: ID!
+  updated_at: DateTime
 }
 
 # A connection to a list of items.
@@ -667,6 +686,39 @@ type SubmitExamPayload {
   pass_mark_pct: Int
   completionObj: CompletionObj
   clientMutationId: String
+}
+
+# A connection to a list of items.
+type TextDocCourseItemConnection {
+  # Information to aid in pagination.
+  pageInfo: PageInfo!
+
+  # A list of edges.
+  edges: [TextDocCourseItemEdge]
+}
+
+# An edge in a connection.
+type TextDocCourseItemEdge {
+  # The item at the end of the edge
+  node: TextDocMatchedCourseItem
+
+  # A cursor for use in pagination
+  cursor: String!
+}
+
+# EXLskills Text Doc for Matched Course Item
+type TextDocMatchedCourseItem implements Node {
+  # The ID of an object
+  id: ID!
+  score: Float
+  itemType: CourseItem
+  title: String
+  headline: String
+  highlights: CourseItemHighlight
+  course_id: String
+  unit_id: String
+  section_id: String
+  card_id: String
 }
 
 type TimekitInterval {

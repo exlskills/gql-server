@@ -12,6 +12,7 @@ import { connectionDefinitions, globalIdField } from 'graphql-relay';
 import { VersionedContentRecordType } from './versioned-content-record-type';
 import { QuestionType } from './question-type';
 import { NodeInterface } from './node-definitions-type';
+import { GraphQLDateTime } from "graphql-iso-date";
 // import { CourseItemRefType } from './course-item-ref-type';
 
 export const SectionCardType = new GraphQLObjectType({
@@ -58,7 +59,10 @@ export const SectionCardType = new GraphQLObjectType({
     },
     currentCourseId: globalIdField('Course', obj => obj.currentCourseId),
     currentUnitId: globalIdField('CourseUnit', obj => obj.currentUnitId),
-    currentSectionId: globalIdField('UnitSection', obj => obj.currentSectionId)
+    currentSectionId: globalIdField('UnitSection', obj => obj.currentSectionId),
+    updated_at: {
+      type: GraphQLDateTime
+    }
   }),
   interfaces: [NodeInterface]
 });

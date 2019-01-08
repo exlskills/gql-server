@@ -36,9 +36,8 @@ export const updateExamSession = async (condition, object, opts = {}) => {
       `Update ExamSession doc failed with error: ` +
         err +
         ` ; Doc object: ` +
-        stringify(sessionObj)
+        stringify(object)
     );
     return null;
   }
 };
-

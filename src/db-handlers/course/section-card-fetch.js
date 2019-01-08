@@ -84,7 +84,8 @@ export const fetchCardDetailsById = async (
       content_id: '$cards.content_id',
       tags: '$cards.tags',
       // question_ids: '$cards.question_ids',
-      github_edit_url: '$cards.github_edit_url'
+      github_edit_url: '$cards.github_edit_url',
+      updated_at: '$cards.updated_at'
     }
   });
   selectFields._id = 1;
@@ -93,6 +94,7 @@ export const fetchCardDetailsById = async (
   selectFields.tags = 1;
   // selectFields.question_ids = 1;
   selectFields.github_edit_url = 1;
+  selectFields.updated_at = 1;
 
   array.push({
     $project: {
@@ -280,7 +282,8 @@ export const fetchSectionCards = async (
       content_id: '$cards.content_id',
       tags: '$cards.tags',
       question_ids: '$cards.question_ids',
-      github_edit_url: '$cards.github_edit_url'
+      github_edit_url: '$cards.github_edit_url',
+      updated_at: '$cards.updated_at'
     }
   });
   selectFields._id = 1;
@@ -289,6 +292,7 @@ export const fetchSectionCards = async (
   selectFields.tags = 1;
   selectFields.question_ids = 1;
   selectFields.github_edit_url = 1;
+  selectFields.updated_at = 1;
 
   array.push({
     $project: {
