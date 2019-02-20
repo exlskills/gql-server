@@ -1,8 +1,6 @@
 import express from 'express';
 import { logger } from '../utils/logger';
-import {
-  ServerError
-} from '../helpers/server';
+import { ServerError } from '../helpers/server';
 import { stringify } from 'flatted/cjs';
 import { loadCourseDeliverySchedule } from '../data-load/course-delivery-schedule/load-api-handler';
 
@@ -50,6 +48,7 @@ router.use((err, req, res, _next) => {
 
   logger.error('~~~ Unexpected error exception start ~~~');
   logger.error(err);
+  logger.error(err.stack);
   logger.error('~~~ Unexpected error exception end ~~~');
 
   return res.status(500).json({

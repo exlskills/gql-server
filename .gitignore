@@ -60,6 +60,7 @@ typings/
 # dotenv environment variables file
 .env
 .docker_run.env
+.env.*
 
 # Build output
 build/
