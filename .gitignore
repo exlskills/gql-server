@@ -61,6 +61,7 @@ typings/
 .env
 .env.*
 .docker_run.env
+.env.*
 
 # Build output
 build/

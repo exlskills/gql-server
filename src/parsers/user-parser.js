@@ -1,5 +1,6 @@
 import { getStringByLocale } from './intl-string-parser';
 import { logger } from '../utils/logger';
+import { fetchLocalDescArrayByTypeAndValueArray } from '../db-handlers/list-def-fetch.js';
 
 export const mdbUserToGqlUser = async (user, viewer) => {
   logger.debug(`in mdbUserToGqlUser`);
@@ -38,6 +39,7 @@ export const mdbUserToGqlUser = async (user, viewer) => {
     logger.debug(` gqlUser ` + JSON.stringify(gqlUser));
     return gqlUser;
   } catch (err) {
+    logger.error(`In mdbUserToGqlUser ` + err);
     return Promise.reject(err);
   }
 };
