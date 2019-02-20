@@ -25,6 +25,12 @@ export const updateUserProfile = async (locale, profile) => {
   if (user) {
     const intlFields = ['full_name', 'headline', 'biography'];
     for (let field of intlFields) {
+      if (!profile[field]) {
+        continue;
+      }
+      if (!user[field]) {
+        user[field] = { intlString: [] };
+      }
       const newData = updateIntlStringObject(
         user[field],
         locale,
@@ -32,11 +38,21 @@ export const updateUserProfile = async (locale, profile) => {
       );
       user[field] = setDefaultIntlStringLocale(newData, profile.primary_locale);
     }
-    user.primary_email = profile.primary_email.toLowerCase();
-    user.username = profile.username;
-    user.primary_locale = profile.primary_locale;
-    user.locales = profile.locales;
-
+    if (profile.primary_email) {
+      user.primary_email = profile.primary_email.toLowerCase();
+    }
+    if (profile.avatar_url) {
+      user.avatar_url = profile.avatar_url;
+    }
+    if (profile.username) {
+      user.username = profile.username;
+    }
+    if (profile.primary_locale) {
+      user.primary_locale = profile.primary_locale;
+    }
+    if (profile.locales) {
+      user.locales = profile.locales;
+    }
     try {
       return await user.save();
     } catch (error) {
