@@ -943,7 +943,7 @@ input UserProfileInput {
   headline: String
   locales: [String]
   primary_locale: String!
-  avatar_url: String!
+  avatar_url: String
 }
 
 # The users subscription level. All users have this field -- they then vary by their level

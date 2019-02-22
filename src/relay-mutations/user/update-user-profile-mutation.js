@@ -26,7 +26,7 @@ const UserProfileInputType = new GraphQLInputObjectType({
     headline: { type: GraphQLString },
     locales: { type: new GraphQLList(GraphQLString) },
     primary_locale: { type: new GraphQLNonNull(GraphQLString) },
-    avatar_url: { type: new GraphQLNonNull(GraphQLString) }
+    avatar_url: { type: GraphQLString }
   })
 });
 
@@ -47,6 +47,8 @@ export default mutationWithClientMutationId({
     if (profile && profile.id) {
       profile.id = fromGlobalId(profile.id).id;
     }
-    return updateUserProfile(locale, profile).then(returnObj => returnObj);
+    return updateUserProfile(locale, profile, viewer).then(
+      returnObj => returnObj
+    );
   }
 });
