@@ -36,7 +36,7 @@ export const fetchCourseDeliverySchedule = async (
   viewer,
   info
 ) => {
-  logger.debug(`in fetchCourseDeliverySchedule`);
+  // logger.debug(`in fetchCourseDeliverySchedule`);
   // logger.debug(`   course_id ` + course_id);
   const selectVal = {
     instructors: 1,
@@ -240,12 +240,12 @@ export const fetchCourseDeliverySchedule = async (
 
     result.scheduled_runs = scheduled_runs;
   }
-  logger.debug(` result ` + JSON.stringify(result));
+  logger.debug(` fetchCourseDeliverySchedule result ` + JSON.stringify(result));
   return result;
 };
 
 export const fetchCourseDeliveryMethods = async (course_id, viewer, info) => {
-  logger.debug(`in fetchCourseDeliverySchedule`);
+  // logger.debug(`in fetchCourseDeliveryMethods`);
   let result = [];
   const selectVal = {
     available_delivery_methods: 1
@@ -258,7 +258,7 @@ export const fetchCourseDeliveryMethods = async (course_id, viewer, info) => {
   if (courseDeliveryRecord && courseDeliveryRecord.available_delivery_methods) {
     result = courseDeliveryRecord.available_delivery_methods;
   }
-  logger.debug(` result ` + result);
+  // logger.debug(` fetchCourseDeliverySchedule result ` + result);
   return result;
 };
 

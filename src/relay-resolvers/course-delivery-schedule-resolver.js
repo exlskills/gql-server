@@ -45,7 +45,7 @@ export const resolveCourseDeliverySchedule = async (
 };
 
 export const resolveCourseDeliveryMethods = async (obj, args, viewer, info) => {
-  logger.debug(`in resolveCourseDeliveryMethods`);
+  // logger.debug(`in resolveCourseDeliveryMethods`);
   try {
     let courseId;
     if (args.course_id) {

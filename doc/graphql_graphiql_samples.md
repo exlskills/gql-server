@@ -29,6 +29,7 @@ query listCourses {
 ```
 
 ## List Units
+### Top level only
 ```
 query listUnits {
   listUnits(resolverArgs: [{param: "course_id", value: "Q291cnNlOmFwX2phdmE="}]) {
@@ -36,6 +37,26 @@ query listUnits {
       node {
         title
         has_exam
+      }
+    }
+  }
+}
+```
+
+### With Cards
+```
+query listUnits {
+  listUnits(resolverArgs: [{param: "course_id", value: "Q291cnNlOmFwX2phdmE="}]) {
+    edges {
+      node {
+        title
+        has_exam
+        sections_list {
+          title
+          cards_list {
+            title
+          }
+        }
       }
     }
   }

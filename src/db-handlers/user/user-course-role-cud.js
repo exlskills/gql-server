@@ -94,6 +94,9 @@ export const createUserCourseRole_Object = async (
       { _id: 1 }
     );
     if (userObj && userObj._id) {
+      logger.debug(
+        `in createUserCourseRole_Object - User is already associated with the Course`
+      );
       return Promise.reject('User is already associated with the Course');
     }
   } catch (ignoring_should_not_happen) {
@@ -103,6 +106,7 @@ export const createUserCourseRole_Object = async (
   const push_elem = {
     $push: { course_roles: { course_id: course_id, ...objContent } }
   };
+  logger.debug(`in createUserCourseRole_Object - running update`);
   const updateQuery = User.updateOne({ _id: user_id }, push_elem);
 
   try {
