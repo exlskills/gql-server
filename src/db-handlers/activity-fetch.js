@@ -177,7 +177,7 @@ export const fetchActivities = async (
   if (limit) array.push(limit);
 
   const result = await Activity.aggregate(array).exec();
-  logger.debug(`  result ` + JSON.stringify(result));
+  logger.debug(`  fetchActivities result ` + JSON.stringify(result));
   return result;
 };
 

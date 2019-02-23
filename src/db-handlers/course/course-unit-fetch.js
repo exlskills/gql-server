@@ -241,21 +241,22 @@ export const fetchCourseUnitsWithDetailedStatus = async (
         sectionElem.cards_list = cardArray;
         if (cardArray.length > 0) {
           for (let card of cardArray) {
+            card.was_viewed = false;
             card.ema = 0;
             card.title = getStringByLocale(card.title, viewerLocale).text;
             card.headline = getStringByLocale(card.headline, viewerLocale).text;
+
+            // Returns card_interaction.action array (in the current design,only last action is recorded)
+            const user_card_view = await checkUserViewedCard(userId, card._id);
+            if (user_card_view && user_card_view.length > 0) {
+              card.ema = 100;
+              card.was_viewed = true;
+            }
+
             if (card.question_ids && card.question_ids.length > 0) {
               card.ema = await computeQuestionsEMA(userId, card.question_ids);
-            } else {
-              const user_card_view = await checkUserViewedCard(
-                userId,
-                card._id
-              );
-              // logger.debug(' user_card_view ' + JSON.stringify(user_card_view));
-              if (user_card_view && user_card_view.length > 0) {
-                card.ema = 100;
-              }
             }
+
             sectEmaSum += card.ema;
             sectEmaCount++;
           }
@@ -433,7 +434,7 @@ export const fetchUserCourseUnitExamStatus = async (
             fetchParameters.userId,
             card._id
           );
-          if (user_card_view && user_card_view.lenght > 0) {
+          if (user_card_view && user_card_view.length > 0) {
             cardObj.ema = 100;
           }
         }

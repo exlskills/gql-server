@@ -38,10 +38,16 @@ export const checkUserViewedCard = async (user_id, card_id) => {
   logger.debug(`in checkUserViewedCard`);
   let record;
   try {
-    record = await basicFind(CardInteraction, null, {
-      user_id: user_id,
-      card_id: card_id
-    });
+    record = await basicFind(
+      CardInteraction,
+      null,
+      {
+        user_id: user_id,
+        card_id: card_id
+      },
+      null,
+      { action: 1 }
+    );
     logger.debug(`     checkUserViewedCard record ` + JSON.stringify(record));
   } catch (errInternalAlreadyReported) {
     return null;

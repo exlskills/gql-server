@@ -570,6 +570,7 @@ type SectionCard implements Node {
   tags: [String]
   question_ids: [ID]
   ema: Float
+  was_viewed: Boolean
   github_edit_url: String
   content: VersionedContentRecord
   question: Question
