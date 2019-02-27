@@ -26,13 +26,10 @@ function startGraphQLServer(callback) {
   logger.debug('mongo DB ' + config.mongo.db);
 
   mongoose.set('useCreateIndex', true);
-  let promiseDb = mongoose.connect(
-    config.mongo.uri + '/' + config.mongo.db,
-    {
-      useNewUrlParser: true,
-      autoReconnect: true
-    }
-  );
+  let promiseDb = mongoose.connect(config.mongo.uri + '/' + config.mongo.db, {
+    useNewUrlParser: true,
+    autoReconnect: true
+  });
 
   if (config.db_debug_log) {
     mongoose.set('debug', true);

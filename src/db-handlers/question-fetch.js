@@ -203,9 +203,9 @@ export const fetchQuestionsGeneric = async (
 ) => {
   logger.debug(`in fetchQuestionsGeneric`);
 
-  logger.debug(`   sort ` + JSON.stringify(sort));
-  logger.debug(`   skip ` + JSON.stringify(skip));
-  logger.debug(`   limit ` + JSON.stringify(limit));
+  //logger.debug(`   sort ` + JSON.stringify(sort));
+  //logger.debug(`   skip ` + JSON.stringify(skip));
+  //logger.debug(`   limit ` + JSON.stringify(limit));
 
   let array = filterArray;
   let elem = {

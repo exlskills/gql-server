@@ -82,7 +82,10 @@ export const fetchCourses = async (
   viewerLocale,
   fetchParameters
 ) => {
-  logger.debug(`in fetchCourses`);
+  //logger.debug(`in fetchCourses`);
+  logger.debug(
+    `in fetchCourses Fetch Parameters ` + JSON.stringify(fetchParameters)
+  );
   let courseFields = {
     subscription_level: 1,
     enrolled_count: 1,

@@ -3,6 +3,7 @@ import { basicFind } from '../basic-query-handler';
 import CourseDelivery from '../../db-models/course-delivery-model';
 import { fetchByKey } from '../user/user-fetch';
 import { getStringByLocale } from '../../parsers/intl-string-parser';
+import { schedCache } from '../../data-cache/';
 
 export const fetchByCourseIdAndLocale = async (
   course_id,
