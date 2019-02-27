@@ -1,6 +1,6 @@
-import QuestionInteraction from '../db-models/question-interaction-model';
-import * as QuestionInteractionFetch from '../db-handlers/question-interaction-fetch';
-import { logger } from '../utils/logger';
+import QuestionInteraction from '../../db-models/question-interaction-model';
+import * as QuestionInteractionFetch from './question-interaction-fetch';
+import { logger } from '../../utils/logger';
 
 export const processExamQuestionInteraction = async (
   user_id,

@@ -353,6 +353,7 @@ mutation setCardInteraction($cardInteraction: SetCardInteractionInput!){
   }
 }
 ```
+
 ### Variables
 ```
 {
@@ -362,6 +363,27 @@ mutation setCardInteraction($cardInteraction: SetCardInteractionInput!){
     "section_id": "U2VjdGlvbjpsaWNyWnNFY2hqcUY=",
     "card_id": "Q2FyZDpmRllTTXVSWXdlRG4=",
     "interaction": "view"
+  }
+}
+```
+
+## Generate Course Badge
+```
+mutation generateCourseBadge($generateCourseBadge: GenerateCourseBadgeInput!) {
+  generateCourseBadge(input: $generateCourseBadge) {
+    badge_uid
+    completionObj {
+      code
+    }
+  }
+}
+```
+
+### Variables
+```
+{
+  "generateCourseBadge": {
+    "course_id": "Q291cnNlOmludHJvX3RvX3B5dGhvbg=="
   }
 }
 ```

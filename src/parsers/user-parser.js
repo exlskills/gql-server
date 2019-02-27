@@ -15,10 +15,14 @@ export const mdbUserToGqlUser = async (user, viewer) => {
       viewer.locale
     ).text;
     gqlUser.headline = getStringByLocale(gqlUser.headline, viewer.locale).text;
-    // apply security
-    if (gqlUser._id !== viewer._id) {
-      gqlUser.auth_strategies = [];
+
+    // apply security - FUTURE
+    if (gqlUser._id !== viewer.user_id) {
     }
+
+    // always block this here:
+    gqlUser.auth_strategies = [];
+
     if (gqlUser.instructor_topics) {
       gqlUser.instructor_topics_en = gqlUser.instructor_topics;
       gqlUser.instructor_topics_locale = gqlUser.instructor_topics;

@@ -1,14 +1,14 @@
-import { basicFind } from '../db-handlers/basic-query-handler';
-import Question from '../db-models/question-model.js';
-import { QUESTION_TYPES } from '../db-models/question-model.js';
-import * as projectionWriter from '../utils/projection-writer';
-import { getStringByLocale } from '../parsers/intl-string-parser';
-import { returnObjectExamAttempt } from '../db-handlers/exam-fetch';
-import { getUserAnswer } from '../db-handlers/question-interaction-fetch';
+import { basicFind } from '../basic-query-handler';
+import Question from '../../db-models/question-model.js';
+import { QUESTION_TYPES } from '../../db-models/question-model.js';
+import * as projectionWriter from '../../utils/projection-writer';
+import { getStringByLocale } from '../../parsers/intl-string-parser';
+import { returnObjectExamAttempt } from '../exam-fetch';
+import { getUserAnswer } from './question-interaction-fetch';
 import { toGlobalId } from 'graphql-relay';
-import { logger } from '../utils/logger';
-import Course from '../db-models/course-model';
-import { recordIncident } from './incidents-cud';
+import { logger } from '../../utils/logger';
+import Course from '../../db-models/course-model';
+import { recordIncident } from '../incidents-cud';
 
 export const fetchById = async (obj_id, selectVal, viewer, info) => {
   logger.debug(`in Question fetchById`);

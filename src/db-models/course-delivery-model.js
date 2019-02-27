@@ -36,4 +36,3 @@ export default mongoose.model(
   CourseDeliverySchema,
   'course_delivery'
 );
-
