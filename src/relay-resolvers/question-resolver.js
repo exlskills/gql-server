@@ -7,7 +7,7 @@ import {
   fetchQuestionHint,
   getQuestions,
   getQuestionsInExamAttempt
-} from '../db-handlers/question-fetch';
+} from '../db-handlers/question/question-fetch';
 import { fromGlobalId } from 'graphql-relay';
 
 export const resolveGetQuestionHint = async (obj, args, viewer, info) => {

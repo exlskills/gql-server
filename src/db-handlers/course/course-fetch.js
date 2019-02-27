@@ -4,7 +4,11 @@ import { basicFind } from '../../db-handlers/basic-query-handler';
 import { getStringByLocale } from '../../parsers/intl-string-parser';
 import { logger } from '../../utils/logger';
 import { toClientUrlId } from '../../utils/client-url';
-import { getLastAccessedCourseItemForUser } from '../card-interaction-fetch';
+import {
+  checkUserViewedCard,
+  getLastAccessedCourseItemForUser
+} from '../card-interaction-fetch';
+import { computeQuestionsEMA } from '../question/question-interaction-fetch';
 
 export const fetchById = async (obj_id, selectVal, viewer, info) => {
   logger.debug(`in Course fetchById`);
@@ -362,4 +366,147 @@ export const getCourseUrl = async (course_id, viewer, info) => {
   const course = await fetchById(course_id, { title: 1 });
   const courseTitle = getStringByLocale(course.title, 'en').text;
   return toClientUrlId(courseTitle, course_id);
+};
+
+export const calcUserCourseEma = async (course_id, viewer) => {
+  logger.debug(`in fetchCourseUnitsWithDetailedStatus`);
+
+  const aggregateArray = [];
+  const fetchParameters = {
+    courseId: course_id
+  };
+
+  const arrayCourseStructure = await fetchCourseStructure(
+    null,
+    aggregateArray,
+    viewer.locale,
+    fetchParameters,
+    true
+  );
+
+  const userId = viewer.user_id;
+
+  let courseEmaSum = 0;
+  let courseEmaCount = 0;
+
+  for (let unitElem of arrayCourseStructure) {
+    let unitEmaSum = 0;
+    let unitEmaCount = 0;
+
+    for (let sectionElem of unitElem.sections) {
+      let sectEmaSum = 0;
+      let sectEmaCount = 0;
+
+      // Section Cards
+      for (let card of sectionElem.cards.Cards) {
+        let cardEma = 0;
+
+        // Returns card_interaction.action array (in the current design,only last action is recorded)
+        const user_card_view = await checkUserViewedCard(userId, card._id);
+        if (user_card_view && user_card_view.length > 0) {
+          cardEma = 100;
+        }
+        if (card.question_ids && card.question_ids.length > 0) {
+          cardEma = await computeQuestionsEMA(userId, card.question_ids);
+        }
+
+        sectEmaSum += cardEma;
+        sectEmaCount++;
+      }
+
+      // End of Section
+      unitEmaSum += sectEmaSum;
+      unitEmaCount += sectEmaCount;
+      // sectionElem.ema = sectEmaCount > 0 ? sectEmaSum / sectEmaCount : 0;
+    }
+
+    courseEmaSum += unitEmaSum;
+    courseEmaCount += unitEmaCount;
+
+    // unitElem.ema = unitEmaCount > 0 ? unitEmaSum / unitEmaCount : 0;
+  } // End of loop on Course Units
+
+  let courseEma = courseEmaCount > 0 ? courseEmaSum / courseEmaCount : 0;
+  logger.debug(`   courseEma ` + courseEma);
+  return courseEma;
+};
+
+export const fetchCourseStructure = async (
+  filterValues,
+  aggregateArray,
+  viewerLocale,
+  fetchParameters,
+  include_sections = true
+) => {
+  logger.debug(`in fetchCourseStructure`);
+  let array = [];
+  let elem;
+
+  elem = { $match: { _id: fetchParameters.courseId } };
+  array.push(elem);
+
+  elem = { $addFields: { 'units.Units.courseId': '$_id' } };
+  array.push(elem);
+
+  elem = { $replaceRoot: { newRoot: '$units' } };
+  array.push(elem);
+  elem = { $unwind: '$Units' };
+  array.push(elem);
+
+  // Filter By specific Unit
+  if (fetchParameters.unitId) {
+    elem = { $match: { 'Units._id': fetchParameters.unitId } };
+    array.push(elem);
+  }
+
+  if (fetchParameters.unitIndex) {
+    elem = { $match: { 'Units.index': fetchParameters.unitIndex } };
+    array.push(elem);
+  }
+
+  elem = {
+    $project: {
+      _id: 0,
+      courseId: '$Units.courseId',
+      unitId: '$Units._id',
+      unitIndex: '$Units.index'
+    }
+  };
+  if (include_sections) {
+    elem.$project.sections = '$Units.sections.Sections';
+  }
+  array.push(elem);
+
+  if (include_sections) {
+    elem = {
+      $project: {
+        courseId: 1,
+        unitId: 1,
+        unitIndex: 1,
+        'sections._id': 1,
+        'sections.index': 1,
+        'sections.cards.Cards._id': 1,
+        'sections.cards.Cards.index': 1,
+        'sections.cards.Cards.question_ids': 1
+      }
+    };
+    array.push(elem);
+  }
+
+  if (aggregateArray) {
+    // array.push(...aggregateArray);
+    // let sort = aggregateArray.find(item => !!item.$sort);
+    let sort = { $sort: { index: 1 } };
+    let skip = aggregateArray.find(item => !!item.$skip);
+    let limit = aggregateArray.find(item => !!item.$limit);
+
+    if (sort) array.push(sort);
+    if (skip) array.push(skip);
+    if (limit) array.push(limit);
+  }
+
+  const result = await Course.aggregate(array).exec();
+
+  logger.debug('fetchCourseStructure result ' + JSON.stringify(result));
+  return result;
 };

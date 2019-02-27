@@ -1,5 +1,5 @@
 import { logger } from '../utils/logger';
-import { computeQuestionsEMA } from '../db-handlers/question-interaction-fetch';
+import { computeQuestionsEMA } from '../db-handlers/question/question-interaction-fetch';
 import { checkUserViewedCard } from '../db-handlers/card-interaction-fetch';
 
 // FUTURE: use for layered GQL queries

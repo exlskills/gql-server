@@ -104,6 +104,12 @@ const CourseSchema = new mongoose.Schema(
       required: true,
       default: 0,
       index: true
+    },
+    content_updated_at: {
+      type: Date
+    },
+    metadata_updated_at: {
+      type: Date
     }
   },
   {

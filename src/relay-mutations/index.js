@@ -4,6 +4,7 @@ import userMutations from './user';
 import userCourseRoleMutations from './user-course-role';
 import question from './question';
 import cardInteraction from './section-card';
+import courseBadge from './course-badge';
 
 export default {
   readNotification: notification.readNotification,
@@ -22,5 +23,7 @@ export default {
   updateUserUnitStatus: userMutations.updateUserUnitStatus,
   updateUserCourseRole: userCourseRoleMutations.updateUserCourseRole,
 
-  setCardInteraction: cardInteraction.setCardInteraction
+  setCardInteraction: cardInteraction.setCardInteraction,
+
+  generateCourseBadge: courseBadge.generateCourseBadge
 };

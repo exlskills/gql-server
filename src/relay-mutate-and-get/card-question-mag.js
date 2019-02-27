@@ -1,11 +1,11 @@
 import { logger } from '../utils/logger';
-import * as QuestionFetch from '../db-handlers/question-fetch';
+import * as QuestionFetch from '../db-handlers/question/question-fetch';
 import { QUESTION_TYPES } from '../db-models/question-model';
 import {
   gradeMCQuestionAnswer,
   gradeWSCQQuestionAnswer
 } from '../utils/question-answer-grading';
-import { processExamQuestionInteraction } from '../db-handlers/question-interaction-cud';
+import { processExamQuestionInteraction } from '../db-handlers/question/question-interaction-cud';
 
 export const processCardQuestionAction = async (
   question_id,

@@ -2,7 +2,7 @@ import Course from '../../db-models/course-model';
 import * as projectionWriter from '../../utils/projection-writer';
 import { fetchExamSessionsByUserAndUnitJoinExam } from '../exam-session-fetch';
 import { getStringByLocale } from '../../parsers/intl-string-parser';
-import { computeQuestionsEMA } from '../question-interaction-fetch';
+import { computeQuestionsEMA } from '../question/question-interaction-fetch';
 import { fetchLastCancExamSessionByUserUnit } from '../exam-session-fetch';
 import { logger } from '../../utils/logger';
 import { checkUserViewedCard } from '../../db-handlers/card-interaction-fetch';

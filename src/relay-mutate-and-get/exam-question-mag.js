@@ -1,9 +1,9 @@
-import { processExamQuestionInteraction } from '../db-handlers/question-interaction-cud';
-import * as QuestionFetch from '../db-handlers/question-fetch';
+import { processExamQuestionInteraction } from '../db-handlers/question/question-interaction-cud';
+import * as QuestionFetch from '../db-handlers/question/question-fetch';
 import { logger } from '../utils/logger';
 import * as ExamSessionFetch from '../db-handlers/exam-session-fetch';
 import { recordIncident } from '../db-handlers/incidents-cud';
-import * as QuestionInteractionFetch from '../db-handlers/question-interaction-fetch';
+import * as QuestionInteractionFetch from '../db-handlers/question/question-interaction-fetch';
 
 // Returns completionObj if verification fails, otherwise returns {}
 export const verifyExamQuestionAnswerCall = async (

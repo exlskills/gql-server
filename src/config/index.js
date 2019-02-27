@@ -23,6 +23,7 @@ const cfg = {
   card_ema: {
     n: 10
   },
+  badgePassingScore: process.env.BADGE_PASSING_SCORE || 80,
   wsenv_signalling_url:
     process.env.WSENV_SIGNALLING_URL ||
     'https://wsenv-signalling-api.exlcode.com/v0/connect-grading',
