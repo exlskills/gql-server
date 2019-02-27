@@ -304,6 +304,18 @@ input FilterValues {
   filterValuesString: String
 }
 
+input GenerateCourseBadgeInput {
+  course_id: ID!
+  badge_type: String
+  clientMutationId: String
+}
+
+type GenerateCourseBadgePayload {
+  badge_uid: String
+  completionObj: CompletionObj
+  clientMutationId: String
+}
+
 input GetCurrentExamQuestionAnswerInput {
   exam_session_id: ID!
   question_id: ID!
@@ -353,6 +365,7 @@ type Mutation {
   updateUserUnitStatus(input: UpdateUserUnitStatusInput!): UpdateUserUnitStatusPayload
   updateUserCourseRole(input: UpdateUserCourseRoleInput!): UpdateUserCourseRolePayload
   setCardInteraction(input: SetCardInteractionInput!): SetCardInteractionPayload
+  generateCourseBadge(input: GenerateCourseBadgeInput!): GenerateCourseBadgePayload
 }
 
 # NextQuestion
