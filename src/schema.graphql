@@ -956,8 +956,11 @@ input UserProfileInput {
   biography: String
   headline: String
   locales: [String]
-  primary_locale: String!
+  primary_locale: String
   avatar_url: String
+  is_public: Boolean
+  linkedin_username: String
+  twitter_username: String
 }
 
 # The users subscription level. All users have this field -- they then vary by their level

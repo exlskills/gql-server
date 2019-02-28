@@ -111,6 +111,12 @@ const UserSchema = new mongoose.Schema(
       // list_def.desc contains non-"en" values by locale
       type: [String],
       index: true
+    },
+    is_public: {
+      type: Boolean,
+      required: true,
+      default: false,
+      index: true
     }
   },
   {

@@ -52,6 +52,9 @@ export const UserType = new GraphQLObjectType({
     is_instructor: {
       type: GraphQLBoolean
     },
+    is_public: {
+      type: GraphQLBoolean
+    },
     headline: {
       type: GraphQLString
     },
