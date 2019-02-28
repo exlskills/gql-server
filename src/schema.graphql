@@ -304,6 +304,18 @@ input FilterValues {
   filterValuesString: String
 }
 
+input GenerateCourseBadgeInput {
+  course_id: ID!
+  badge_type: String
+  clientMutationId: String
+}
+
+type GenerateCourseBadgePayload {
+  badge_uid: String
+  completionObj: CompletionObj
+  clientMutationId: String
+}
+
 input GetCurrentExamQuestionAnswerInput {
   exam_session_id: ID!
   question_id: ID!
@@ -353,6 +365,7 @@ type Mutation {
   updateUserUnitStatus(input: UpdateUserUnitStatusInput!): UpdateUserUnitStatusPayload
   updateUserCourseRole(input: UpdateUserCourseRoleInput!): UpdateUserCourseRolePayload
   setCardInteraction(input: SetCardInteractionInput!): SetCardInteractionPayload
+  generateCourseBadge(input: GenerateCourseBadgeInput!): GenerateCourseBadgePayload
 }
 
 # NextQuestion
@@ -806,6 +819,7 @@ type User implements Node {
   biography: String
   is_demo: Boolean
   is_instructor: Boolean
+  is_public: Boolean
   headline: String
   has_completed_first_tutorial: Boolean
   instructor_topics_en: [String]
@@ -943,8 +957,11 @@ input UserProfileInput {
   biography: String
   headline: String
   locales: [String]
-  primary_locale: String!
+  primary_locale: String
   avatar_url: String
+  is_public: Boolean
+  linkedin_username: String
+  twitter_username: String
 }
 
 # The users subscription level. All users have this field -- they then vary by their level

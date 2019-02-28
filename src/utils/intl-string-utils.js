@@ -14,8 +14,8 @@ export const setDefaultIntlStringLocale = (field, defLocale) => {
   return field;
 };
 
-export const updateIntlStringObject = (field, locale, newVal) => {
-  logger.debug(` in updateIntlStringObject`);
+export const modifyIntlStringObject = (field, locale, newVal) => {
+  logger.debug(` in modifyIntlStringObject`);
   const index = field.intlString.findIndex(item => item.locale === locale);
 
   if (index !== -1) {

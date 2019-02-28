@@ -135,6 +135,7 @@ export const fetchUserProfileById = async (obj_id, viewer, info) => {
         headline: 1,
         is_demo: 1,
         has_completed_first_tutorial: 1,
+        is_public: 1,
         is_instructor: 1,
         instructor_topics: 1,
         locales: 1,
