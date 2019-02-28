@@ -819,6 +819,7 @@ type User implements Node {
   biography: String
   is_demo: Boolean
   is_instructor: Boolean
+  is_public: Boolean
   headline: String
   has_completed_first_tutorial: Boolean
   instructor_topics_en: [String]
