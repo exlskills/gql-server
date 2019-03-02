@@ -62,6 +62,11 @@ export const resolveListCourses = async (obj, args, viewer, info) => {
     if (topicType) {
       fetchParameters.topic = topicType.value;
     }
+
+    const primaryTopicType = args.resolverArgs.find(e => e.param === 'primary_topic');
+    if (primaryTopicType) {
+      fetchParameters.primary_topic = primaryTopicType.value;
+    }
   }
 
   const execDetails = {

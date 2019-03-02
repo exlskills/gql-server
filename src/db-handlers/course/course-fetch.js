@@ -252,6 +252,15 @@ export const fetchCourses = async (
     array.push(elem);
   }
 
+  if (fetchParameters.primary_topic) {
+    elem = {
+      $match: {
+        primary_topic: fetchParameters.primary_topic
+      }
+    };
+    array.push(elem);
+  }
+
   elem = {
     $project: {
       ...courseFields,
