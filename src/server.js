@@ -12,6 +12,7 @@ import * as middleware from './http-middleware';
 import { logger } from './utils/logger';
 import User from './db-models/user-model';
 import routes from './routes';
+import { initCacheLoad } from './data-cache/cache-manager';
 
 logger.info('Server starting ...');
 
@@ -21,31 +22,38 @@ let graphQLServer;
 
 mongoose.Promise = global.Promise;
 
-function startGraphQLServer(callback) {
+async function startGraphQLServer(callback) {
   //logger.debug('mongo URI ' + config.mongo.uri);
   logger.debug('mongo DB ' + config.mongo.db);
 
   mongoose.set('useCreateIndex', true);
-  let promiseDb = mongoose.connect(config.mongo.uri + '/' + config.mongo.db, {
+
+  const mongoDbProps = {
     useNewUrlParser: true,
     autoReconnect: true
-  });
+  };
 
   if (config.db_debug_log) {
     mongoose.set('debug', true);
   }
 
-  promiseDb
-    .then(db => {
-      logger.info('Mongoose connected ok ');
-      logger.debug(
-        'Mongo DB ' + User.db.host + ':' + User.db.port + '/' + User.db.name
-      );
-    })
-    .catch(err => {
-      logger.error('Mongoose connection error:', err.stack);
-      process.exit(1);
-    });
+  try {
+    await mongoose.connect(
+      config.mongo.uri + '/' + config.mongo.db,
+      mongoDbProps
+    );
+    logger.info('Mongoose connected ok ');
+    logger.debug(
+      'Mongo DB ' + User.db.host + ':' + User.db.port + '/' + User.db.name
+    );
+    // logger.debug(mongoose.connection.readyState);
+  } catch (err) {
+    logger.error('Mongoose connection error:', err.stack);
+    process.exit(1);
+  }
+
+  // This is a periodic function
+  initCacheLoad();
 
   const graphQLApp = express();
 

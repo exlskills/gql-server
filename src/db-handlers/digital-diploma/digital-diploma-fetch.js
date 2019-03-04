@@ -1,7 +1,7 @@
 import DigitalDiploma from '../../db-models/digital-diploma-model';
 import * as projectionWriter from '../../utils/projection-writer';
 import { basicFind } from '../../db-handlers/basic-query-handler';
-import { getStringByLocale } from '../../parsers/intl-string-parser';
+import { getStringByLocale } from '../../utils/intl-string-utils';
 import { logger } from '../../utils/logger';
 import { toClientUrlId } from '../../utils/client-url';
 

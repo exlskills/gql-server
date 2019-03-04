@@ -1,7 +1,7 @@
 import { logger } from '../utils/logger';
 import { fromGlobalId } from 'graphql-relay';
 import {
-  fetchCourseDeliveryMethods,
+  fetchCourseDeliveryMethodsFromCache,
   fetchCourseDeliverySchedule
 } from '../db-handlers/course/course-delivery-schedule-fetch';
 import { fetchByUserAndItemRefId } from '../db-handlers/user/user-order-handler';
@@ -53,7 +53,7 @@ export const resolveCourseDeliveryMethods = async (obj, args, viewer, info) => {
     } else {
       courseId = obj._id;
     }
-    let result = await fetchCourseDeliveryMethods(courseId, viewer, info);
+    let result = await fetchCourseDeliveryMethodsFromCache(courseId, viewer, info);
     return result;
   } catch (err) {
     return Promise.reject(err);

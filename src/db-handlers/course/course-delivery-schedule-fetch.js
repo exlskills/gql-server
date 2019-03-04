@@ -2,14 +2,15 @@ import { logger } from '../../utils/logger';
 import { basicFind } from '../basic-query-handler';
 import CourseDelivery from '../../db-models/course-delivery-model';
 import { fetchByKey } from '../user/user-fetch';
-import { getStringByLocale } from '../../parsers/intl-string-parser';
-import { schedCache } from '../../data-cache/';
+import { getStringByLocale } from '../../utils/intl-string-utils';
+import { courseDeliveryDataCache } from '../../data-cache/cache-objects';
 
 export const fetchByCourseIdAndLocale = async (
   course_id,
   locale,
   selectVal
 ) => {
+  logger.debug(`In fetchByCourseIdAndLocale`);
   let record;
   try {
     record = await basicFind(
@@ -37,7 +38,7 @@ export const fetchCourseDeliverySchedule = async (
   viewer,
   info
 ) => {
-  // logger.debug(`in fetchCourseDeliverySchedule`);
+  logger.debug(`in fetchCourseDeliverySchedule`);
   // logger.debug(`   course_id ` + course_id);
   const selectVal = {
     instructors: 1,
@@ -245,21 +246,25 @@ export const fetchCourseDeliverySchedule = async (
   return result;
 };
 
-export const fetchCourseDeliveryMethods = async (course_id, viewer, info) => {
-  // logger.debug(`in fetchCourseDeliveryMethods`);
+export const fetchCourseDeliveryMethodsFromCache = async (
+  course_id,
+  viewer,
+  info
+) => {
+  // logger.debug(`in fetchCourseDeliveryMethodsFromCache`);
+
   let result = [];
-  const selectVal = {
-    available_delivery_methods: 1
-  };
-  let courseDeliveryRecord = await fetchByCourseIdAndLocale(
-    course_id,
-    viewer.locale,
-    selectVal
-  );
-  if (courseDeliveryRecord && courseDeliveryRecord.available_delivery_methods) {
-    result = courseDeliveryRecord.available_delivery_methods;
+  if (
+    courseDeliveryDataCache[course_id] &&
+    courseDeliveryDataCache[course_id][viewer.locale] &&
+    courseDeliveryDataCache[course_id][viewer.locale].available_delivery_methods
+  ) {
+    result =
+      courseDeliveryDataCache[course_id][viewer.locale]
+        .available_delivery_methods;
   }
-  // logger.debug(` fetchCourseDeliverySchedule result ` + result);
+
+  logger.debug(`    fetchCourseDeliveryMethodsFromCache result ` + result);
   return result;
 };
 

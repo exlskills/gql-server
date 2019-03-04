@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 import { id_gen } from '../utils/url-id-generator';
-import { getStringByLocale } from '../parsers/intl-string-parser';
+import { getStringByLocale } from '../utils/intl-string-utils';
 import VersionedContentRecordSchema from './versioned-content-record-model.js';
 
 const VersionedContentSchema = new mongoose.Schema(

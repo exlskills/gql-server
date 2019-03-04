@@ -1,7 +1,7 @@
 import Course from '../../db-models/course-model';
 import * as projectionWriter from '../../utils/projection-writer';
 import { basicFind } from '../../db-handlers/basic-query-handler';
-import { getStringByLocale } from '../../parsers/intl-string-parser';
+import { getStringByLocale } from '../../utils/intl-string-utils';
 import { logger } from '../../utils/logger';
 import { toClientUrlId } from '../../utils/client-url';
 import {
@@ -100,8 +100,6 @@ export const fetchCourses = async (
     view_count: 1,
     logo_url: 1,
     _id: 1,
-    delivery_methods: 1,
-    delivery_structures: 1,
     weight: { $ifNull: ['$weight', 0] }
   };
   let courseIntlStringFields = {

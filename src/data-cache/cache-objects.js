@@ -1,5 +1,3 @@
-import { logger } from '../utils/logger';
-
-export const courseData = {};
-
+export const courseDataCache = {};
+export const courseDeliveryDataCache = {};
 

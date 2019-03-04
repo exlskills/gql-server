@@ -1,7 +1,7 @@
 import { logger } from './logger';
 import { singleToDoubleQuotes } from './string-utils';
 import { fromGlobalId } from 'graphql-relay';
-import { getStringByLocale } from '../parsers/intl-string-parser';
+import { getStringByLocale } from '../utils/intl-string-utils';
 import { QUESTION_TYPES } from '../db-models/question-model';
 import {
   callWsenvGrading,

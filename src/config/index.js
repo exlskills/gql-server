@@ -41,7 +41,8 @@ const cfg = {
     log_level:
       process.env.ELASTICSEARCH_LOG_LEVEL ||
       (process.env.NODE_ENV === 'production' ? 'warning' : 'trace')
-  }
+  },
+  cacheRefreshIntervalMin: process.env.CACHE_REFRESH_INTERVAL_MIN || 5
 };
 
 export default cfg;
