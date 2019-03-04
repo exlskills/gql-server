@@ -115,7 +115,7 @@ export const updateUserProfile = async (locale, profile) => {
     }
 
     for (let fld of profileDirectUpdateFields) {
-      if (profile[fld]) {
+      if (profile[fld] !== undefined) {
         user[fld] = profile[fld];
       }
     }
