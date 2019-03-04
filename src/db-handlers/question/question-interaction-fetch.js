@@ -1,8 +1,8 @@
-import { basicFind } from '../db-handlers/basic-query-handler';
-import QuestionInteraction from '../db-models/question-interaction-model.js';
-import { logger } from '../utils/logger';
-import Config from '../config';
-import ExamSession from '../db-models/exam-session-model';
+import { basicFind } from '../basic-query-handler';
+import QuestionInteraction from '../../db-models/question-interaction-model.js';
+import { logger } from '../../utils/logger';
+import Config from '../../config';
+import ExamSession from '../../db-models/exam-session-model';
 import mongoose from 'mongoose';
 
 export const fetchById = async (obj_id, selectVal, viewer, info) => {

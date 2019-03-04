@@ -3,7 +3,7 @@ import { fromGlobalId, nodeDefinitions } from 'graphql-relay';
 import * as Course from '../db-handlers/course/course-fetch.js';
 import * as Organization from '../db-handlers/organization-fetch.js';
 import * as Path from '../db-handlers/path-fetch.js';
-import * as Question from '../db-handlers/question-fetch.js';
+import * as Question from '../db-handlers/question/question-fetch.js';
 import * as VersionedContent from '../db-handlers/versioned-content/versioned-content-fetch.js';
 
 /**

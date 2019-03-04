@@ -40,7 +40,10 @@ export const resolveUserProfile = async (obj, args, viewer, info) => {
     if (!userRecord) {
       return null;
     }
-    if (!userRecord.is_instructor && userRecord._id !== viewer.user_id) {
+    if (
+      !(userRecord.is_instructor || userRecord.is_public) &&
+      userRecord._id !== viewer.user_id
+    ) {
       //  Do not wait for this
       recordIncident(viewer.user_id, 'user_profile', 'profile requested');
       return null;

@@ -1,8 +1,8 @@
 import Course from '../../db-models/course-model';
-import * as QuestionFetch from '../../db-handlers/question-fetch';
+import * as QuestionFetch from '../question/question-fetch';
 import * as projectionWriter from '../../utils/projection-writer';
 import { logger } from '../../utils/logger';
-import { fetchQuestionsGeneric } from '../question-fetch';
+import { fetchQuestionsGeneric } from '../question/question-fetch';
 import { QUESTION_TYPES } from '../../db-models/question-model';
 
 export const fetchCardDetailsById = async (

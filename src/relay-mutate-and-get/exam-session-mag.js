@@ -19,9 +19,9 @@ import {
   gradeMCQuestionAnswer,
   gradeWSCQQuestionAnswer
 } from '../utils/question-answer-grading';
-import { fetchFinalAnswerJoinQuestion } from '../db-handlers/question-interaction-fetch';
+import { fetchFinalAnswerJoinQuestion } from '../db-handlers/question/question-interaction-fetch';
 import { QUESTION_TYPES } from '../db-models/question-model';
-import { processExamQuestionInteraction } from '../db-handlers/question-interaction-cud';
+import { processExamQuestionInteraction } from '../db-handlers/question/question-interaction-cud';
 import moment from 'moment';
 import { agenda } from '../scheduler/agenda-jobs';
 

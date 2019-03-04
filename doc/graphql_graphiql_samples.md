@@ -353,6 +353,7 @@ mutation setCardInteraction($cardInteraction: SetCardInteractionInput!){
   }
 }
 ```
+
 ### Variables
 ```
 {
@@ -362,6 +363,58 @@ mutation setCardInteraction($cardInteraction: SetCardInteractionInput!){
     "section_id": "U2VjdGlvbjpsaWNyWnNFY2hqcUY=",
     "card_id": "Q2FyZDpmRllTTXVSWXdlRG4=",
     "interaction": "view"
+  }
+}
+```
+
+## Generate Course Badge
+```
+mutation generateCourseBadge($generateCourseBadge: GenerateCourseBadgeInput!) {
+  generateCourseBadge(input: $generateCourseBadge) {
+    badge_uid
+    completionObj {
+      code
+      msg
+      msg_id
+    }
+  }
+}
+```
+
+### Variables
+```
+{
+  "generateCourseBadge": {
+    "course_id": "Q291cnNlOmludHJvX3RvX3B5dGhvbg=="
+  }
+}
+```
+
+## Update User Profile
+```
+mutation updateUserProfile($updateUserProfile: UpdateUserProfileInput!) {
+  updateUserProfile(input: $updateUserProfile) {
+    completionObj {
+      code
+      msg
+      msg_id
+    }
+  }
+}
+```
+
+### Variables
+```
+{
+  "updateUserProfile": {
+    "profile": {
+      "id": "VXNlcjoxU2dOT3BXbzRvb0E=",
+      "headline": "Test Headline01",
+      "linkedin_username": "Test01",
+      "username": "testuser01",
+      "locales": ["en","fr"],
+      "is_public": true
+    }
   }
 }
 ```
