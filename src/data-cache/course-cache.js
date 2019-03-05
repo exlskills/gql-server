@@ -24,7 +24,7 @@ export async function loadCourseCache(init_load, courseID) {
     'primary_topic',
     'weight',
     'content_updated_at',
-    'metadata_updated_at'
+    'static_data_updated_at'
   ];
 
   // Locale-specific fields
@@ -50,12 +50,7 @@ export async function loadCourseCache(init_load, courseID) {
     runParams = { isById: true };
     queryVal = courseID;
   } else {
-    queryVal = {
-      $or: [
-        { content_updated_at: { $ge: courseCache.updated_at } },
-        { metadata_updated_at: { $ge: courseCache.updated_at } }
-      ]
-    };
+    queryVal = { static_data_updated_at: { $gte: courseCache.updated_at } };
   }
 
   let courseDbObj = await basicFind(
@@ -74,53 +69,53 @@ export async function loadCourseCache(init_load, courseID) {
     logger.debug(`course records ` + JSON.stringify(courseDbObj));
     courseCache.updated_at = extractedAt;
     logger.debug(`   CourseCache updated_at ` + courseCache.updated_at);
-  } else {
-    logger.debug(`No course delivery records extracted `);
-  }
 
-  for (let course of courseDbObj) {
-    logger.debug(`Loading data for course ` + course._id);
-    // logger.debug(`course ` + JSON.stringify(course));
-    const oneCourseDataCache = {};
-    objSize += sizeof(course._id);
-    for (let genField of genFields) {
-      // logger.debug(`genField ` + genField);
-      if (course[genField]) {
-        objSize += sizeof(genField);
-        oneCourseDataCache[genField] = course[genField];
-        // logger.debug(`course[genField] ` + JSON.stringify(course[genField]));
-        objSize += sizeof(course[genField]);
-      }
-    }
-    oneCourseDataCache['locale_data'] = {};
-    objSize += sizeof('locale_data');
-    for (let titleIntlString of course.title.intlString) {
-      logger.debug(`Loading data for locale ` + titleIntlString.locale);
-      oneCourseDataCache['locale_data'][titleIntlString.locale] = {};
-      objSize += sizeof(titleIntlString.locale);
-      for (let localeField of localeFields) {
-        if (course[localeField]) {
-          // logger.debug(`localeField ` + localeField);
-          objSize += sizeof(localeField);
-          const intlText = getStringByLocale(
-            course[localeField],
-            titleIntlString.locale
-          ).text;
-          oneCourseDataCache['locale_data'][titleIntlString.locale][
-            localeField
-          ] = intlText;
-          // logger.debug(`intlText ` + intlText);
-          objSize += sizeof(intlText);
-          // logger.debug(`objSize after intlText ` + objSize);
+    for (let course of courseDbObj) {
+      logger.debug(`Loading data for course ` + course._id);
+      // logger.debug(`course ` + JSON.stringify(course));
+      const oneCourseDataCache = {};
+      objSize += sizeof(course._id);
+      for (let genField of genFields) {
+        // logger.debug(`genField ` + genField);
+        if (course[genField]) {
+          objSize += sizeof(genField);
+          oneCourseDataCache[genField] = course[genField];
+          // logger.debug(`course[genField] ` + JSON.stringify(course[genField]));
+          objSize += sizeof(course[genField]);
         }
       }
-    } // On intlString
+      oneCourseDataCache['locale_data'] = {};
+      objSize += sizeof('locale_data');
+      for (let titleIntlString of course.title.intlString) {
+        logger.debug(`Loading data for locale ` + titleIntlString.locale);
+        oneCourseDataCache['locale_data'][titleIntlString.locale] = {};
+        objSize += sizeof(titleIntlString.locale);
+        for (let localeField of localeFields) {
+          if (course[localeField]) {
+            // logger.debug(`localeField ` + localeField);
+            objSize += sizeof(localeField);
+            const intlText = getStringByLocale(
+              course[localeField],
+              titleIntlString.locale
+            ).text;
+            oneCourseDataCache['locale_data'][titleIntlString.locale][
+              localeField
+            ] = intlText;
+            // logger.debug(`intlText ` + intlText);
+            objSize += sizeof(intlText);
+            // logger.debug(`objSize after intlText ` + objSize);
+          }
+        }
+      } // On intlString
 
-    courseCache[course._id] = oneCourseDataCache;
-  } // On courses
+      courseCache[course._id] = oneCourseDataCache;
+    } // On courses
 
-  logger.debug(`  loadCourseCache RESULT ` + JSON.stringify(courseCache));
-  logger.debug(`  loadCourseCache RESULT Size ` + objSize);
+    logger.debug(`  loadCourseCache RESULT ` + JSON.stringify(courseCache));
+    logger.debug(`  loadCourseCache RESULT Size ` + objSize);
+  } else {
+    logger.debug(`No course records extracted `);
+  }
 }
 
 export async function loadCourseDeliveryCache(init_load, recordID) {
@@ -137,7 +132,7 @@ export async function loadCourseDeliveryCache(init_load, recordID) {
     runParams = { isById: true };
     queryVal = recordID;
   } else {
-    queryVal = { updated_at: { $ge: courseDeliveryCache.updated_at } };
+    queryVal = { updated_at: { $gte: courseDeliveryCache.updated_at } };
   }
 
   const extractedAt = new Date();
@@ -162,35 +157,35 @@ export async function loadCourseDeliveryCache(init_load, recordID) {
     logger.debug(
       `   CourseDeliveryCache updated_at ` + courseDeliveryCache.updated_at
     );
+
+    for (let courseDeliveryRec of courseDeliveryDbObj) {
+      logger.debug(
+        `Loading data for course and locale ` +
+          courseDeliveryRec.course_id +
+          ` ` +
+          courseDeliveryRec.locale
+      );
+      logger.debug(`course delivery rec ` + JSON.stringify(courseDeliveryRec));
+      if (!courseDeliveryCache[courseDeliveryRec.course_id]) {
+        courseDeliveryCache[courseDeliveryRec.course_id] = {};
+      }
+      courseDeliveryCache[courseDeliveryRec.course_id][
+        courseDeliveryRec.locale
+      ] = {
+        ...courseDeliveryRec.toObject()
+      };
+      delete courseDeliveryCache[courseDeliveryRec.course_id][
+        courseDeliveryRec.locale
+      ].course_id;
+      delete courseDeliveryCache[courseDeliveryRec.course_id][
+        courseDeliveryRec.locale
+      ].locale;
+    }
+    logger.debug(
+      `   loadCourseDeliveryCache RESULT ` + JSON.stringify(courseDeliveryCache)
+    );
+    // logger.debug(`   loadCourseDeliveryCache RESULT Size ` + objSize);
   } else {
     logger.debug(`No course delivery records extracted `);
   }
-
-  for (let courseDeliveryRec of courseDeliveryDbObj) {
-    logger.debug(
-      `Loading data for course and locale ` +
-        courseDeliveryRec.course_id +
-        ` ` +
-        courseDeliveryRec.locale
-    );
-    logger.debug(`course delivery rec ` + JSON.stringify(courseDeliveryRec));
-    if (!courseDeliveryCache[courseDeliveryRec.course_id]) {
-      courseDeliveryCache[courseDeliveryRec.course_id] = {};
-    }
-    courseDeliveryCache[courseDeliveryRec.course_id][
-      courseDeliveryRec.locale
-    ] = {
-      ...courseDeliveryRec.toObject()
-    };
-    delete courseDeliveryCache[courseDeliveryRec.course_id][
-      courseDeliveryRec.locale
-    ].course_id;
-    delete courseDeliveryCache[courseDeliveryRec.course_id][
-      courseDeliveryRec.locale
-    ].locale;
-  }
-  logger.debug(
-    `   loadCourseDeliveryCache RESULT ` + JSON.stringify(courseDeliveryCache)
-  );
-  // logger.debug(`   loadCourseDeliveryCache RESULT Size ` + objSize);
 }

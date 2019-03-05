@@ -255,13 +255,13 @@ export const fetchCourseDeliveryMethodsFromCache = async (
 
   let result = [];
   if (
+    courseDeliveryCache &&
     courseDeliveryCache[course_id] &&
     courseDeliveryCache[course_id][viewer.locale] &&
     courseDeliveryCache[course_id][viewer.locale].available_delivery_methods
   ) {
     result =
-      courseDeliveryCache[course_id][viewer.locale]
-        .available_delivery_methods;
+      courseDeliveryCache[course_id][viewer.locale].available_delivery_methods;
   }
 
   logger.debug(`    fetchCourseDeliveryMethodsFromCache result ` + result);

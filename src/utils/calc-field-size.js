@@ -48,6 +48,10 @@ function sizeOfArray(object) {
 }
 
 export const sizeof = object => {
+  if (process.env.NODE_ENV === 'production') {
+    return 0;
+  }
+
   //logger.debug(`object ` + JSON.stringify(object));
   var objectType = typeof object;
   //logger.debug(`objectType ` + objectType);
