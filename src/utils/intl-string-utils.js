@@ -1,5 +1,21 @@
 import { logger } from './logger';
 
+export const getStringByLocale = (intlString, locale) => {
+  if (intlString && Array.isArray(intlString.intlString)) {
+    let result;
+    result = intlString.intlString.find(elem => elem.locale == locale);
+    if (!result) {
+      result = intlString.intlString.find(elem => elem.is_default);
+    }
+    if (!result) {
+      return { err: 'not found', text: '' };
+    }
+    return { err: '', text: result.content };
+  } else {
+    return { err: 'empty or not array', text: '' };
+  }
+};
+
 export const setDefaultIntlStringLocale = (field, defLocale) => {
   logger.debug(`in setDefaultIntlStringLocale`);
   const index = field.intlString.findIndex(item => item.locale === defLocale);

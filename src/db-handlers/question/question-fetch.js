@@ -2,12 +2,11 @@ import { basicFind } from '../basic-query-handler';
 import Question from '../../db-models/question-model.js';
 import { QUESTION_TYPES } from '../../db-models/question-model.js';
 import * as projectionWriter from '../../utils/projection-writer';
-import { getStringByLocale } from '../../parsers/intl-string-parser';
+import { getStringByLocale } from '../../utils/intl-string-utils';
 import { returnObjectExamAttempt } from '../exam-fetch';
 import { getUserAnswer } from './question-interaction-fetch';
 import { toGlobalId } from 'graphql-relay';
 import { logger } from '../../utils/logger';
-import Course from '../../db-models/course-model';
 import { recordIncident } from '../incidents-cud';
 
 export const fetchById = async (obj_id, selectVal, viewer, info) => {
@@ -203,9 +202,9 @@ export const fetchQuestionsGeneric = async (
 ) => {
   logger.debug(`in fetchQuestionsGeneric`);
 
-  logger.debug(`   sort ` + JSON.stringify(sort));
-  logger.debug(`   skip ` + JSON.stringify(skip));
-  logger.debug(`   limit ` + JSON.stringify(limit));
+  //logger.debug(`   sort ` + JSON.stringify(sort));
+  //logger.debug(`   skip ` + JSON.stringify(skip));
+  //logger.debug(`   limit ` + JSON.stringify(limit));
 
   let array = filterArray;
   let elem = {

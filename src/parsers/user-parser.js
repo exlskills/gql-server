@@ -1,4 +1,4 @@
-import { getStringByLocale } from './intl-string-parser';
+import { getStringByLocale } from '../utils/intl-string-utils';
 import { logger } from '../utils/logger';
 import { fetchLocalDescArrayByTypeAndValueArray } from '../db-handlers/list-def-fetch.js';
 

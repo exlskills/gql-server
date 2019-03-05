@@ -108,8 +108,9 @@ const CourseSchema = new mongoose.Schema(
     content_updated_at: {
       type: Date
     },
-    metadata_updated_at: {
-      type: Date
+    static_data_updated_at: {
+      type: Date,
+      index: true
     }
   },
   {

@@ -1,14 +1,12 @@
 import Course from '../../db-models/course-model';
 import * as projectionWriter from '../../utils/projection-writer';
 import { fetchExamSessionsByUserAndUnitJoinExam } from '../exam-session-fetch';
-import { getStringByLocale } from '../../parsers/intl-string-parser';
+import { getStringByLocale } from '../../utils/intl-string-utils';
 import { computeQuestionsEMA } from '../question/question-interaction-fetch';
-import { fetchLastCancExamSessionByUserUnit } from '../exam-session-fetch';
 import { logger } from '../../utils/logger';
 import { checkUserViewedCard } from '../../db-handlers/card-interaction-fetch';
 import { fetchSectionCardIDsForUnit } from './section-card-fetch';
 import { fetchExamSessionsByUserAndUnitToday } from '../exam-session-fetch';
-import { basicFind } from '../basic-query-handler';
 
 export const fetchByCourseAndUnitId = async (
   course_id,

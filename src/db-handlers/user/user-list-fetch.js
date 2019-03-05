@@ -2,7 +2,7 @@ import { logger } from '../../utils/logger';
 import User from '../../db-models/user-model';
 import * as projectionWriter from '../../utils/projection-writer';
 import { findValuesByTypeAndDesc } from '../list-def-fetch';
-import { getStringByLocale } from '../../parsers/intl-string-parser';
+import { getStringByLocale } from '../../utils/intl-string-utils';
 
 export const fetchUserList = async (
   filterValues,

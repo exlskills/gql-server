@@ -1,7 +1,5 @@
 import mongoose from 'mongoose';
 import IntlStringSchema from './intl-string-model.js';
-import { getStringByLocale } from '../parsers/intl-string-parser';
-import { logger } from '../utils/logger';
 
 const QuestionFreeResponseSchema = new mongoose.Schema(
   {

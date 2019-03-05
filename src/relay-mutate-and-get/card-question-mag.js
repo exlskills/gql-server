@@ -104,7 +104,7 @@ export const processCardQuestionAction = async (
     DEPRECATED
 
     if (is_last_question) {
-      const courseData = await fetchById(question.course_item_ref.course_id, {
+      const courseCache = await fetchById(question.course_item_ref.course_id, {
         title: 1
       });
 
@@ -159,10 +159,10 @@ export const processCardQuestionAction = async (
         }
       }
 
-      const courseTitle = getStringByLocale(courseData.title, viewer.locale);
+      const courseTitle = getStringByLocale(courseCache.title, viewer.locale);
 
       returnData.next_question = {
-        course_id: toClientUrlId(courseTitle.text, courseData._id)
+        course_id: toClientUrlId(courseTitle.text, courseCache._id)
       };
 
       if (nextUnit && nextSection) {

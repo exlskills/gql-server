@@ -49,6 +49,18 @@ ListDefSchema.index(
   { default_language: 'none' }
 );
 
-// Also a UNIQUE compound index on type:1 and value:1
+ListDefSchema.index(
+  {
+    type: 1,
+    value: 1
+  },
+  {
+    unique: true
+  }
+);
+
+ListDefSchema.index({
+  updated_at: 1
+});
 
 export default mongoose.model('ListDef', ListDefSchema, 'list_def');

@@ -1,4 +1,3 @@
-
 export function RNG(seed) {
   // LCG using GCC's constants
   this.m = 0x80000000; // 2**31;
@@ -48,4 +47,8 @@ export function make_random_string() {
   }
 
   return text;
+}
+
+export function getRandomArbitrary(min, max) {
+  return Math.random() * (max - min) + min;
 }

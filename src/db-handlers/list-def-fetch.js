@@ -1,6 +1,7 @@
 import { logger } from '../utils/logger';
 import ListDef from '../db-models/list-def-model';
 import * as projectionWriter from '../utils/projection-writer';
+import { listDefCache } from '../data-cache/cache-objects';
 
 export const fetchTopic = async (obj_id, viewer, info) => {
   logger.debug(`in fetchTopic`);
@@ -17,7 +18,24 @@ export const fetchTopic = async (obj_id, viewer, info) => {
       }
     }
   ];
-  return await ListDef.aggregate(array).exec();
+  const result = await ListDef.aggregate(array).exec();
+  logger.debug(` fetchTopic result ` + JSON.stringify(result));
+  return result;
+};
+
+export const fetchTopicFromCache = async (obj_id, viewer, info) => {
+  let result = [];
+  if (listDefCache && listDefCache.topic) {
+    Object.keys(listDefCache.topic).forEach(key => {
+      try {
+        result.push({ _id: listDefCache.topic[key]._id, value: key });
+      } catch (err) {
+        logger.error(`in fetchTopicFromCache ` + err);
+      }
+    });
+  }
+  logger.debug(` fetchTopicFromCache result ` + JSON.stringify(result));
+  return result;
 };
 
 export const findValuesByTypeAndDesc = async (
