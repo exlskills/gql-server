@@ -3,7 +3,7 @@ import { basicFind } from '../basic-query-handler';
 import CourseDelivery from '../../db-models/course-delivery-model';
 import { fetchByKey } from '../user/user-fetch';
 import { getStringByLocale } from '../../utils/intl-string-utils';
-import { courseDeliveryDataCache } from '../../data-cache/cache-objects';
+import { courseDeliveryCache } from '../../data-cache/cache-objects';
 
 export const fetchByCourseIdAndLocale = async (
   course_id,
@@ -255,12 +255,12 @@ export const fetchCourseDeliveryMethodsFromCache = async (
 
   let result = [];
   if (
-    courseDeliveryDataCache[course_id] &&
-    courseDeliveryDataCache[course_id][viewer.locale] &&
-    courseDeliveryDataCache[course_id][viewer.locale].available_delivery_methods
+    courseDeliveryCache[course_id] &&
+    courseDeliveryCache[course_id][viewer.locale] &&
+    courseDeliveryCache[course_id][viewer.locale].available_delivery_methods
   ) {
     result =
-      courseDeliveryDataCache[course_id][viewer.locale]
+      courseDeliveryCache[course_id][viewer.locale]
         .available_delivery_methods;
   }
 

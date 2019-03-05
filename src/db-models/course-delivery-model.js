@@ -39,6 +39,20 @@ const CourseDeliverySchema = new mongoose.Schema(
   }
 );
 
+CourseDeliverySchema.index(
+  {
+    course_id: 1,
+    locale: 1
+  },
+  {
+    unique: true
+  }
+);
+
+CourseDeliverySchema.index({
+  updated_at: 1
+});
+
 export default mongoose.model(
   'CourseDelivery',
   CourseDeliverySchema,
