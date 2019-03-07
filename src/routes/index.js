@@ -10,7 +10,7 @@ router.post('/', async (req, res) => {
   logger.debug(`in post course-delivery-schedule`);
 
   try {
-    logger.debug(stringify(req));
+    // logger.debug(` request ` + stringify(req));
     const result = await loadCourseDeliverySchedule(
       req.body,
       req.get('X-Hub-Signature')
@@ -20,7 +20,7 @@ router.post('/', async (req, res) => {
       result.status &&
       [304, 400, 403, 422, 500].indexOf(result.status) > -1
     ) {
-      logger.debug(`return with status `);
+      logger.debug(`return with status ` + result.status);
       return res.status(result.status).json(result);
     } else {
       res.json(
@@ -28,6 +28,9 @@ router.post('/', async (req, res) => {
           status: 'OK'
         }
       );
+      // TODO - change to return upon call initial validation and send detailed status to the GitHub user's email
+      logger.debug(`return with default status `);
+      return res;
     }
   } catch (error) {
     logger.error(`uncaught error ` + error);

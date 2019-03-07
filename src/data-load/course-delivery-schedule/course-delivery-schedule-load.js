@@ -6,6 +6,8 @@ import momentTz from 'moment-timezone';
 import { basicFind } from '../../db-handlers/basic-query-handler';
 
 export async function loadData(fileContents, yamlFile) {
+  logger.debug(`in loadData`);
+
   const timeInputStringFormat = 'YYYY-MM-DD HH:mm';
   try {
     const courseDeliveryObj = jsyaml.safeLoad(fileContents);
@@ -23,7 +25,7 @@ export async function loadData(fileContents, yamlFile) {
 
     for (let schedRun of courseDeliveryObj.delivery_structures[0]
       .scheduled_runs) {
-      // logger.debug(`schedRun ` + JSON.stringify(schedRun));
+      logger.debug(`schedRun ` + JSON.stringify(schedRun));
 
       const timeZone = schedRun.scheduling_timezone;
 
@@ -33,6 +35,13 @@ export async function loadData(fileContents, yamlFile) {
         timeZone
       );
       schedRun.run_start_date = momentDateTz.utc().format();
+      logger.debug(`schedRun.sessions ` + JSON.stringify(schedRun.sessions));
+      if (!schedRun.sessions) {
+        throw new Error(
+          'Must provide scheduled run sessions. Missing for ' +
+            JSON.stringify(schedRun)
+        );
+      }
       for (let schedSession of schedRun.sessions) {
         const sessMomentDateTz = momentTz.tz(
           schedSession.session_start_date,
@@ -93,12 +102,19 @@ export async function loadData(fileContents, yamlFile) {
 }
 
 const prepareForYaml = (obj, timeInputStringFormat) => {
+  logger.debug(`in prepareForYaml`);
+  logger.debug(`  prepareForYaml input ` + JSON.stringify(obj));
+  logger.debug(
+    `  prepareForYaml timeInputStringFormat ` + timeInputStringFormat
+  );
+
   delete obj._id;
   if (obj.instructors && obj.instructors.length < 1) {
     delete obj.instructors;
   }
 
   for (let delivery_structure of obj.delivery_structures) {
+    logger.debug(` delivery_structure ` + JSON.stringify(delivery_structure));
     if (
       delivery_structure.instructors &&
       delivery_structure.instructors.length < 1
@@ -108,10 +124,13 @@ const prepareForYaml = (obj, timeInputStringFormat) => {
 
     delete delivery_structure.created_at;
     delete delivery_structure.updated_at;
-    delete delivery_structure.list_price.created_at;
-    delete delivery_structure.list_price.updated_at;
+    if (delivery_structure.list_price) {
+      delete delivery_structure.list_price.created_at;
+      delete delivery_structure.list_price.updated_at;
+    }
 
     for (let session of delivery_structure.sessions) {
+      logger.debug(`    session ` + JSON.stringify(session));
       if (session.instructors && session.instructors.length < 1) {
         delete session.instructors;
       }
@@ -121,6 +140,7 @@ const prepareForYaml = (obj, timeInputStringFormat) => {
       delete session.created_at;
       delete session.updated_at;
     }
+
     for (let scheduled_run of delivery_structure.scheduled_runs) {
       if (scheduled_run.instructors && scheduled_run.instructors.length < 1) {
         delete scheduled_run.instructors;
@@ -133,6 +153,7 @@ const prepareForYaml = (obj, timeInputStringFormat) => {
       }
 
       const timeZone = scheduled_run.scheduling_timezone;
+      // logger.debug(` timeZone ` + timeZone);
 
       const utcTime = momentTz.tz(
         scheduled_run.run_start_date,
@@ -163,5 +184,6 @@ const prepareForYaml = (obj, timeInputStringFormat) => {
       }
     }
   }
+  logger.debug(`  prepareForYaml result ` + JSON.stringify(obj))
   return obj;
 };

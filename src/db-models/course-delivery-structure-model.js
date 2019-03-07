@@ -38,8 +38,7 @@ export default new mongoose.Schema(
       type: [String]
     },
     list_price: {
-      type: ItemPrice,
-      required: true
+      type: ItemPrice
     },
     sessions: {
       type: [CourseDeliverySchedSessionSchema]

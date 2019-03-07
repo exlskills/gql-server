@@ -52,7 +52,7 @@ async function startGraphQLServer(callback) {
     process.exit(1);
   }
 
-  // This is a periodic function
+  // This function has an infinite loop - no wait here
   initCacheLoad();
 
   const graphQLApp = express();

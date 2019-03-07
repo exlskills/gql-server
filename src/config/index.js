@@ -10,7 +10,6 @@ const cfg = {
   cors_origin: process.env.CORS_REGEX
     ? [new RegExp(process.env.CORS_REGEX)]
     : [/localhost/, /exlskills.com/, /\.exlskills\.com$/],
-  loader_http_port: process.env.LOADER_PORT || 8083,
   mongo: {
     uri: process.env.DB_URI || 'mongodb://localhost:27017',
     db: process.env.DB_NAME || 'webph2_dev',
@@ -43,7 +42,8 @@ const cfg = {
       (process.env.NODE_ENV === 'production' ? 'warning' : 'trace')
   },
   cacheRefreshIntervalMin: process.env.CACHE_REFRESH_INTERVAL_MIN || 5,
-  activateTestMode: process.env.ACTIVATE_TEST_MODE || false
+  activateTestMode: process.env.ACTIVATE_TEST_MODE || false,
+  ghWebhookBranch: process.env.GH_WEBHOOK_BRANCH || 'master' // single string or a comma-delimited list, no spaces
 };
 
 export default cfg;

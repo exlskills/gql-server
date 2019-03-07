@@ -84,6 +84,8 @@ The commit to the GitHub repository should contain only the schedule file(s) - t
 - 422 - error creating feedback commit 
 - 500 - other error     
 
+The branch of the GitHub repository containing the schedule to be processed can be controlled via the `GH_WEBHOOK_BRANCH` Environment variable. By default, only the `master` branch is in scope. As GitHub webhook is set at the repository vs. branch level, to limit the branch(es) that trigger the API, set the value of `GH_WEBHOOK_BRANCH` to another branch or a comma-separated list of branches, no spaces. The values are case-sensitive. 
+
 ## License
 
 This software is offered under the terms outlined in the [LICENSE.md](LICENSE.md) file provided with this notice. If you have any questions regarding the license, please contact [licensing@exlinc.com](mailto:licensing@exlinc.com)

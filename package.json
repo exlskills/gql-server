@@ -32,7 +32,7 @@
     }
   },
   "dependencies": {
-    "@octokit/rest": "^15.12.1",
+    "@octokit/rest": "^16.16.4",
     "agenda": "^2.0.2",
     "app-root-path": "^2.1.0",
     "axios": "^0.18.0",

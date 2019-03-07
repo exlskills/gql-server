@@ -4,7 +4,7 @@ import { parse, stringify } from 'flatted/cjs';
 import { loadData } from './course-delivery-schedule-load';
 import verifyGithubWebhook from 'verify-github-webhook';
 
-const octokit = require('@octokit/rest')();
+const Octokit = require('@octokit/rest');
 
 export const loadCourseDeliverySchedule = async (
   githubEvent,
@@ -12,8 +12,8 @@ export const loadCourseDeliverySchedule = async (
 ) => {
   logger.debug(`in loadCourseDeliverySchedule`);
 
-  logger.debug(`xhubSignature ` + xhubSignature);
-  logger.debug(`githubEvent ` + stringify(githubEvent));
+  //logger.debug(`xhubSignature ` + xhubSignature);
+  //logger.debug(`githubEvent ` + stringify(githubEvent));
 
   const result = { files_processed: [] };
   let errorInProcess = false;
@@ -33,23 +33,47 @@ export const loadCourseDeliverySchedule = async (
     let jsonBody;
     try {
       jsonBody = JSON.stringify(githubEvent);
+      logger.debug(` jsonBody ` + jsonBody);
     } catch (err) {
       result.status = 400;
       result.msg = 'Invalid request body';
       return result;
     }
     if (!verifyGithubWebhook(xhubSignature, jsonBody, config.github_wh_token)) {
-      logger.debug(`X-Hub-Signature does not match expected value`);
+      logger.error(`X-Hub-Signature does not match expected value`);
       result.status = 400;
       result.msg = 'X-Hub-Signature does not match expected value';
       return result;
     }
   }
 
+  logger.debug(` body ref ` + githubEvent.ref);
+  if (!githubEvent.ref || !githubEvent.ref.startsWith('refs/heads/')) {
+    logger.error(`Invalid or missing ref: ` + githubEvent.ref);
+    result.status = 400;
+    result.msg = '`Invalid or missing ref: ` + githubEvent.ref';
+    return result;
+  }
+  const hookBranch = githubEvent.ref.substring(11);
+  logger.debug(`branch ` + hookBranch);
   try {
-    octokit.authenticate({
-      type: 'token',
-      token: config.github_user_token
+    const branches = config.ghWebhookBranch.split(',');
+    if (!branches.includes(hookBranch)) {
+      result.status = 304;
+      result.msg = 'Branch is not on the list';
+      return result;
+    }
+  } catch (err) {
+    logger.error(`Failed checking branch against list ` + err);
+    result.status = 304;
+    result.msg = 'Branch is not on the list';
+    return result;
+  }
+
+  let octokit;
+  try {
+    octokit = new Octokit({
+      auth: 'token ' + config.github_user_token
     });
   } catch (err) {
     logger.error(`github user token auth error ` + err);
@@ -95,7 +119,7 @@ export const loadCourseDeliverySchedule = async (
   for (let fileToProcess of filesToProcess) {
     logger.debug(`path ` + fileToProcess);
 
-    const fileFromRepo = await octokit.repos.getContent({
+    const fileFromRepo = await octokit.repos.getContents({
       owner: githubEvent.repository.owner.name,
       repo: githubEvent.repository.name,
       path: fileToProcess,
@@ -113,12 +137,12 @@ export const loadCourseDeliverySchedule = async (
 
       let fileContentObj;
       try {
-        fileContentObj = await octokit.gitdata.getBlob({
+        fileContentObj = await octokit.git.getBlob({
           owner: githubEvent.repository.owner.name,
           repo: githubEvent.repository.name,
           file_sha: fileFromRepo.data.sha
         });
-        logger.debug(stringify(fileContentObj));
+        logger.debug(`fileContentObj ` + stringify(fileContentObj));
       } catch (err) {
         logger.error(JSON.stringify(fileContentObj));
         fileReplyObj.completed = 'error';
@@ -154,7 +178,7 @@ export const loadCourseDeliverySchedule = async (
           const fileNewContentBase64 = Buffer(fileContentString).toString(
             'base64'
           );
-          const fileBlobSha = await octokit.gitdata.createBlob({
+          const fileBlobSha = await octokit.git.createBlob({
             owner: githubEvent.repository.owner.name,
             repo: githubEvent.repository.name,
             content: fileNewContentBase64,
@@ -185,21 +209,21 @@ export const loadCourseDeliverySchedule = async (
 
   if (fileBlobs.length > 0) {
     try {
-      const latestReference = await octokit.gitdata.getReference({
+      const latestReference = await octokit.git.getRef({
         owner: githubEvent.repository.owner.name,
         repo: githubEvent.repository.name,
         ref: githubEvent.ref.substring('refs/'.length)
       });
       logger.debug(`latestReference ` + stringify(latestReference));
 
-      const latestCommit = await octokit.gitdata.getCommit({
+      const latestCommit = await octokit.git.getCommit({
         owner: githubEvent.repository.owner.name,
         repo: githubEvent.repository.name,
         commit_sha: latestReference.data.object.sha
       });
       logger.debug(`latestCommit ` + stringify(latestCommit));
 
-      const newTree = await octokit.gitdata.createTree({
+      const newTree = await octokit.git.createTree({
         owner: githubEvent.repository.owner.name,
         repo: githubEvent.repository.name,
         tree: fileBlobs,
@@ -207,7 +231,7 @@ export const loadCourseDeliverySchedule = async (
       });
       logger.debug(`newTree ` + stringify(newTree));
 
-      const newCommit = await octokit.gitdata.createCommit({
+      const newCommit = await octokit.git.createCommit({
         owner: githubEvent.repository.owner.name,
         repo: githubEvent.repository.name,
         message: 'auto#gen by ' + latestCommit.data.sha,
@@ -216,7 +240,7 @@ export const loadCourseDeliverySchedule = async (
       });
       logger.debug(`newCommit ` + stringify(newCommit));
 
-      const result = await octokit.gitdata.updateReference({
+      const result = await octokit.git.updateRef({
         owner: githubEvent.repository.owner.name,
         repo: githubEvent.repository.name,
         ref: githubEvent.ref.substring('refs/'.length),
