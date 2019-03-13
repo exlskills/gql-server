@@ -2,6 +2,8 @@ import { logger } from '../utils/logger';
 import ListDef from '../db-models/list-def-model';
 import { basicFind } from '../db-handlers/basic-query-handler';
 import { listDefCache } from './cache-objects';
+import { getStringByLocale } from '../utils/intl-string-utils';
+import { sizeof } from '../utils/calc-field-size';
 
 export async function loadListDefCache(init_load, recordID) {
   logger.debug(`In loadListDefCache`);
@@ -40,6 +42,7 @@ export async function loadListDefCache(init_load, recordID) {
     logger.debug(`   listDefCache updated_at ` + listDefCache.updated_at);
 
     for (let dbRec of dbObj) {
+      dbRec = dbRec.toObject();
       logger.debug(
         `Loading data for type and value ` + dbRec.type + ` ` + dbRec.value
       );
@@ -48,7 +51,7 @@ export async function loadListDefCache(init_load, recordID) {
         listDefCache[dbRec.type] = {};
       }
       listDefCache[dbRec.type][dbRec.value] = {
-        ...dbRec.toObject()
+        ...dbRec
       };
       delete listDefCache[dbRec.type][dbRec.value].type;
       delete listDefCache[dbRec.type][dbRec.value].value;
@@ -57,5 +60,24 @@ export async function loadListDefCache(init_load, recordID) {
     //logger.debug(`   loadListDefCache RESULT Size ` + objSize);
   } else {
     logger.debug(`No list-def records extracted`);
+  }
+}
+
+export function getIntlStringFieldsOfObject(obj, intlStringFields, locales) {
+  const result = { data: {}, size: 0 };
+  if (obj) {
+    for (let locale of locales) {
+      result.data[locale] = {};
+      result.size += sizeof(locale);
+      for (let localeField of intlStringFields) {
+        if (obj[localeField]) {
+          const intlText = getStringByLocale(obj[localeField], locale).text;
+          result.size += sizeof(localeField);
+          result.data[locale][localeField] = intlText;
+          result.size += sizeof(intlText);
+        }
+      }
+    }
+    return result;
   }
 }

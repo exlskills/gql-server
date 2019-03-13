@@ -2,6 +2,7 @@ import config from '../config';
 import { logger } from '../utils/logger';
 import { delay } from '../utils/timeout';
 import { loadCourseCache, loadCourseDeliveryCache } from './course-cache';
+import { loadCourseStructureCache } from './course-structure-cache';
 import { loadListDefCache } from './misc-cache';
 import { getRandomArbitrary } from '../utils/randomization';
 
@@ -12,6 +13,7 @@ export const initCacheLoad = async () => {
     loadCourseDeliveryCache(true, null),
     loadListDefCache(true, null)
   ]);
+  await loadCourseStructureCache(true, null);
 
   for (;;) {
     let delay_minutes = config.cacheRefreshIntervalMin;
@@ -25,5 +27,6 @@ export const initCacheLoad = async () => {
       loadCourseDeliveryCache(false, null),
       loadListDefCache(false, null)
     ]);
+    await loadCourseStructureCache(false, null);
   }
 };

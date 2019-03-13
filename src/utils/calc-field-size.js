@@ -3,16 +3,18 @@ import { logger } from './logger';
 // Based on https://github.com/miktam/sizeof
 
 function sizeOfObject(object) {
-  if (object == null) {
+  //logger.debug(`In sizeOfObject ` + JSON.stringify(object));
+  if (!object) {
     return 0;
   }
 
   var bytes = 0;
-  for (var key in object) {
+  for (let key of Object.keys(object)) {
+    //logger.debug(`Object key ` + key);
+
     if (!Object.hasOwnProperty.call(object, key)) {
       continue;
     }
-
     bytes += sizeof(key);
     try {
       bytes += sizeof(object[key]);
@@ -53,23 +55,24 @@ export const sizeof = object => {
   }
 
   //logger.debug(`object ` + JSON.stringify(object));
-  var objectType = typeof object;
+  const objectType = Object.prototype.toString.call(object);
   //logger.debug(`objectType ` + objectType);
-  const isArr = Object.prototype.toString.call(object) == '[object Array]';
-  if (isArr) {
-    return sizeOfArray(object);
-  }
   switch (objectType) {
-    case 'string':
+    case '[object Array]':
+      return sizeOfArray(object);
+    case '[object String]':
       return object.length * 2;
-    case 'boolean':
+    case '[object Boolean]':
       return 4;
-    case 'number':
+    case '[object Number]':
       return 8;
-    case 'object':
-      //logger.debug(`object ` + JSON.stringify(object));
+    case '[object Date]':
+      return 8;
+    case '[object Object]':
+      //logger.debug(`object Object ` + object);
       return sizeOfObject(object);
     default:
+      logger.debug(`default objectType ` + objectType);
       return 0;
   }
 };

@@ -7,6 +7,7 @@ import { logger } from '../../utils/logger';
 import { checkUserViewedCard } from '../../db-handlers/card-interaction-fetch';
 import { fetchSectionCardIDsForUnit } from './section-card-fetch';
 import { fetchExamSessionsByUserAndUnitToday } from '../exam-session-fetch';
+import { courseStructureCache } from '../../data-cache/cache-objects';
 
 export const fetchByCourseAndUnitId = async (
   course_id,
@@ -203,7 +204,7 @@ export const fetchCourseUnitsWithDetailedStatus = async (
     fetchParameters
   );
 
-  // Get individual Secions and Cards and calculate the progress status
+  // Get individual Sections and Cards and calculate the progress status
   for (let unitElem of arrayCourseUnitsDetails) {
     unitElem.attempts_left = 0;
     let unitEmaSum = 0;
@@ -506,4 +507,153 @@ export const fetchCourseUnitById = async (
     unitElem.grade = 0;
   }
   return arrayRet[0];
+};
+
+export const fetchCourseUnitsWithDetailedStatusCache = async (
+  filterValues,
+  aggregateArray,
+  viewerLocale,
+  fetchParameters
+) => {
+  logger.debug(`in fetchCourseUnitsWithDetailedStatusCache`);
+
+  const courseObj = courseStructureCache[fetchParameters.courseId];
+  if (!courseObj || !courseObj.units) {
+    logger.error(
+      `Course in not in the structure cache ` + fetchParameters.courseId
+    );
+    return [];
+  }
+
+  let locale = viewerLocale;
+  if (!courseObj.locale_data[viewerLocale]) {
+    locale = courseObj.default_locale;
+  }
+
+  const userId = fetchParameters.userId;
+
+  const examStatusByCourseUnit = await fetchUserCourseUnitExamStatus(
+    filterValues,
+    aggregateArray,
+    viewerLocale,
+    fetchParameters
+  );
+
+  let arrayCourseUnitsDetails = [];
+
+  // Get individual Sections and Cards and calculate the progress status
+  for (let unitId of Object.keys(courseObj.units)) {
+    if (fetchParameters.courseId && !fetchParameters.courseId === unitId) {
+      continue;
+    }
+    logger.debug(` Course unit ` + unitId);
+    const unitObj = courseObj.units[unitId];
+
+    const unitElem = {
+      _id: unitId,
+      index: unitObj.index,
+      attempts_allowed_per_day: unitObj.attempts_allowed_per_day,
+      currentCourseId: fetchParameters.courseId,
+      final_exam_weight_pct: unitObj.final_exam_weight_pct,
+      ...unitObj.locale_data[locale]
+    };
+
+    unitElem.attempts_left = 0;
+    let unitEmaSum = 0;
+    let unitEmaCount = 0;
+    unitElem.section_list = [];
+
+    // Unit Sections
+    if (unitObj.sections) {
+      for (let sectionId of Object.keys(unitObj.sections)) {
+        const sectionObj = unitObj.sections[sectionId];
+        let sectEmaSum = 0;
+        let sectEmaCount = 0;
+        const sectionElem = {
+          _id: sectionId,
+          index: sectionObj.index,
+          ...sectionObj.locale_data[locale]
+        };
+
+        // Section Cards
+        sectionElem.cards_list = [];
+        if (sectionObj.cards) {
+          for (let cardId of Object.keys(sectionObj.cards)) {
+            const cardObj = sectionObj.cards[cardId];
+            const cardElem = {
+              _id: cardId,
+              index: cardObj.index,
+              question_ids: cardObj.question_ids,
+              course_item_ref: cardObj.course_item_ref,
+              github_edit_url: cardObj.github_edit_url,
+              tags: cardObj.tags,
+              updated_at: cardObj.updated_at,
+              ...cardObj.locale_data[locale]
+            };
+            cardElem.was_viewed = false;
+            cardElem.ema = 0;
+
+            // Returns card_interaction.action array (in the current design,only last action is recorded)
+            const user_card_view = await checkUserViewedCard(userId, cardId);
+            if (user_card_view && user_card_view.length > 0) {
+              cardElem.ema = 100;
+              cardElem.was_viewed = true;
+            }
+
+            if (cardElem.question_ids && cardElem.question_ids.length > 0) {
+              cardElem.ema = await computeQuestionsEMA(
+                userId,
+                cardElem.question_ids
+              );
+            }
+            sectionElem.cards_list.push(cardElem);
+            sectEmaSum += cardElem.ema;
+            sectEmaCount++;
+          } // On cards
+        }
+
+        unitEmaSum += sectEmaSum;
+        unitEmaCount += sectEmaCount;
+        sectionElem.ema = sectEmaCount > 0 ? sectEmaSum / sectEmaCount : 0;
+        unitElem.section_list.push(sectionElem);
+      } // On sections
+    }
+
+    unitElem.ema = unitEmaCount > 0 ? unitEmaSum / unitEmaCount : 0;
+    unitElem.unit_progress_state = unitElem.ema > 0 ? 0 : -1;
+
+    // Course Unit Exam Attempts
+    unitElem.grade = 0;
+    unitElem.attempts_left = unitElem.attempts_allowed_per_day;
+
+    const examStatusUnitIndex = examStatusByCourseUnit.findIndex(
+      x => x._id === unitElem._id
+    );
+    if (examStatusUnitIndex >= 0) {
+      unitElem.grade = examStatusByCourseUnit[examStatusUnitIndex].grade;
+      if (examStatusByCourseUnit[examStatusUnitIndex].passed) {
+        unitElem.unit_progress_state = 1;
+      }
+
+      unitElem.attempts = examStatusByCourseUnit[examStatusUnitIndex].attempts;
+      unitElem.attempts_left =
+        examStatusByCourseUnit[examStatusUnitIndex].attempts_left;
+      unitElem.last_attempted_at =
+        examStatusByCourseUnit[examStatusUnitIndex].last_attempted_at;
+      unitElem.final_exam_weight_pct =
+        examStatusByCourseUnit[examStatusUnitIndex].final_exam_weight_pct;
+      unitElem.passed = examStatusByCourseUnit[examStatusUnitIndex].passed;
+    }
+    logger.debug(
+      `fetchCourseUnitsWithDetailedStatusCache unitElem  ` +
+        JSON.stringify(unitElem)
+    );
+    arrayCourseUnitsDetails.push(unitElem);
+  } // End of loop on Course Units
+
+  logger.debug(
+    `fetchCourseUnitsWithDetailedStatusCache result ` +
+      JSON.stringify(arrayCourseUnitsDetails)
+  );
+  return arrayCourseUnitsDetails;
 };

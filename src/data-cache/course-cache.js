@@ -71,6 +71,7 @@ export async function loadCourseCache(init_load, courseID) {
     logger.debug(`   CourseCache updated_at ` + courseCache.updated_at);
 
     for (let course of courseDbObj) {
+      course = course.toObject();
       logger.debug(`Loading data for course ` + course._id);
       // logger.debug(`course ` + JSON.stringify(course));
       const oneCourseDataCache = {};
@@ -87,9 +88,16 @@ export async function loadCourseCache(init_load, courseID) {
       oneCourseDataCache['locale_data'] = {};
       objSize += sizeof('locale_data');
       for (let titleIntlString of course.title.intlString) {
-        logger.debug(`Loading data for locale ` + titleIntlString.locale);
+        // logger.debug(`Loading data for locale ` + titleIntlString.locale);
         oneCourseDataCache['locale_data'][titleIntlString.locale] = {};
         objSize += sizeof(titleIntlString.locale);
+
+        if (titleIntlString.is_default) {
+          oneCourseDataCache.default_locale = titleIntlString.locale;
+          objSize += sizeof(titleIntlString.locale);
+          objSize += sizeof('default_locale');
+        }
+
         for (let localeField of localeFields) {
           if (course[localeField]) {
             // logger.debug(`localeField ` + localeField);
@@ -159,6 +167,7 @@ export async function loadCourseDeliveryCache(init_load, recordID) {
     );
 
     for (let courseDeliveryRec of courseDeliveryDbObj) {
+      courseDeliveryRec = courseDeliveryRec.toObject();
       logger.debug(
         `Loading data for course and locale ` +
           courseDeliveryRec.course_id +
@@ -172,7 +181,7 @@ export async function loadCourseDeliveryCache(init_load, recordID) {
       courseDeliveryCache[courseDeliveryRec.course_id][
         courseDeliveryRec.locale
       ] = {
-        ...courseDeliveryRec.toObject()
+        ...courseDeliveryRec
       };
       delete courseDeliveryCache[courseDeliveryRec.course_id][
         courseDeliveryRec.locale

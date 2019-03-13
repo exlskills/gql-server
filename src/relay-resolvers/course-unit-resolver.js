@@ -13,6 +13,7 @@ import {
 
 export const resolveCourseUnits = (obj, args, viewer, info) => {
   logger.debug(`in -----> resolveCourseUnits`);
+  logger.debug(`in -----> resolverArgs ` + JSON.stringify(args.resolverArgs));
   const businessKey = '_id';
   const fetchParameters = {
     userId: viewer.user_id
@@ -35,7 +36,7 @@ export const resolveCourseUnits = (obj, args, viewer, info) => {
   }
 
   const execDetails = {
-    queryFunction: fetchCourseUnitsWithDetailedStatus,
+    queryFunction: fetchCourseUnitsWithDetailedStatusCache,
     businessKey: businessKey,
     fetchParameters: fetchParameters
   };
