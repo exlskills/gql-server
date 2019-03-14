@@ -8,7 +8,7 @@ import {
   fetchCourseUnitById,
   fetchCourseUnitsWithDetailedStatus,
   fetchUserCourseUnitExamStatus,
-  fetchUserCourseExamAttemptsByUnit
+  fetchCourseUnitsWithDetailedStatusCache
 } from '../db-handlers/course/course-unit-fetch';
 
 export const resolveCourseUnits = (obj, args, viewer, info) => {

@@ -7,7 +7,10 @@ import { logger } from '../../utils/logger';
 import { checkUserViewedCard } from '../../db-handlers/card-interaction-fetch';
 import { fetchSectionCardIDsForUnit } from './section-card-fetch';
 import { fetchExamSessionsByUserAndUnitToday } from '../exam-session-fetch';
-import { courseStructureCache } from '../../data-cache/cache-objects';
+import {
+  courseCache,
+  courseStructureCache
+} from '../../data-cache/cache-objects';
 
 export const fetchByCourseAndUnitId = async (
   course_id,
@@ -517,11 +520,17 @@ export const fetchCourseUnitsWithDetailedStatusCache = async (
 ) => {
   logger.debug(`in fetchCourseUnitsWithDetailedStatusCache`);
 
-  const courseObj = courseStructureCache[fetchParameters.courseId];
-  if (!courseObj || !courseObj.units) {
+  const courseStructObj = courseStructureCache[fetchParameters.courseId];
+  if (!courseStructObj || !courseStructObj.units) {
     logger.error(
       `Course in not in the structure cache ` + fetchParameters.courseId
     );
+    return [];
+  }
+
+  const courseObj = courseCache[fetchParameters.courseId];
+  if (!courseObj) {
+    logger.error(`Course in not in the cache ` + fetchParameters.courseId);
     return [];
   }
 
@@ -542,12 +551,12 @@ export const fetchCourseUnitsWithDetailedStatusCache = async (
   let arrayCourseUnitsDetails = [];
 
   // Get individual Sections and Cards and calculate the progress status
-  for (let unitId of Object.keys(courseObj.units)) {
+  for (let unitId of courseStructObj.units.keys()) {
     if (fetchParameters.courseId && !fetchParameters.courseId === unitId) {
       continue;
     }
-    logger.debug(` Course unit ` + unitId);
-    const unitObj = courseObj.units[unitId];
+    // logger.debug(` Course unit ` + unitId);
+    const unitObj = courseStructObj.units.get(unitId);
 
     const unitElem = {
       _id: unitId,
@@ -555,18 +564,19 @@ export const fetchCourseUnitsWithDetailedStatusCache = async (
       attempts_allowed_per_day: unitObj.attempts_allowed_per_day,
       currentCourseId: fetchParameters.courseId,
       final_exam_weight_pct: unitObj.final_exam_weight_pct,
+      has_exam: unitObj.final_exams.length > 0 ? true : false,
       ...unitObj.locale_data[locale]
     };
 
     unitElem.attempts_left = 0;
     let unitEmaSum = 0;
     let unitEmaCount = 0;
-    unitElem.section_list = [];
+    unitElem.sections_list = [];
 
     // Unit Sections
     if (unitObj.sections) {
-      for (let sectionId of Object.keys(unitObj.sections)) {
-        const sectionObj = unitObj.sections[sectionId];
+      for (let sectionId of unitObj.sections.keys()) {
+        const sectionObj = unitObj.sections.get(sectionId);
         let sectEmaSum = 0;
         let sectEmaCount = 0;
         const sectionElem = {
@@ -578,8 +588,8 @@ export const fetchCourseUnitsWithDetailedStatusCache = async (
         // Section Cards
         sectionElem.cards_list = [];
         if (sectionObj.cards) {
-          for (let cardId of Object.keys(sectionObj.cards)) {
-            const cardObj = sectionObj.cards[cardId];
+          for (let cardId of sectionObj.cards.keys()) {
+            const cardObj = sectionObj.cards.get(cardId);
             const cardElem = {
               _id: cardId,
               index: cardObj.index,
@@ -615,7 +625,7 @@ export const fetchCourseUnitsWithDetailedStatusCache = async (
         unitEmaSum += sectEmaSum;
         unitEmaCount += sectEmaCount;
         sectionElem.ema = sectEmaCount > 0 ? sectEmaSum / sectEmaCount : 0;
-        unitElem.section_list.push(sectionElem);
+        unitElem.sections_list.push(sectionElem);
       } // On sections
     }
 
@@ -644,10 +654,7 @@ export const fetchCourseUnitsWithDetailedStatusCache = async (
         examStatusByCourseUnit[examStatusUnitIndex].final_exam_weight_pct;
       unitElem.passed = examStatusByCourseUnit[examStatusUnitIndex].passed;
     }
-    logger.debug(
-      `fetchCourseUnitsWithDetailedStatusCache unitElem  ` +
-        JSON.stringify(unitElem)
-    );
+    // logger.debug(`fetchCourseUnitsWithDetailedStatusCache unitElem  ` +JSON.stringify(unitElem));
     arrayCourseUnitsDetails.push(unitElem);
   } // End of loop on Course Units
 

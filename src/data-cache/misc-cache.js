@@ -46,7 +46,7 @@ export async function loadListDefCache(init_load, recordID) {
       logger.debug(
         `Loading data for type and value ` + dbRec.type + ` ` + dbRec.value
       );
-      logger.debug(`list-def rec ` + JSON.stringify(dbRec));
+      // logger.debug(`list-def rec ` + JSON.stringify(dbRec));
       if (!listDefCache[dbRec.type]) {
         listDefCache[dbRec.type] = {};
       }

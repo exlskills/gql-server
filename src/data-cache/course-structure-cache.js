@@ -85,7 +85,7 @@ export async function loadCourseStructureCache(init_load, courseID) {
       }
 
       // logger.debug(`course ` + JSON.stringify(course));
-      const oneCourseDataCache = {};
+      const courseObj = {};
       objSize += sizeof(course._id);
 
       let locales = [];
@@ -94,7 +94,7 @@ export async function loadCourseStructureCache(init_load, courseID) {
         locales.push(locale);
       }
 
-      oneCourseDataCache.units = {};
+      courseObj.units = new Map();
       objSize += sizeof('units');
 
       const unitsSorted = course.units.Units.sort(
@@ -103,8 +103,7 @@ export async function loadCourseStructureCache(init_load, courseID) {
       for (let unit of unitsSorted) {
         //logger.debug(`Unit ` + unit._id);
 
-        oneCourseDataCache.units[unit._id] = {};
-        objSize += sizeof(unit._id);
+        const unitObj = {};
 
         const intlStringFieldsObj = getIntlStringFieldsOfObject(
           unit,
@@ -113,14 +112,13 @@ export async function loadCourseStructureCache(init_load, courseID) {
         );
 
         objSize += intlStringFieldsObj.size;
-        oneCourseDataCache.units[unit._id].locale_data =
-          intlStringFieldsObj.data;
+        unitObj.locale_data = intlStringFieldsObj.data;
 
         for (let genField of unitFields) {
           // logger.debug(`genField ` + genField);
           if (unit[genField]) {
             objSize += sizeof(genField);
-            oneCourseDataCache.units[unit._id][genField] = unit[genField];
+            unitObj[genField] = unit[genField];
             // logger.debug(`course[genField] ` + JSON.stringify(course[genField]));
             objSize += sizeof(unit[genField]);
           }
@@ -128,7 +126,7 @@ export async function loadCourseStructureCache(init_load, courseID) {
 
         if (unit.sections) {
           // Sections
-          oneCourseDataCache.units[unit._id].sections = {};
+          unitObj.sections = new Map();
           objSize += sizeof('sections');
 
           const sectionsSorted = unit.sections.Sections.sort(
@@ -137,8 +135,7 @@ export async function loadCourseStructureCache(init_load, courseID) {
           for (let section of sectionsSorted) {
             //logger.debug(`Section ` + section._id);
 
-            oneCourseDataCache.units[unit._id].sections[section._id] = {};
-            objSize += sizeof(section._id);
+            const sectionObj = {};
 
             const intlStringFieldsObj = getIntlStringFieldsOfObject(
               section,
@@ -147,17 +144,13 @@ export async function loadCourseStructureCache(init_load, courseID) {
             );
 
             objSize += intlStringFieldsObj.size;
-            oneCourseDataCache.units[unit._id].sections[
-              section._id
-            ].locale_data = intlStringFieldsObj.data;
+            sectionObj.locale_data = intlStringFieldsObj.data;
 
             for (let genField of sectionFields) {
               // logger.debug(`genField ` + genField);
               if (section[genField]) {
                 objSize += sizeof(genField);
-                oneCourseDataCache.units[unit._id].sections[section._id][
-                  genField
-                ] = section[genField];
+                sectionObj[genField] = section[genField];
                 // logger.debug(`section[genField] ` + JSON.stringify(section[genField]));
                 objSize += sizeof(section[genField]);
               }
@@ -165,9 +158,7 @@ export async function loadCourseStructureCache(init_load, courseID) {
 
             if (section.cards) {
               // Cards
-              oneCourseDataCache.units[unit._id].sections[
-                section._id
-              ].cards = {};
+              sectionObj.cards = new Map();
               objSize += sizeof('cards');
 
               const cardsSorted = section.cards.Cards.sort(
@@ -176,10 +167,7 @@ export async function loadCourseStructureCache(init_load, courseID) {
               for (let card of cardsSorted) {
                 // logger.debug(`Card ` + card._id);
 
-                oneCourseDataCache.units[unit._id].sections[section._id].cards[
-                  card._id
-                ] = {};
-                objSize += sizeof(card._id);
+                const cardObj = {};
 
                 const intlStringFieldsObj = getIntlStringFieldsOfObject(
                   card,
@@ -188,33 +176,40 @@ export async function loadCourseStructureCache(init_load, courseID) {
                 );
 
                 objSize += intlStringFieldsObj.size;
-                oneCourseDataCache.units[unit._id].sections[section._id].cards[
-                  card._id
-                ].locale_data = intlStringFieldsObj.data;
+                cardObj.locale_data = intlStringFieldsObj.data;
 
                 for (let genField of cardFields) {
                   // logger.debug(`genField ` + genField);
                   if (card[genField]) {
                     objSize += sizeof(genField);
-                    oneCourseDataCache.units[unit._id].sections[
-                      section._id
-                    ].cards[card._id][genField] = card[genField];
+                    cardObj[genField] = card[genField];
                     //logger.debug(`card[genField] ` + JSON.stringify(card[genField]));
                     objSize += sizeof(card[genField]);
                   }
                 }
+                logger.debug(`  loadCourseStructureCache cardObj ` + JSON.stringify(cardObj));
+                sectionObj.cards.set(card._id, cardObj);
+                objSize += sizeof(card._id);
               } // On Cards
-            }
+            } // Has Cards
+
+            unitObj.sections.set(section._id, sectionObj);
+            logger.debug(`  loadCourseStructureCache sectionObj ` + JSON.stringify(sectionObj));
+            logger.debug(`  loadCourseStructureCache sectionObj Cards ` + sectionObj.cards.keys());
+            objSize += sizeof(section._id);
           } // On Sections
-        }
+        } // Has Sections
+
+        courseObj.units.set(unit._id, unitObj);
+        objSize += sizeof(unit._id);
       } // On Units
 
-      courseStructureCache[course._id] = oneCourseDataCache;
+      courseStructureCache[course._id] = courseObj;
     } // On courses
 
     logger.debug(
       `  loadCourseStructureCache RESULT ` +
-        JSON.stringify(courseStructureCache)
+        JSON.stringify(courseStructureCache.intro_to_python.units.keys())
     );
     logger.debug(`  loadCourseStructureCache RESULT Size ` + objSize);
   } else {

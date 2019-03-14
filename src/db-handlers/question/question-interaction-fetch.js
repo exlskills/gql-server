@@ -43,7 +43,7 @@ export const findByQuestionIds = async (
   type = null,
   opts = {}
 ) => {
-  logger.debug(`in Quest Interact findByQuestionIds`);
+  // logger.debug(`in Quest Interact findByQuestionIds`);
   try {
     let conditions = { user_id: userId, question_id: { $in: quesIds } };
     if (type) {
@@ -66,7 +66,7 @@ export const findByQuestionIds = async (
     }
 
     const result = await query.exec();
-    logger.debug(`    result ` + JSON.stringify(result));
+    // logger.debug(`   findByQuestionIds result ` + JSON.stringify(result));
     return result;
   } catch (error) {
     return [];
@@ -88,7 +88,7 @@ export const getUserAnswer = async (exam_session_id, question_id, user_id) => {
 };
 
 export const computeQuestionsEMA = async (userId, questionIds) => {
-  logger.debug(`in computeQuestionsEMA`);
+  // logger.debug(`in computeQuestionsEMA`);
   const N = Config.card_ema.n;
   const K = 2 / (N + 1);
   let quesInters = [];

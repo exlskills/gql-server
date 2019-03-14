@@ -35,7 +35,7 @@ export const fetchByUserIdAndCardId = async (user_id, card_id, selectVal) => {
 };
 
 export const checkUserViewedCard = async (user_id, card_id) => {
-  logger.debug(`in checkUserViewedCard`);
+  // logger.debug(`in checkUserViewedCard`);
   let record;
   try {
     record = await basicFind(
@@ -48,7 +48,7 @@ export const checkUserViewedCard = async (user_id, card_id) => {
       null,
       { action: 1 }
     );
-    logger.debug(`     checkUserViewedCard record ` + JSON.stringify(record));
+    // logger.debug(`     checkUserViewedCard record ` + JSON.stringify(record));
   } catch (errInternalAlreadyReported) {
     return null;
   }
