@@ -5,7 +5,10 @@ import { getStringByLocale } from '../../utils/intl-string-utils';
 import { computeQuestionsEMA } from '../question/question-interaction-fetch';
 import { logger } from '../../utils/logger';
 import { checkUserViewedCard } from '../../db-handlers/card-interaction-fetch';
-import { fetchSectionCardIDsForUnit } from './section-card-fetch';
+import {
+  fetchSectionCardIDsForUnit,
+  fetchSectionCardIDsForUnitCache
+} from './section-card-fetch';
 import { fetchExamSessionsByUserAndUnitToday } from '../exam-session-fetch';
 import {
   courseCache,
@@ -411,7 +414,7 @@ export const fetchUserCourseUnitExamStatus = async (
       }
     } // End of work with Exam Attempts
 
-    const cardsAndQuestions = await fetchSectionCardIDsForUnit(
+    const cardsAndQuestions = await fetchSectionCardIDsForUnitCache(
       fetchParameters.courseId,
       unit._id
     );

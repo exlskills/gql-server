@@ -48,7 +48,7 @@ export const resolveSectionCards = (obj, args, viewer, info) => {
   }
 
   const execDetails = {
-    queryFunction: SectionCardFetch.fetchSectionCards,
+    queryFunction: SectionCardFetch.fetchSectionCardsCache,
     businessKey: '_id',
     fetchParameters: fetchParameters
   };
@@ -96,7 +96,7 @@ export const resolveGetCard = async (obj, args, viewer, info) => {
       $limit: 1
     }
   ];
-  const result = await SectionCardFetch.fetchSectionCards(
+  const result = await SectionCardFetch.fetchSectionCardsCache(
     {},
     aggregateArray,
     viewer.locale,

@@ -53,13 +53,18 @@ export async function loadCourseCache(init_load, courseID) {
     queryVal = { static_data_updated_at: { $gte: courseCache.updated_at } };
   }
 
-  let courseDbObj = await basicFind(
-    Course,
-    runParams,
-    queryVal,
-    { _id: 1 },
-    selectVal
-  );
+  let courseDbObj;
+  try {
+    courseDbObj = await basicFind(
+      Course,
+      runParams,
+      queryVal,
+      { _id: 1 },
+      selectVal
+    );
+  } catch (errInternalAlreadyReported) {
+    return;
+  }
 
   if (courseID && courseDbObj) {
     courseDbObj = [courseDbObj];
@@ -145,13 +150,18 @@ export async function loadCourseDeliveryCache(init_load, recordID) {
 
   const extractedAt = new Date();
 
-  let courseDeliveryDbObj = await basicFind(
-    CourseDelivery,
-    runParams,
-    queryVal,
-    { course_id: 1 },
-    selectVal
-  );
+  let courseDeliveryDbObj;
+  try {
+    courseDeliveryDbObj = await basicFind(
+      CourseDelivery,
+      runParams,
+      queryVal,
+      { course_id: 1 },
+      selectVal
+    );
+  } catch (errInternalAlreadyReported) {
+    return;
+  }
 
   if (recordID && courseDeliveryDbObj) {
     courseDeliveryDbObj = [courseDeliveryDbObj];

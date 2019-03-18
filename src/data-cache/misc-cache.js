@@ -24,13 +24,18 @@ export async function loadListDefCache(init_load, recordID) {
 
   const extractedAt = new Date();
 
-  let dbObj = await basicFind(
-    ListDef,
-    runParams,
-    queryVal,
-    { type: 1 },
-    selectVal
-  );
+  let dbObj;
+  try {
+    dbObj = await basicFind(
+      ListDef,
+      runParams,
+      queryVal,
+      { type: 1 },
+      selectVal
+    );
+  } catch (errInternalAlreadyReported) {
+    return;
+  }
 
   if (recordID && dbObj) {
     dbObj = [dbObj];

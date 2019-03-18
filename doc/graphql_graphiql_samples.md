@@ -62,13 +62,63 @@ query listUnits {
   }
 }
 ```
-
+## List Cards
+```
+query listCards {
+  listCards(resolverArgs: [{param: "course_id", value: "Q291cnNlOmFwX2phdmE="}, {param: "unit_id", value: "Q291cnNlVW5pdDoyY2VjZjFkNTk3ODM0YTg2OWEyZDI0OTVhMWRhNGU3ZA=="}, {param: "section_id", value: "VW5pdFNlY3Rpb246ZWEyNmIxZGNhMTRlNDk2OGEzY2RiODI3ODI1OTJhZTg="}]) {
+    edges {
+      node {
+        id
+        index
+        title
+        content {
+          content
+        }
+        questions {
+          id
+          hint_exists
+        }
+      }
+    }
+  }
+}
+```
 ## Card
 ```
 query getCard {
-  getCard(course_id: "Q291cnNlOmFwX2phdmE=", unit_id: "VW5pdDo5Yjg1OGFlYjczMTA0ZDEyOTJiZmFhYTRiZWE2Y2JjNA==", section_id: "U2VjdGlvbjpmZjgzMTcwYWE5ZjQ0NWNmODg3ZWExNzAwNGRjNWQxZA==", card_id: "Q2FyZDpkNGY5YTFhMGE2YTE0NDE4YTI3NzYwMTA5NmFjN2MzMQ==") {
+  getCard(course_id: "Q291cnNlOmludHJvX3RvX3B5dGhvbg==", unit_id: "Q291cnNlVW5pdDpCWEVtZ3ZwaExCQVc=", section_id: "VW5pdFNlY3Rpb246ZkdSbXBSZWN3VGpG", card_id: "U2VjdGlvbkNhcmQ6Y1NXWkhKYUZqUUpM") {
+    id
+    index
     title
+    headline
+    content_id
+    tags
     github_edit_url
+    updated_at
+    content {
+      id
+      version
+      content
+    }
+    question {
+      id
+      question_text
+      question_type
+      hint_exists
+      data {
+        id
+        tmpl_files
+        environment_key
+        use_advanced_features
+        explanation
+        src_files
+        options {
+          id
+          seq
+          text
+        }
+      }
+    }
   }
 }
 ```

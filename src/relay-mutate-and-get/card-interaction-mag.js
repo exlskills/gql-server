@@ -1,9 +1,9 @@
 import { logger } from '../utils/logger';
-import { fetchOneCourseRecord } from '../db-handlers/course/course-fetch';
 import { fetchByUserIdAndCardId } from '../db-handlers/card-interaction-fetch';
 import { fetchCourseItemRefByCourseUnitCardId } from '../db-handlers/course/section-card-fetch';
 import CardInteraction from '../db-models/card-interaction-model';
 import { updateLastAccessedAt } from '../db-handlers/user/user-course-role-cud';
+import { isCardInCache } from '../data-cache/course-structure-cache';
 
 export const processCardInteractionWrapper = (
   course_id,
@@ -88,18 +88,7 @@ const processCardInteraction = async (
             : '';
         logger(` section_id ` + section_id);
       } else {
-        cardRec = await fetchOneCourseRecord(
-          {
-            _id: course_id,
-            'units.Units._id': unit_id,
-            'units.Units.sections.Sections._id': section_id,
-            'units.Units.sections.Sections.cards.Cards._id': card_id
-          },
-          { _id: 1 }
-        );
-        logger.debug(`  cardRec ` + JSON.stringify(cardRec));
-
-        if (!cardRec) {
+        if (!isCardInCache(course_id, unit_id, section_id, card_id)) {
           logger.error(`Card not found: ` + card_id);
           return {
             completionObj: {

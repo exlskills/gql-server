@@ -1,39 +1,44 @@
 import { logger } from '../utils/logger';
 import { basicFind } from '../db-handlers/basic-query-handler';
 import Question, { QUESTION_TYPES } from '../db-models/question-model';
-import { questionCache } from './cache-objects';
+import { cardQuestionCache } from './cache-objects';
 import { sizeof } from '../utils/calc-field-size';
 import { getIntlStringFieldsOfObject } from './misc-cache';
 
-export async function loadCardQuestionCache(question_ids, locales) {
+export async function loadCardQuestionCache(card_id, question_ids, locales) {
   if (!question_ids || question_ids.length < 1) {
-    return;
+    delete cardQuestionCache[card_id];
+    return 0;
   }
 
   logger.debug(`In loadCardQuestionCache`);
 
   let objSize = 0;
 
-  for (let qId of question_ids) {
-    delete questionCache[qId];
-  }
-
   const intlStringFields = ['question_text', 'hint'];
   const intlStringFieldsDataWSCQ = ['src_files', 'tmpl_files', 'explanation'];
   const intlStringFieldsDataMC = ['text', 'explanation'];
 
-  let questionsDbObj = await basicFind(
-    Question,
-    null,
-    { _id: { $in: question_ids } },
-    { _id: 1 },
-    null
-  );
+  let questionsDbObj;
+  try {
+    questionsDbObj = await basicFind(
+      Question,
+      null,
+      { _id: { $in: question_ids } },
+      { _id: 1 },
+      null
+    );
+  } catch (errInternalAlreadyReported) {
+    return;
+  }
 
   if (!questionsDbObj || questionsDbObj.length < 1) {
     logger.error(`questions listed in the card are not found in the DB`);
-    return;
+    delete cardQuestionCache[card_id];
+    return 0;
   }
+
+  const questCache = new Map();
 
   for (let quest of questionsDbObj) {
     quest = quest.toObject();
@@ -56,26 +61,33 @@ export async function loadCardQuestionCache(question_ids, locales) {
     objSize += intlStringFieldsObj.size;
     questObj.locale_data = intlStringFieldsObj.data;
 
-    questObj.data = {};
+    questObj.data = new Map();
     objSize += sizeof('data');
 
     if (quest.question_type === QUESTION_TYPES.WRITE_SOFTWARE_CODE_QUESTION) {
-      questObj.data.api_version = quest.data.api_version;
-      questObj.data.environment_key = quest.data.environment_key;
-      questObj.data.grading_strategy = quest.data.grading_strategy;
-      questObj.data.grading_tests = quest.data.grading_tests;
+      const questDataObj = {
+        api_version: quest.data.api_version,
+        environment_key: quest.data.environment_key,
+        grading_strategy: quest.data.grading_strategy,
+        grading_tests: quest.data.grading_tests
+      };
       const intlStringFieldsDataWSCQObj = getIntlStringFieldsOfObject(
         quest.data,
         intlStringFieldsDataWSCQ,
         locales
       );
       objSize += intlStringFieldsDataWSCQObj.size;
-      questObj.data.locale_data = intlStringFieldsDataWSCQObj.data;
+      questDataObj.locale_data = intlStringFieldsDataWSCQObj.data;
+
+      questObj.data.set(1, questDataObj);
     } else if (
       quest.question_type === QUESTION_TYPES.MULT_CHOICE_SINGLE_ANSWER ||
       quest.question_type === QUESTION_TYPES.MULT_CHOICE_MULT_ANSWERS
     ) {
-      for (let questData of quest.data) {
+      const questLinesSorted = quest.data.sort(
+        (it1, it2) => (it1.seq || 0) - (it2.seq || 0)
+      );
+      for (let questData of questLinesSorted) {
         const questDataObj = {
           seq: questData.seq,
           is_answer: questData.is_answer
@@ -88,12 +100,17 @@ export async function loadCardQuestionCache(question_ids, locales) {
         objSize += intlStringFieldsDataMCObj.size;
         questDataObj.locale_data = intlStringFieldsDataMCObj.data;
 
-        questObj.data[questData._id] = questDataObj;
+        questObj.data.set(questData._id, questDataObj);
       }
     } else {
       logger.error('Unsupported question type ' + quest.question_type);
     }
-    questionCache[quest._id] = questObj;
-    logger.debug(`question cache obj ` + JSON.stringify(questObj));
-  }
+
+    questCache.set(quest._id, questObj);
+    //logger.error(' questObj ' + JSON.stringify(questObj));
+  } // On questions
+
+  cardQuestionCache[card_id] = questCache;
+
+  return objSize;
 }

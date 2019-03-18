@@ -5,6 +5,7 @@ import Course from '../db-models/course-model';
 import { sizeof } from '../utils/calc-field-size';
 import { getIntlStringFieldsOfObject } from './misc-cache';
 import { loadCardQuestionCache } from './question-cache';
+import { loadCardContentCache } from './versioned-content-cache';
 
 export async function loadCourseStructureCache(init_load, courseID) {
   logger.debug(`In loadCourseStructureCache`);
@@ -51,13 +52,18 @@ export async function loadCourseStructureCache(init_load, courseID) {
     };
   }
 
-  let courseDbObj = await basicFind(
-    Course,
-    runParams,
-    queryVal,
-    { _id: 1 },
-    selectVal
-  );
+  let courseDbObj;
+  try {
+    courseDbObj = await basicFind(
+      Course,
+      runParams,
+      queryVal,
+      { _id: 1 },
+      selectVal
+    );
+  } catch (errInternalAlreadyReported) {
+    return;
+  }
 
   if (courseID && courseDbObj) {
     courseDbObj = [courseDbObj];
@@ -188,12 +194,20 @@ export async function loadCourseStructureCache(init_load, courseID) {
                     objSize += sizeof(card[genField]);
                   }
                 }
-                logger.debug(`  loadCourseStructureCache cardObj ` + JSON.stringify(cardObj));
+                logger.debug(
+                  `  loadCourseStructureCache cardObj ` +
+                    JSON.stringify(cardObj)
+                );
                 sectionObj.cards.set(card._id, cardObj);
                 objSize += sizeof(card._id);
 
                 try {
-                  await loadCardQuestionCache(card.question_ids, locales);
+                  const questObjSize = await loadCardQuestionCache(
+                    card._id,
+                    card.question_ids,
+                    locales
+                  );
+                  objSize += questObjSize;
                 } catch (err) {
                   logger.error(
                     `loading question cache for card id ` +
@@ -202,13 +216,30 @@ export async function loadCourseStructureCache(init_load, courseID) {
                       err
                   );
                 }
-
+                try {
+                  const contentObjSize = await loadCardContentCache(
+                    card._id,
+                    card.content_id,
+                    locales
+                  );
+                  objSize += contentObjSize;
+                } catch (err) {
+                  logger.error(
+                    `loading content cache for card id ` + card._id + ': ' + err
+                  );
+                }
               } // On Cards
             } // Has Cards
 
             unitObj.sections.set(section._id, sectionObj);
-            logger.debug(`  loadCourseStructureCache sectionObj ` + JSON.stringify(sectionObj));
-            logger.debug(`  loadCourseStructureCache sectionObj Cards ` + sectionObj.cards.keys());
+            logger.debug(
+              `  loadCourseStructureCache sectionObj ` +
+                JSON.stringify(sectionObj)
+            );
+            logger.debug(
+              `  loadCourseStructureCache sectionObj Cards ` +
+                sectionObj.cards.keys()
+            );
             objSize += sizeof(section._id);
           } // On Sections
         } // Has Sections
@@ -220,12 +251,36 @@ export async function loadCourseStructureCache(init_load, courseID) {
       courseStructureCache[course._id] = courseObj;
     } // On courses
 
-    logger.debug(
-      `  loadCourseStructureCache RESULT ` +
-        JSON.stringify(courseStructureCache.intro_to_python.units.keys())
-    );
     logger.debug(`  loadCourseStructureCache RESULT Size ` + objSize);
   } else {
     logger.debug(`No course records extracted `);
   }
+}
+
+export function isCardInCache(course_id, unit_id, section_id, card_id) {
+  if (
+    isSectionInCache(course_id, unit_id, section_id) &&
+    courseStructureCache[course_id].units.get(unit_id).sections.get(section_id)
+      .cards &&
+    courseStructureCache[course_id].units
+      .get(unit_id)
+      .sections.get(section_id)
+      .cards.get(card_id)
+  ) {
+    return true;
+  }
+  return false;
+}
+
+export function isSectionInCache(course_id, unit_id, section_id) {
+  if (
+    courseStructureCache[course_id] &&
+    courseStructureCache[course_id].units &&
+    courseStructureCache[course_id].units.get(unit_id) &&
+    courseStructureCache[course_id].units.get(unit_id).sections &&
+    courseStructureCache[course_id].units.get(unit_id).sections.get(section_id)
+  ) {
+    return true;
+  }
+  return false;
 }

@@ -520,3 +520,244 @@ export const fetchCourseStructure = async (
   logger.debug('fetchCourseStructure result ' + JSON.stringify(result));
   return result;
 };
+
+export const fetchCoursesCache = async (
+  filterValues,
+  aggregateArray,
+  viewerLocale,
+  fetchParameters
+) => {
+  //logger.debug(`in fetchCoursesCache`);
+  logger.debug(
+    `in fetchCoursesCache Fetch Parameters ` + JSON.stringify(fetchParameters)
+  );
+  let courseFields = {
+    subscription_level: 1,
+    enrolled_count: 1,
+    verified_cert_cost: 1,
+    skill_level: 1,
+    est_minutes: 1,
+    primary_topic: 1,
+    view_count: 1,
+    logo_url: 1,
+    _id: 1,
+    weight: { $ifNull: ['$weight', 0] }
+  };
+  let courseIntlStringFields = {
+    title: 1,
+    headline: 1,
+    description: 1
+  };
+
+  // Default sort is overridden below for specific queries
+  let sort = {
+    $sort: {
+      title: 1
+    }
+  };
+
+  let skip = aggregateArray.find(item => !!item.$skip);
+  let limit = aggregateArray.find(item => !!item.$limit);
+
+  let array = [];
+  let elem;
+
+  if (fetchParameters.courseIds) {
+    elem = {
+      $match: {
+        _id: {
+          $in: fetchParameters.courseIds
+        }
+      }
+    };
+    array.push(elem);
+  }
+
+  if (fetchParameters.userId) {
+    // Pull this User's record
+    elem = { $addFields: { userid: fetchParameters.userId } };
+    array.push(elem);
+
+    elem = {
+      $lookup: {
+        from: 'user',
+        localField: 'userid',
+        foreignField: '_id',
+        as: 'users'
+      }
+    };
+    array.push(elem);
+  }
+
+  if (fetchParameters.mine && fetchParameters.userId) {
+    // Note, we only merge Courses with Users if the userId is provided
+    // Otherwise, the query performance is unacceptable
+    elem = {
+      $unwind: '$users'
+    };
+    array.push(elem);
+
+    elem = {
+      $project: {
+        ...courseIntlStringFields,
+        ...courseFields,
+        'users.course_roles': {
+          $filter: {
+            input: '$users.course_roles',
+            cond: {
+              $eq: ['$$this.course_id', '$_id']
+            }
+          }
+        }
+      }
+    };
+    array.push(elem);
+
+    if (fetchParameters.roles) {
+      // filter courses by specific roles
+      elem = {
+        $match: {
+          'users.course_roles.role': {
+            $elemMatch: {
+              $in: fetchParameters.roles.split(',')
+            }
+          }
+        }
+      };
+    } else {
+      // filter courses to those where the user has any role
+      elem = {
+        $match: {
+          'users.course_roles.course_id': { $exists: true }
+        }
+      };
+    }
+    array.push(elem);
+
+    elem = {
+      $addFields: {
+        last_accessed_at: '$users.course_roles.last_accessed_at'
+      }
+    };
+    array.push(elem);
+
+    courseFields.last_accessed_at = 1;
+
+    sort = {
+      $sort: {
+        last_accessed_at: -1
+      }
+    };
+  }
+
+  if (fetchParameters.relevant) {
+    elem = {
+      $project: {
+        ...courseIntlStringFields,
+        ...courseFields
+      }
+    };
+    array.push(elem);
+
+    sort = {
+      $sort: {
+        weight: -1,
+        title: 1
+      }
+    };
+  }
+
+  if (fetchParameters.trending) {
+    elem = {
+      $project: {
+        ...courseIntlStringFields,
+        ...courseFields
+      }
+    };
+    array.push(elem);
+
+    // TODO - enrolled_count is not maintained, review the logic
+    sort = {
+      $sort: {
+        enrolled_count: -1,
+        title: 1
+      }
+    };
+  }
+
+  if (fetchParameters.topic) {
+    elem = {
+      $match: {
+        topics: fetchParameters.topic
+      }
+    };
+    array.push(elem);
+  }
+
+  if (fetchParameters.primary_topic) {
+    elem = {
+      $match: {
+        primary_topic: fetchParameters.primary_topic
+      }
+    };
+    array.push(elem);
+  }
+
+  elem = {
+    $project: {
+      ...courseFields,
+      'title.intlString': projectionWriter.writeIntlStringFilter(
+        'title',
+        viewerLocale
+      ),
+      'headline.intlString': projectionWriter.writeIntlStringFilter(
+        'headline',
+        viewerLocale
+      ),
+      'description.intlString': projectionWriter.writeIntlStringFilter(
+        'description',
+        viewerLocale
+      )
+    }
+  };
+  array.push(elem);
+
+  elem = {
+    $project: {
+      ...courseFields,
+      title: projectionWriter.writeIntlStringEval('title', viewerLocale),
+      headline: projectionWriter.writeIntlStringEval('headline', viewerLocale),
+      description: projectionWriter.writeIntlStringEval(
+        'description',
+        viewerLocale
+      )
+    }
+  };
+  array.push(elem);
+
+  if (filterValues) {
+    try {
+      const objectFilter = JSON.parse(filterValues.filterValuesString);
+      elem = {
+        $match: objectFilter
+      };
+      array.push(elem);
+
+      sort = {
+        $sort: {
+          title: 1
+        }
+      };
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  }
+
+  if (sort) array.push(sort);
+  if (skip) array.push(skip);
+  if (limit) array.push(limit);
+
+  const result = await Course.aggregate(array).exec();
+  logger.debug(` fetchCourses result ` + JSON.stringify(result));
+  return result;
+};

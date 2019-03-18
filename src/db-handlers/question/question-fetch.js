@@ -284,6 +284,6 @@ export const fetchQuestionsGeneric = async (
     //question.hint = 'get hint';
   }
 
-  logger.debug(`question fetch generic result ` + JSON.stringify(result));
+  logger.debug(`  fetchQuestionsGeneric result ` + JSON.stringify(result));
   return result;
 };

@@ -4,6 +4,13 @@ import * as projectionWriter from '../../utils/projection-writer';
 import { logger } from '../../utils/logger';
 import { fetchQuestionsGeneric } from '../question/question-fetch';
 import { QUESTION_TYPES } from '../../db-models/question-model';
+import {
+  cardContentCache,
+  cardQuestionCache,
+  courseCache,
+  courseStructureCache
+} from '../../data-cache/cache-objects';
+import { isSectionInCache } from '../../data-cache/course-structure-cache';
 
 export const fetchCardDetailsById = async (
   courseId,
@@ -417,7 +424,7 @@ export const fetchSectionCards = async (
 
   delete result.question_ids;
 
-  logger.debug(`result with qs ` + JSON.stringify(result));
+  logger.debug(`  fetchSectionCards result ` + JSON.stringify(result));
 
   return result;
 };
@@ -530,4 +537,239 @@ export const fetchCourseItemRefByCourseUnitCardId = async (
     return null;
   }
   return result.length > 0 ? result[0] : null;
+};
+
+export const fetchSectionCardIDsForUnitCache = async (course_id, unit_id) => {
+  logger.debug(`in fetchSectionCardIDsForUnitCache`);
+
+  const result = { _id: course_id, unit: { sections: { Sections: [] } } };
+
+  if (
+    !courseStructureCache[course_id] ||
+    !courseStructureCache[course_id].units ||
+    !courseStructureCache[course_id].units.get(unit_id)
+  ) {
+    logger.error(
+      `course - unit not in Course Structure cache ` + course_id + ` ` + unit_id
+    );
+    return await fetchSectionCardIDsForUnit(course_id, unit_id);
+  }
+
+  for (let sectionId of courseStructureCache[course_id].units
+    .get(unit_id)
+    .sections.keys()) {
+    const sectionObj = { _id: sectionId, cards: { Cards: [] } };
+
+    for (let cardId of courseStructureCache[course_id].units
+      .get(unit_id)
+      .sections.get(sectionId)
+      .cards.keys()) {
+      const cardObj = {
+        _id: cardId,
+        question_ids: courseStructureCache[course_id].units
+          .get(unit_id)
+          .sections.get(sectionId)
+          .cards.get(cardId).question_ids
+      };
+      sectionObj.cards.Cards.push(cardObj);
+    } // On Cards
+    result.unit.sections.Sections.push(sectionObj);
+  } // On Sections
+
+  logger.debug(
+    `   fetchSectionCardIDsForUnitCache result ` + JSON.stringify(result)
+  );
+  return result;
+};
+
+export const fetchSectionCardsCache = async (
+  filterValues,
+  aggregateArray,
+  viewerLocale,
+  fetchParameters
+) => {
+  logger.debug(`in fetchSectionCardsCache`);
+  logger.debug(`  course_ID ` + fetchParameters.courseId);
+  logger.debug(`  unit_ID ` + fetchParameters.unitId);
+  logger.debug(`  section_ID ` + fetchParameters.sectionId);
+  logger.debug(`  card_ID ` + fetchParameters.cardId);
+
+  if (
+    !isSectionInCache(
+      fetchParameters.courseId,
+      fetchParameters.unitId,
+      fetchParameters.sectionId
+    )
+  ) {
+    logger.error(
+      ` course-unit-section missing from cache ` +
+        fetchParameters.courseId +
+        ` ` +
+        fetchParameters.unitId +
+        ` ` +
+        fetchParameters.sectionId
+    );
+    return await fetchSectionCards(
+      filterValues,
+      aggregateArray,
+      viewerLocale,
+      fetchParameters
+    );
+  }
+
+  try {
+    let result = [];
+
+    let locale = viewerLocale;
+    if (!courseCache[fetchParameters.courseId].locale_data[viewerLocale]) {
+      locale = courseCache[fetchParameters.courseId].default_locale;
+    }
+
+    let skip = aggregateArray.find(item => !!item.$skip);
+    let limit = aggregateArray.find(item => !!item.$limit);
+
+    for (let cardId of courseStructureCache[fetchParameters.courseId].units
+      .get(fetchParameters.unitId)
+      .sections.get(fetchParameters.sectionId)
+      .cards.keys()) {
+      if (fetchParameters.cardId && fetchParameters.cardId !== cardId) {
+        continue;
+      } else if (skip && skip > 0) {
+        skip--;
+        continue;
+      } else if (limit) {
+        if (limit <= 0) {
+          break;
+        }
+        limit--;
+      }
+
+      const cardElem = {
+        currentCourseId: fetchParameters.courseId,
+        currentUnitId: fetchParameters.unitId,
+        currentSectionId: fetchParameters.sectionId,
+        _id: cardId
+      };
+
+      const card = courseStructureCache[fetchParameters.courseId].units
+        .get(fetchParameters.unitId)
+        .sections.get(fetchParameters.sectionId)
+        .cards.get(cardId);
+
+      cardElem.index = card.index;
+      cardElem.tags = card.tags;
+      cardElem.question_ids = card.question_ids;
+      cardElem.github_edit_url = card.github_edit_url;
+      cardElem.updated_at = card.updated_at;
+      cardElem.question_ids = card.question_ids;
+
+      cardElem.title = card.locale_data[locale].title;
+      cardElem.headline = card.locale_data[locale].headline;
+
+      cardElem.content = { _id: card.content_id, version: 0, content: '' };
+
+      if (cardContentCache[cardId]) {
+        if (
+          !fetchParameters.version ||
+          fetchParameters.version === cardContentCache[cardId].latest_version
+        ) {
+          cardElem.content.version = cardContentCache[cardId].latest_version;
+          cardElem.content.content =
+            cardContentCache[cardId].locale_data[locale].content;
+        } else {
+          cardElem.content.version =
+            cardContentCache[cardId].fetchParameters.version;
+          if (
+            cardContentCache[cardId][fetchParameters.version] &&
+            cardContentCache[cardId][fetchParameters.version].locale_data &&
+            cardContentCache[cardId][fetchParameters.version].locale_data[
+              locale
+            ]
+          ) {
+            cardElem.content.content =
+              cardContentCache[cardId][fetchParameters.version].locale_data[
+                locale
+              ].content;
+          }
+        }
+      } else {
+        logger.error(`cardContentCache not loaded for ` + cardId);
+      }
+
+      cardElem.questions = [];
+      if (card.question_ids && card.question_ids.length > 0) {
+        if (cardQuestionCache[cardId]) {
+          for (let questionId of cardQuestionCache[cardId].keys()) {
+            const questCacheElem = cardQuestionCache[cardId].get(questionId);
+            const questionElem = {
+              _id: questionId,
+              question_type: questCacheElem.question_type,
+              course_item_ref: questCacheElem.course_item_ref,
+              hint_exists: false
+            };
+            questionElem.question_text =
+              questCacheElem.locale_data[locale].question_text;
+            if (questCacheElem.locale_data[locale].hint) {
+              questionElem.hint_exists = true;
+            }
+
+            if (
+              questCacheElem.question_type ===
+              QUESTION_TYPES.WRITE_SOFTWARE_CODE_QUESTION
+            ) {
+              questionElem.data = {
+                api_version: questCacheElem.data.get(1).api_version,
+                environment_key: questCacheElem.data.get(1).environment_key,
+                tmpl_files: questCacheElem.data.get(1).locale_data[locale]
+                  .tmpl_files
+              };
+            } else {
+              // This covers MC questions
+              questionElem.data = { _id: questionId, options: [] };
+              for (let optionId of questCacheElem.data.keys()) {
+                const optionCache = questCacheElem.data.get(optionId);
+                const option = {
+                  _id: optionId,
+                  seq: optionCache.seq,
+                  text: optionCache.locale_data[locale].text
+                };
+                questionElem.data.options.push(option);
+              } // On options
+            } // On Q type
+            cardElem.questions.push(questionElem);
+          } // On questions
+
+          // Pick Random Q to show
+          cardElem.question =
+            cardElem.questions[
+              Math.floor(Math.random() * cardElem.questions.length)
+            ];
+        } else {
+          logger.error(`cardQuestionCache not loaded for ` + cardId);
+        }
+      }
+      result.push(cardElem);
+    } // On cards
+
+    logger.debug(`  fetchSectionCardsCache result ` + JSON.stringify(result));
+
+    return result;
+  } catch (err) {
+    logger.error(
+      ` in fetchSectionCardsCache for course-unit-section ` +
+        fetchParameters.courseId +
+        ` ` +
+        fetchParameters.unitId +
+        ` ` +
+        fetchParameters.sectionId +
+        ` ` +
+        err
+    );
+    return await fetchSectionCards(
+      filterValues,
+      aggregateArray,
+      viewerLocale,
+      fetchParameters
+    );
+  }
 };
