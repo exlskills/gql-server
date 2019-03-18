@@ -124,7 +124,7 @@ query listTextMatchingCourseItems {
 ## Question Hint
 ```
 query getQuestionHint {
-   getQuestionHint(resolverArgs: [{param: "question_id", value: ""UXVlc3Rpb246OGIzMTZkNjQ3M2I1NDBhOGI2NTg4YzgxNGY2ZDdiNGI=""}]){
+   getQuestionHint(resolverArgs: [{param: "question_id", value: "UXVlc3Rpb246OGIzMTZkNjQ3M2I1NDBhOGI2NTg4YzgxNGY2ZDdiNGI="}]){
      hint
    }
 }   
@@ -240,6 +240,20 @@ query listActivities {
   }
 }
 ```
+
+## Card By Question
+```
+query getCardByQuestion {
+  getCardByQuestion(question_id: "UXVlc3Rpb246Y1FEYVBHZ0tnRUpFX3FfMA==") {
+    id
+    title
+    headline
+  }
+}
+```
+
+### Question ID format
+`Question:<db id>`
 
 ## startExam
 ```

@@ -165,26 +165,31 @@ export const fetchCardDetailsById = async (
 
 export const fetchCardByQuestionId = async (questionId, viewerLocale) => {
   logger.debug(`in fetchCardByQuestionId`);
-  const question = await QuestionFetch.fetchById(questionId, { doc_ref: 1 });
+  const question = await QuestionFetch.fetchById(questionId, {
+    course_item_ref: 1
+  });
   if (!question) {
+    logger.debug(` question not found `);
     return {};
   }
 
-  const docRefs = question.doc_ref.EmbeddedDocRef.embedded_doc_refs;
-  const course = docRefs.find(item => item.level === 'course');
-  const unit = docRefs.find(item => item.level === 'unit');
-  const section = docRefs.find(item => item.level === 'section');
-  const card = docRefs.find(item => item.level === 'card');
+  //logger.debug(` course_item_ref ` + JSON.stringify(question.course_item_ref));
 
-  if (!course || !unit || !section || !card) {
+  if (
+    !question.course_item_ref.course_id ||
+    !question.course_item_ref.unit_id ||
+    !question.course_item_ref.section_id ||
+    !question.course_item_ref.card_id
+  ) {
+    logger.debug(` not a card-level question `);
     return {};
   }
 
   const result = await fetchCardDetailsById(
-    course.doc_id,
-    unit.doc_id,
-    section.doc_id,
-    card.doc_id,
+    question.course_item_ref.course_id,
+    question.course_item_ref.unit_id,
+    question.course_item_ref.section_id,
+    question.course_item_ref.card_id,
     viewerLocale
   );
   return result;
@@ -447,7 +452,9 @@ export const fetchSectionCardIDsForUnit = async (course_id, unit_id) => {
   });
 
   let result = await Course.aggregate(array).exec();
-  logger.debug(`   fetched cards with question ID ` + JSON.stringify(result));
+  logger.debug(
+    `   fetchSectionCardIDsForUnit result ` + JSON.stringify(result)
+  );
 
   return result[0];
 };

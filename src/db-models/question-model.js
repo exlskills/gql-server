@@ -10,10 +10,6 @@ const QuestionSchema = new mongoose.Schema(
       type: String,
       default: id_gen
     },
-    // TODO - deprecate and remove
-    doc_ref: {
-      type: EmbeddedDocRefSchema
-    },
     tags: {
       type: [String],
       required: true
@@ -59,10 +55,6 @@ const QuestionSchema = new mongoose.Schema(
     timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' }
   }
 );
-
-QuestionSchema.index({
-  'doc_ref.EmbeddedDocRef.embedded_doc_refs.doc_id': 1
-});
 
 export default mongoose.model('Question', QuestionSchema, 'question');
 

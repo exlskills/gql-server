@@ -85,18 +85,14 @@ export const getQuestions = async (
   if (fetchParameters.unitId) {
     elem = {
       $match: {
-        'doc_ref.EmbeddedDocRef.embedded_doc_refs.level': 'unit',
-        'doc_ref.EmbeddedDocRef.embedded_doc_refs.doc_id':
-          fetchParameters.unitId
+        'course_item_ref.unit_id': fetchParameters.unitId
       }
     };
     filterArray.push(elem);
   } else {
     elem = {
       $match: {
-        'doc_ref.EmbeddedDocRef.embedded_doc_refs.level': 'section',
-        'doc_ref.EmbeddedDocRef.embedded_doc_refs.doc_id':
-          fetchParameters.sectionId
+        'course_item_ref.section_id': fetchParameters.sectionId
       }
     };
     filterArray.push(elem);
@@ -111,21 +107,12 @@ export const getQuestions = async (
   );
 
   for (let question of result) {
-    if (
-      question.doc_ref &&
-      question.doc_ref.EmbeddedDocRef &&
-      question.doc_ref.EmbeddedDocRef.embedded_doc_refs
-    ) {
-      const cardRef = question.doc_ref.EmbeddedDocRef.embedded_doc_refs.find(
-        item => item.level === 'card'
-      );
-      if (cardRef) {
-        question.card_id = cardRef.doc_id;
-      }
+    if (question.course_item_ref && question.course_item_ref.card_id) {
+      question.card_id = question.course_item_ref.card_id;
     }
   }
 
-  logger.debug(`getQuestions result ` + JSON.stringify(result));
+  logger.debug(`   getQuestions result ` + JSON.stringify(result));
 
   return result;
 };
@@ -210,7 +197,7 @@ export const fetchQuestionsGeneric = async (
   let elem = {
     $project: {
       sort_sequence: 1,
-      doc_ref: 1,
+      course_item_ref: 1,
       question_type: 1,
       'question_text.intlString': projectionWriter.writeIntlStringFilter(
         'question_text',
@@ -237,7 +224,7 @@ export const fetchQuestionsGeneric = async (
   elem = {
     $project: {
       sort_sequence: 1,
-      doc_ref: 1,
+      course_item_ref: 1,
       question_type: 1,
       question_text: projectionWriter.writeIntlStringEval(
         'question_text',

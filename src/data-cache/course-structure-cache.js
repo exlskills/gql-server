@@ -4,6 +4,7 @@ import { basicFind } from '../db-handlers/basic-query-handler';
 import Course from '../db-models/course-model';
 import { sizeof } from '../utils/calc-field-size';
 import { getIntlStringFieldsOfObject } from './misc-cache';
+import { loadCardQuestionCache } from './question-cache';
 
 export async function loadCourseStructureCache(init_load, courseID) {
   logger.debug(`In loadCourseStructureCache`);
@@ -190,6 +191,18 @@ export async function loadCourseStructureCache(init_load, courseID) {
                 logger.debug(`  loadCourseStructureCache cardObj ` + JSON.stringify(cardObj));
                 sectionObj.cards.set(card._id, cardObj);
                 objSize += sizeof(card._id);
+
+                try {
+                  await loadCardQuestionCache(card.question_ids, locales);
+                } catch (err) {
+                  logger.error(
+                    `loading question cache for card id ` +
+                      card._id +
+                      ': ' +
+                      err
+                  );
+                }
+
               } // On Cards
             } // Has Cards
 
