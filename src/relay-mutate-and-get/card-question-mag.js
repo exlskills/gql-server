@@ -23,9 +23,12 @@ export const processCardQuestionAction = async (
   const received_at = new Date();
 
   try {
+    // Note: as Grading functions apply locale to the raw question structure - get the question from the DB vs. cache
     const question = await QuestionFetch.fetchById(question_id, {
       question_text: 0
     });
+
+    logger.debug(`   question fetched ` + JSON.stringify(question_id));
     if (!question || question.exam_only) {
       return {
         completionObj: {

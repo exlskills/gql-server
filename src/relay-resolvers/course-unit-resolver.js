@@ -13,6 +13,7 @@ import {
 
 export const resolveCourseUnits = (obj, args, viewer, info) => {
   logger.debug(`in -----> resolveCourseUnits`);
+  logger.debug(`in -----> obj ` + JSON.stringify(obj));
   logger.debug(`in -----> resolverArgs ` + JSON.stringify(args.resolverArgs));
   const businessKey = '_id';
   const fetchParameters = {

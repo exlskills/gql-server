@@ -6,7 +6,7 @@ import { fetchQuestionsGeneric } from '../question/question-fetch';
 import { QUESTION_TYPES } from '../../db-models/question-model';
 import {
   cardContentCache,
-  cardQuestionCache,
+  questionCache,
   courseCache,
   courseStructureCache
 } from '../../data-cache/cache-objects';
@@ -696,55 +696,55 @@ export const fetchSectionCardsCache = async (
 
       cardElem.questions = [];
       if (card.question_ids && card.question_ids.length > 0) {
-        if (cardQuestionCache[cardId]) {
-          for (let questionId of cardQuestionCache[cardId].keys()) {
-            const questCacheElem = cardQuestionCache[cardId].get(questionId);
-            const questionElem = {
-              _id: questionId,
-              question_type: questCacheElem.question_type,
-              course_item_ref: questCacheElem.course_item_ref,
-              hint_exists: false
+        for (let questionId of card.question_ids) {
+          const questCacheElem = questionCache[questionId];
+          if (!questCacheElem) {
+            logger.error(`questionCache not loaded for ` + questionId);
+            continue;
+          }
+          const questionElem = {
+            _id: questionId,
+            question_type: questCacheElem.question_type,
+            course_item_ref: questCacheElem.course_item_ref,
+            hint_exists: false
+          };
+          questionElem.question_text =
+            questCacheElem.locale_data[locale].question_text;
+          if (questCacheElem.locale_data[locale].hint) {
+            questionElem.hint_exists = true;
+          }
+
+          if (
+            questCacheElem.question_type ===
+            QUESTION_TYPES.WRITE_SOFTWARE_CODE_QUESTION
+          ) {
+            questionElem.data = {
+              api_version: questCacheElem.data.get(1).api_version,
+              environment_key: questCacheElem.data.get(1).environment_key,
+              tmpl_files: questCacheElem.data.get(1).locale_data[locale]
+                .tmpl_files
             };
-            questionElem.question_text =
-              questCacheElem.locale_data[locale].question_text;
-            if (questCacheElem.locale_data[locale].hint) {
-              questionElem.hint_exists = true;
-            }
-
-            if (
-              questCacheElem.question_type ===
-              QUESTION_TYPES.WRITE_SOFTWARE_CODE_QUESTION
-            ) {
-              questionElem.data = {
-                api_version: questCacheElem.data.get(1).api_version,
-                environment_key: questCacheElem.data.get(1).environment_key,
-                tmpl_files: questCacheElem.data.get(1).locale_data[locale]
-                  .tmpl_files
+          } else {
+            // This covers MC questions
+            questionElem.data = { _id: questionId, options: [] };
+            for (let optionId of questCacheElem.data.keys()) {
+              const optionCache = questCacheElem.data.get(optionId);
+              const option = {
+                _id: optionId,
+                seq: optionCache.seq,
+                text: optionCache.locale_data[locale].text
               };
-            } else {
-              // This covers MC questions
-              questionElem.data = { _id: questionId, options: [] };
-              for (let optionId of questCacheElem.data.keys()) {
-                const optionCache = questCacheElem.data.get(optionId);
-                const option = {
-                  _id: optionId,
-                  seq: optionCache.seq,
-                  text: optionCache.locale_data[locale].text
-                };
-                questionElem.data.options.push(option);
-              } // On options
-            } // On Q type
-            cardElem.questions.push(questionElem);
-          } // On questions
+              questionElem.data.options.push(option);
+            } // On options
+          } // On Q type
+          cardElem.questions.push(questionElem);
+        } // On questions
 
-          // Pick Random Q to show
-          cardElem.question =
-            cardElem.questions[
-              Math.floor(Math.random() * cardElem.questions.length)
-            ];
-        } else {
-          logger.error(`cardQuestionCache not loaded for ` + cardId);
-        }
+        // Pick Random Q to show
+        cardElem.question =
+          cardElem.questions[
+            Math.floor(Math.random() * cardElem.questions.length)
+          ];
       }
       result.push(cardElem);
     } // On cards

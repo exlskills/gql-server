@@ -1,13 +1,12 @@
 import { logger } from '../utils/logger';
 import { basicFind } from '../db-handlers/basic-query-handler';
 import Question, { QUESTION_TYPES } from '../db-models/question-model';
-import { cardQuestionCache } from './cache-objects';
+import { questionCache } from './cache-objects';
 import { sizeof } from '../utils/calc-field-size';
 import { getIntlStringFieldsOfObject } from './misc-cache';
 
 export async function loadCardQuestionCache(card_id, question_ids, locales) {
   if (!question_ids || question_ids.length < 1) {
-    delete cardQuestionCache[card_id];
     return 0;
   }
 
@@ -34,11 +33,8 @@ export async function loadCardQuestionCache(card_id, question_ids, locales) {
 
   if (!questionsDbObj || questionsDbObj.length < 1) {
     logger.error(`questions listed in the card are not found in the DB`);
-    delete cardQuestionCache[card_id];
     return 0;
   }
-
-  const questCache = new Map();
 
   for (let quest of questionsDbObj) {
     quest = quest.toObject();
@@ -106,11 +102,9 @@ export async function loadCardQuestionCache(card_id, question_ids, locales) {
       logger.error('Unsupported question type ' + quest.question_type);
     }
 
-    questCache.set(quest._id, questObj);
+    questionCache[quest._id] = questObj;
     //logger.error(' questObj ' + JSON.stringify(questObj));
   } // On questions
-
-  cardQuestionCache[card_id] = questCache;
 
   return objSize;
 }

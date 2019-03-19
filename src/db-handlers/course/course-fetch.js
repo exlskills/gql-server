@@ -678,7 +678,7 @@ export const fetchCourseAndCardInteractionCache = async (
     return await fetchCourseAndCardInteraction(course_id, viewer, info);
   }
 
-  let courseRecord = { ...courseCache[course_id] };
+  let courseRecord = { _id: course_id, ...courseCache[course_id] };
   delete courseRecord.locale_data;
 
   const locale = getCourseUserLocale(viewer.locale, course_id);

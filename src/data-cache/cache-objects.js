@@ -15,12 +15,11 @@ export const courseStructureCache = {
 };
 
 /*
- *  card_id
- *    questions = map (question_id, content) sorted in the id order so that randomization can be applied to the fixed set
+ *  question_id, content
  *      data = map (data elem id for MC or 1 for WSCQ, content) sorted by s  eq (applies to MC):
  *
  */
-export const cardQuestionCache = {
+export const questionCache = {
   updated_at: new Date('1970-01-01Z00:00:00:000')
 };
 

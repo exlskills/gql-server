@@ -554,6 +554,7 @@ export const fetchCourseUnitsWithDetailedStatusCache = async (
   fetchParameters
 ) => {
   logger.debug(`in fetchCourseUnitsWithDetailedStatusCache`);
+  logger.debug(`     fetchParameters ` + JSON.stringify(fetchParameters));
 
   const courseStructObj = courseStructureCache[fetchParameters.courseId];
   if (!courseStructObj || !courseStructObj.units) {
