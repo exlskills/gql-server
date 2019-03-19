@@ -11,7 +11,7 @@ export async function loadCardQuestionCache(card_id, question_ids, locales) {
     return 0;
   }
 
-  logger.debug(`In loadCardQuestionCache`);
+  //logger.debug(`In loadCardQuestionCache`);
 
   let objSize = 0;
 

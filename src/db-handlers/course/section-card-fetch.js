@@ -11,6 +11,7 @@ import {
   courseStructureCache
 } from '../../data-cache/cache-objects';
 import { isSectionInCache } from '../../data-cache/course-structure-cache';
+import { getCourseUserLocale } from '../../data-cache/course-cache';
 
 export const fetchCardDetailsById = async (
   courseId,
@@ -620,10 +621,7 @@ export const fetchSectionCardsCache = async (
   try {
     let result = [];
 
-    let locale = viewerLocale;
-    if (!courseCache[fetchParameters.courseId].locale_data[viewerLocale]) {
-      locale = courseCache[fetchParameters.courseId].default_locale;
-    }
+    const locale = getCourseUserLocale(viewerLocale, fetchParameters.courseId);
 
     let skip = aggregateArray.find(item => !!item.$skip);
     let limit = aggregateArray.find(item => !!item.$limit);
@@ -634,14 +632,14 @@ export const fetchSectionCardsCache = async (
       .cards.keys()) {
       if (fetchParameters.cardId && fetchParameters.cardId !== cardId) {
         continue;
-      } else if (skip && skip > 0) {
-        skip--;
+      } else if (skip && skip.$skip > 0) {
+        skip.$skip--;
         continue;
       } else if (limit) {
-        if (limit <= 0) {
+        if (limit.$limit <= 0) {
           break;
         }
-        limit--;
+        limit.$limit--;
       }
 
       const cardElem = {

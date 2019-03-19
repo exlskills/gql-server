@@ -14,33 +14,37 @@ export async function loadCourseCache(init_load, courseID) {
   // General fields
   const genFields = [
     'primary_locale',
+    'is_organization_only',
+    'subscription_level',
     'logo_url',
     'cover_url',
     'topics',
     'repo_url',
     'verified_cert_cost',
     'skill_level',
+    'subscription_level',
     'est_minutes',
     'primary_topic',
     'weight',
     'content_updated_at',
-    'static_data_updated_at'
+    'static_data_updated_at',
+    'organization_ids',
+    'instructor_timekit'
   ];
 
   // Locale-specific fields
-  const localeFields = ['title', 'headline', 'description'];
+  const localeFields = ['title', 'headline', 'description', 'info_md'];
+
+  // Init with 0
+  const initFields = ['enrolled_count', 'view_count'];
 
   const extractedAt = new Date();
 
   // Excluded fields
   const selectVal = {
-    is_organization_only: 0,
-    subscription_level: 0,
     view_count: 0,
     enrolled_count: 0,
-    units: 0,
-    organization_ids: 0,
-    instructor_timekit: 0
+    units: 0
   };
   let runParams = null;
   let queryVal = null;
@@ -89,6 +93,11 @@ export async function loadCourseCache(init_load, courseID) {
           // logger.debug(`course[genField] ` + JSON.stringify(course[genField]));
           objSize += sizeof(course[genField]);
         }
+      }
+      for (let initField of initFields) {
+        objSize += sizeof(initField);
+        oneCourseDataCache[initField] = 0;
+        objSize += sizeof(course[initField]);
       }
       oneCourseDataCache['locale_data'] = {};
       objSize += sizeof('locale_data');
@@ -207,4 +216,12 @@ export async function loadCourseDeliveryCache(init_load, recordID) {
   } else {
     logger.debug(`No course delivery records extracted `);
   }
+}
+
+export function getCourseUserLocale(viewerLocale, courseId) {
+  logger.debug(`in getCourseUserLocale ` + viewerLocale + ` ` + courseId);
+  if (courseCache[courseId].locale_data[viewerLocale]) {
+    return viewerLocale;
+  }
+  return courseCache[courseId].default_locale;
 }

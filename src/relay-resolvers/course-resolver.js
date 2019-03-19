@@ -4,7 +4,9 @@ import {
 } from '../paging-processor/connection-from-datasource';
 import {
   fetchCourses,
-  fetchCourseAndCardInteraction
+  fetchCourseAndCardInteraction,
+  fetchCoursesCache,
+  fetchCourseAndCardInteractionCache
 } from '../db-handlers/course/course-fetch';
 import { fromGlobalId, toGlobalId } from 'graphql-relay';
 import { logger } from '../utils/logger';
@@ -63,14 +65,16 @@ export const resolveListCourses = async (obj, args, viewer, info) => {
       fetchParameters.topic = topicType.value;
     }
 
-    const primaryTopicType = args.resolverArgs.find(e => e.param === 'primary_topic');
+    const primaryTopicType = args.resolverArgs.find(
+      e => e.param === 'primary_topic'
+    );
     if (primaryTopicType) {
       fetchParameters.primary_topic = primaryTopicType.value;
     }
   }
 
   const execDetails = {
-    queryFunction: fetchCourses,
+    queryFunction: fetchCoursesCache,
     businessKey: businessKey,
     fetchParameters: fetchParameters
   };
@@ -84,7 +88,11 @@ export const resolveCourseById = async (obj, args, viewer, info) => {
   logger.debug(`   args ` + JSON.stringify(args));
   try {
     let course_id = fromGlobalId(args.course_id).id;
-    let result = await fetchCourseAndCardInteraction(course_id, viewer, info);
+    let result = await fetchCourseAndCardInteractionCache(
+      course_id,
+      viewer,
+      info
+    );
 
     if (result && result.last_accessed_unit) {
       result.last_accessed_unit = toGlobalId(

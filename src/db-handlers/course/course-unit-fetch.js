@@ -14,6 +14,7 @@ import {
   courseCache,
   courseStructureCache
 } from '../../data-cache/cache-objects';
+import { getCourseUserLocale } from '../../data-cache/course-cache';
 
 export const fetchByCourseAndUnitId = async (
   course_id,
@@ -320,37 +321,68 @@ export const fetchUserCourseUnitExamStatus = async (
   logger.debug(`   viewerLocale ` + viewerLocale);
   logger.debug(`   fetchParameters ` + JSON.stringify(fetchParameters));
 
-  let array = [];
-  let selectFields = {};
+  let result = [];
+  if (
+    !courseStructureCache[fetchParameters.courseId] ||
+    !courseStructureCache[fetchParameters.courseId].units
+  ) {
+    logger.error(
+      `course not in Course Structure cache ` + fetchParameters.courseId
+    );
 
-  // Find the course
-  array.push({ $match: { _id: fetchParameters.courseId } });
-  array.push({ $unwind: '$units.Units' });
-  array.push({ $addFields: { 'units.Units.currentCourseId': '$_id' } });
-  array.push({ $replaceRoot: { newRoot: '$units.Units' } });
+    let array = [];
+    let selectFields = {};
 
-  selectFields.currentCourseId = 1;
-  selectFields.final_exam_weight_pct = 1;
-  selectFields.attempts_allowed_per_day = 1;
+    // Find the course
+    array.push({ $match: { _id: fetchParameters.courseId } });
+    array.push({ $unwind: '$units.Units' });
+    array.push({ $addFields: { 'units.Units.currentCourseId': '$_id' } });
+    array.push({ $replaceRoot: { newRoot: '$units.Units' } });
 
-  array.push({
-    $project: {
-      ...selectFields,
-      'title.intlString': projectionWriter.writeIntlStringFilter(
-        'title',
-        viewerLocale
-      )
-    }
-  });
-  array.push({
-    $project: {
-      ...selectFields,
-      title: projectionWriter.writeIntlStringEval('title', viewerLocale)
-    }
-  });
-  selectFields.title = 1;
+    selectFields.currentCourseId = 1;
+    selectFields.final_exam_weight_pct = 1;
+    selectFields.attempts_allowed_per_day = 1;
 
-  const result = await Course.aggregate(array).exec();
+    array.push({
+      $project: {
+        ...selectFields,
+        'title.intlString': projectionWriter.writeIntlStringFilter(
+          'title',
+          viewerLocale
+        )
+      }
+    });
+    array.push({
+      $project: {
+        ...selectFields,
+        title: projectionWriter.writeIntlStringEval('title', viewerLocale)
+      }
+    });
+    selectFields.title = 1;
+
+    result = await Course.aggregate(array).exec();
+  } else {
+    // Get from Cache
+    const locale = getCourseUserLocale(viewerLocale, fetchParameters.courseId);
+    for (let unitId of courseStructureCache[
+      fetchParameters.courseId
+    ].units.keys()) {
+      const unitObj = {
+        _id: unitId,
+        final_exam_weight_pct: courseStructureCache[
+          fetchParameters.courseId
+        ].units.get(unitId).final_exam_weight_pct,
+        attempts_allowed_per_day: courseStructureCache[
+          fetchParameters.courseId
+        ].units.get(unitId).attempts_allowed_per_day,
+        currentCourseId: fetchParameters.courseId,
+        title: courseStructureCache[fetchParameters.courseId].units.get(unitId)
+          .locale_data[locale].title
+      };
+      result.push(unitObj);
+    } // On Units
+  }
+
   logger.debug(
     `fetchUserCourseUnitExamStatus Course-Unit fetch result ` +
       JSON.stringify(result)
@@ -537,10 +569,7 @@ export const fetchCourseUnitsWithDetailedStatusCache = async (
     return [];
   }
 
-  let locale = viewerLocale;
-  if (!courseObj.locale_data[viewerLocale]) {
-    locale = courseObj.default_locale;
-  }
+  const locale = getCourseUserLocale(viewerLocale, fetchParameters.courseId);
 
   const userId = fetchParameters.userId;
 

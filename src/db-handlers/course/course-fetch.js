@@ -9,6 +9,9 @@ import {
   getLastAccessedCourseItemForUser
 } from '../card-interaction-fetch';
 import { computeQuestionsEMA } from '../question/question-interaction-fetch';
+import { getUserCoursesAndRoles } from '../user/user-course-role-fetch';
+import { courseCache } from '../../data-cache/cache-objects';
+import { getCourseUserLocale } from '../../data-cache/course-cache';
 
 export const fetchById = async (obj_id, selectVal, viewer, info) => {
   logger.debug(`in Course fetchById`);
@@ -531,233 +534,170 @@ export const fetchCoursesCache = async (
   logger.debug(
     `in fetchCoursesCache Fetch Parameters ` + JSON.stringify(fetchParameters)
   );
-  let courseFields = {
-    subscription_level: 1,
-    enrolled_count: 1,
-    verified_cert_cost: 1,
-    skill_level: 1,
-    est_minutes: 1,
-    primary_topic: 1,
-    view_count: 1,
-    logo_url: 1,
-    _id: 1,
-    weight: { $ifNull: ['$weight', 0] }
-  };
-  let courseIntlStringFields = {
-    title: 1,
-    headline: 1,
-    description: 1
-  };
-
-  // Default sort is overridden below for specific queries
-  let sort = {
-    $sort: {
-      title: 1
-    }
-  };
+  logger.debug(
+    `in fetchCoursesCache Aggregate Array ` + JSON.stringify(aggregateArray)
+  );
 
   let skip = aggregateArray.find(item => !!item.$skip);
   let limit = aggregateArray.find(item => !!item.$limit);
+  logger.debug(` limit ` + JSON.stringify(limit));
 
-  let array = [];
-  let elem;
+  let result = [];
 
+  let courseScopeArray = [];
+  let userScopeArray = [];
   if (fetchParameters.courseIds) {
-    elem = {
-      $match: {
-        _id: {
-          $in: fetchParameters.courseIds
-        }
-      }
-    };
-    array.push(elem);
+    courseScopeArray = fetchParameters.courseIds;
+  }
+  if (fetchParameters.mine && fetchParameters.userId) {
+    const rolesArray = fetchParameters.roles
+      ? fetchParameters.roles.split(',')
+      : [];
+    userScopeArray = await getUserCoursesAndRoles(
+      fetchParameters.userId,
+      fetchParameters.courseIds,
+      rolesArray
+    );
+    if (userScopeArray.length < 1) {
+      logger.debug(` fetchCoursesCache result - no matching User/Role records`);
+      return [];
+    }
+    for (let userScopeRec of userScopeArray) {
+      courseScopeArray.push(userScopeRec.course_id);
+    }
   }
 
-  if (fetchParameters.userId) {
-    // Pull this User's record
-    elem = { $addFields: { userid: fetchParameters.userId } };
-    array.push(elem);
+  for (let courseId of Object.keys(courseCache)) {
+    logger.debug(`courseCache key ` + courseId);
+    if (courseId === 'updated_at') {
+      continue;
+    }
+    if (courseScopeArray.length > 0 && !courseScopeArray.includes(courseId)) {
+      continue;
+    }
+    if (
+      fetchParameters.primary_topic &&
+      courseCache[courseId].primary_topic !== fetchParameters.primary_topic
+    ) {
+      continue;
+    }
+    if (
+      fetchParameters.topic &&
+      !courseCache[courseId].topics.includes(fetchParameters.topic)
+    ) {
+      continue;
+    }
 
-    elem = {
-      $lookup: {
-        from: 'user',
-        localField: 'userid',
-        foreignField: '_id',
-        as: 'users'
-      }
+    const outputObj = {
+      _id: courseId,
+      subscription_level: courseCache[courseId].subscription_level,
+      skill_level: courseCache[courseId].skill_level,
+      primary_topic: courseCache[courseId].primary_topic,
+      est_minutes: courseCache[courseId].est_minutes,
+      logo_url: courseCache[courseId].logo_url,
+      verified_cert_cost: courseCache[courseId].verified_cert_cost,
+      weight: courseCache[courseId].weight ? courseCache[courseId].weight : 0
     };
-    array.push(elem);
+
+    // TODO Future
+    outputObj.view_count = 0;
+    outputObj.enrolled_count = 0;
+
+    const locale = getCourseUserLocale(viewerLocale, courseId);
+    outputObj.title = courseCache[courseId].locale_data[locale].title;
+    outputObj.headline = courseCache[courseId].locale_data[locale].headline;
+    outputObj.description =
+      courseCache[courseId].locale_data[locale].description;
+
+    if (userScopeArray.length > 0) {
+      const userRec = userScopeArray.find(e => e.course_id === courseId);
+      outputObj.last_accessed_at = userRec.last_accessed_at;
+    }
+
+    logger.debug(` outputObj ` + JSON.stringify(outputObj));
+    result.push(outputObj);
   }
 
   if (fetchParameters.mine && fetchParameters.userId) {
-    // Note, we only merge Courses with Users if the userId is provided
-    // Otherwise, the query performance is unacceptable
-    elem = {
-      $unwind: '$users'
-    };
-    array.push(elem);
-
-    elem = {
-      $project: {
-        ...courseIntlStringFields,
-        ...courseFields,
-        'users.course_roles': {
-          $filter: {
-            input: '$users.course_roles',
-            cond: {
-              $eq: ['$$this.course_id', '$_id']
-            }
-          }
-        }
-      }
-    };
-    array.push(elem);
-
-    if (fetchParameters.roles) {
-      // filter courses by specific roles
-      elem = {
-        $match: {
-          'users.course_roles.role': {
-            $elemMatch: {
-              $in: fetchParameters.roles.split(',')
-            }
-          }
-        }
-      };
-    } else {
-      // filter courses to those where the user has any role
-      elem = {
-        $match: {
-          'users.course_roles.course_id': { $exists: true }
-        }
-      };
-    }
-    array.push(elem);
-
-    elem = {
-      $addFields: {
-        last_accessed_at: '$users.course_roles.last_accessed_at'
-      }
-    };
-    array.push(elem);
-
-    courseFields.last_accessed_at = 1;
-
-    sort = {
-      $sort: {
-        last_accessed_at: -1
-      }
-    };
+    result.sort(
+      (a, b) => b.last_accessed_at.getTime() - a.last_accessed_at.getTime()
+    );
   }
 
+  // Note: in current logic, each sort overrides those above
   if (fetchParameters.relevant) {
-    elem = {
-      $project: {
-        ...courseIntlStringFields,
-        ...courseFields
+    result.sort((a, b) => {
+      if (b.weight === a.weight) {
+        return a.title.localeCompare(b.title);
       }
-    };
-    array.push(elem);
-
-    sort = {
-      $sort: {
-        weight: -1,
-        title: 1
-      }
-    };
+      return b.weight - a.weight;
+    });
   }
 
+  // TODO - enrolled_count is not maintained, review the logic
   if (fetchParameters.trending) {
-    elem = {
-      $project: {
-        ...courseIntlStringFields,
-        ...courseFields
+    result.sort((a, b) => {
+      if (b.enrolled_count === a.enrolled_count) {
+        return a.title.localeCompare(b.title);
       }
-    };
-    array.push(elem);
-
-    // TODO - enrolled_count is not maintained, review the logic
-    sort = {
-      $sort: {
-        enrolled_count: -1,
-        title: 1
-      }
-    };
+      return b.enrolled_count - a.enrolled_count;
+    });
   }
 
-  if (fetchParameters.topic) {
-    elem = {
-      $match: {
-        topics: fetchParameters.topic
-      }
-    };
-    array.push(elem);
-  }
-
-  if (fetchParameters.primary_topic) {
-    elem = {
-      $match: {
-        primary_topic: fetchParameters.primary_topic
-      }
-    };
-    array.push(elem);
-  }
-
-  elem = {
-    $project: {
-      ...courseFields,
-      'title.intlString': projectionWriter.writeIntlStringFilter(
-        'title',
-        viewerLocale
-      ),
-      'headline.intlString': projectionWriter.writeIntlStringFilter(
-        'headline',
-        viewerLocale
-      ),
-      'description.intlString': projectionWriter.writeIntlStringFilter(
-        'description',
-        viewerLocale
-      )
-    }
-  };
-  array.push(elem);
-
-  elem = {
-    $project: {
-      ...courseFields,
-      title: projectionWriter.writeIntlStringEval('title', viewerLocale),
-      headline: projectionWriter.writeIntlStringEval('headline', viewerLocale),
-      description: projectionWriter.writeIntlStringEval(
-        'description',
-        viewerLocale
-      )
-    }
-  };
-  array.push(elem);
-
-  if (filterValues) {
-    try {
-      const objectFilter = JSON.parse(filterValues.filterValuesString);
-      elem = {
-        $match: objectFilter
-      };
-      array.push(elem);
-
-      sort = {
-        $sort: {
-          title: 1
-        }
-      };
-    } catch (error) {
-      return Promise.reject(error);
+  if (skip) {
+    const skipVal = skip.$skip;
+    if (skipVal >= result.length) {
+      result = [];
+    } else {
+      result = result.slice(skipVal);
     }
   }
 
-  if (sort) array.push(sort);
-  if (skip) array.push(skip);
-  if (limit) array.push(limit);
+  if (limit) {
+    const limitVal = limit.$limit;
+    if (limitVal < result.length) {
+      result = result.slice(0, limitVal);
+    }
+  }
 
-  const result = await Course.aggregate(array).exec();
-  logger.debug(` fetchCourses result ` + JSON.stringify(result));
+  logger.debug(` fetchCoursesCache result ` + JSON.stringify(result));
   return result;
+};
+
+export const fetchCourseAndCardInteractionCache = async (
+  course_id,
+  viewer,
+  info
+) => {
+  logger.debug(`in fetchCourseAndCardInteractionCache`);
+  logger.debug(`   course_id ` + course_id);
+  logger.debug(`   user_id ` + viewer.user_id);
+
+  if (!courseCache[course_id]) {
+    logger.error(`Course is not in cache ` + course_id);
+    return await fetchCourseAndCardInteraction(course_id, viewer, info);
+  }
+
+  let courseRecord = { ...courseCache[course_id] };
+  delete courseRecord.locale_data;
+
+  const locale = getCourseUserLocale(viewer.locale, course_id);
+
+  courseRecord.title = courseCache[course_id].locale_data[locale].title;
+  courseRecord.headline = courseCache[course_id].locale_data[locale].headline;
+  courseRecord.description =
+    courseCache[course_id].locale_data[locale].description;
+  courseRecord.info_md = courseCache[course_id].locale_data[locale].info_md;
+
+  const lastAccessedObj = await getLastAccessedCourseItemForUser(
+    viewer.user_id,
+    course_id
+  );
+
+  courseRecord = { ...courseRecord, ...lastAccessedObj };
+  logger.debug(
+    `    fetchCourseAndCardInteractionCache result ` +
+      JSON.stringify(courseRecord)
+  );
+  return courseRecord;
 };

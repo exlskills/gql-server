@@ -7,7 +7,10 @@ export const getUserCoursesAndRoles = async (
   course_id,
   roleArrayObj
 ) => {
-  logger.debug(`in getUserCoursesAndRoles`);
+  logger.debug(`in getUserCoursesAndRoles `);
+  logger.debug(`in getUserCoursesAndRoles user_id ` + user_id);
+  logger.debug(`in getUserCoursesAndRoles course_id ` + course_id);
+  logger.debug(`in getUserCoursesAndRoles roleArrayObj ` + roleArrayObj);
   if (!user_id) {
     return [];
   }
@@ -23,14 +26,19 @@ export const getUserCoursesAndRoles = async (
     return [];
   }
 
+  //logger.debug(` getUserCoursesAndRoles userObj ` + JSON.stringify(userObj));
+
   for (let userCourse of userObj.course_roles) {
+    //logger.debug(`  userCourse ` + JSON.stringify(userCourse));
     if (result.find(e => e.course_id === userCourse.course_id)) {
+      //logger.debug(`skip double`);
       continue;
     }
     if (course_id && userCourse.course_id !== course_id) {
+      //logger.debug(`course ID mismatch`);
       continue;
     }
-    if (roleArrayObj) {
+    if (roleArrayObj && roleArrayObj.length > 0) {
       let roleInList = false;
       for (let role of roleArrayObj) {
         if (userCourse.role.includes(role)) {
@@ -39,6 +47,7 @@ export const getUserCoursesAndRoles = async (
         }
       }
       if (!roleInList) {
+        //logger.debug(`role mismatch`);
         continue;
       }
     }

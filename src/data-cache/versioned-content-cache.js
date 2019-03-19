@@ -11,7 +11,7 @@ export async function loadCardContentCache(card_id, content_id, locales) {
     return 0;
   }
 
-  logger.debug(`In loadCardContentCache`);
+  //logger.debug(`In loadCardContentCache`);
 
   let objSize = 0;
 

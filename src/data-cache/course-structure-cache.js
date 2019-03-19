@@ -194,10 +194,12 @@ export async function loadCourseStructureCache(init_load, courseID) {
                     objSize += sizeof(card[genField]);
                   }
                 }
+                /*
                 logger.debug(
                   `  loadCourseStructureCache cardObj ` +
                     JSON.stringify(cardObj)
                 );
+                */
                 sectionObj.cards.set(card._id, cardObj);
                 objSize += sizeof(card._id);
 
@@ -232,6 +234,7 @@ export async function loadCourseStructureCache(init_load, courseID) {
             } // Has Cards
 
             unitObj.sections.set(section._id, sectionObj);
+            /*
             logger.debug(
               `  loadCourseStructureCache sectionObj ` +
                 JSON.stringify(sectionObj)
@@ -240,6 +243,7 @@ export async function loadCourseStructureCache(init_load, courseID) {
               `  loadCourseStructureCache sectionObj Cards ` +
                 sectionObj.cards.keys()
             );
+            */
             objSize += sizeof(section._id);
           } // On Sections
         } // Has Sections
