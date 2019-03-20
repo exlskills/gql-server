@@ -71,8 +71,15 @@ export const sizeof = object => {
     case '[object Object]':
       //logger.debug(`object Object ` + object);
       return sizeOfObject(object);
+    case '[object Undefined]':
+      return 0;
     default:
-      logger.debug(`default objectType ` + objectType);
+      logger.debug(
+        `calc field size - unknown objectType ` +
+          objectType +
+          ` object ` +
+          JSON.stringify(object)
+      );
       return 0;
   }
 };
