@@ -610,8 +610,11 @@ export const fetchCoursesCache = async (
       courseCache[courseId].locale_data[locale].description;
 
     if (userScopeArray.length > 0) {
+      // TODO @svarlamov added reasonable default, but needs to be revisted (to prevent earlier 500 errors)
       const userRec = userScopeArray.find(e => e.course_id === courseId);
-      outputObj.last_accessed_at = userRec.last_accessed_at;
+      outputObj.last_accessed_at = userRec.last_accessed_at
+        ? userRec.last_accessed_at
+        : new Date();
     }
 
     logger.debug(` outputObj ` + JSON.stringify(outputObj));
