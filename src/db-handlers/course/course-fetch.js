@@ -610,11 +610,12 @@ export const fetchCoursesCache = async (
       courseCache[courseId].locale_data[locale].description;
 
     if (userScopeArray.length > 0) {
-      // TODO @svarlamov added reasonable default, but needs to be revisted (to prevent earlier 500 errors)
       const userRec = userScopeArray.find(e => e.course_id === courseId);
+      // Catch-all default to "never accessed"
+      // last_accessed_at should always be populated in getUserCoursesAndRoles
       outputObj.last_accessed_at = userRec.last_accessed_at
         ? userRec.last_accessed_at
-        : new Date();
+        : new Date('2000-01-01T00:00:00');
     }
 
     logger.debug(` outputObj ` + JSON.stringify(outputObj));

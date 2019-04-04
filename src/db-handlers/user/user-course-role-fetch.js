@@ -53,7 +53,9 @@ export const getUserCoursesAndRoles = async (
     }
     result.push({
       course_id: userCourse.course_id,
-      last_accessed_at: userCourse.last_accessed_at,
+      last_accessed_at: userCourse.last_accessed_at
+        ? userCourse.last_accessed_at
+        : userCourse.updated_at,
       role: userCourse.role
     });
   }
